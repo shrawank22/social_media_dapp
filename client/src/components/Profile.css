@@ -1,0 +1,71 @@
+/* CommonCSS.css */
+
+.feed {
+    flex: 0.5;
+    border-right: 1px solid var(--twitter-background);
+    min-width: fit-content;
+    overflow-y: scroll;
+}
+
+.feed::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge, and Firefox */
+.feed {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.feed > h2 {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/* Profile Section */
+.profile-info {
+    flex: 1;
+    padding: 10px;
+    background-color: #fff;
+    border-bottom: 3px solid var(--app-background);
+}
+
+.cover-image {
+    width: 100%;
+    height: 180px;
+    background-size: cover;
+    /* background-position: center; */
+}
+
+.profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-top: -50px;
+    border: 3px solid #fff;
+}
+
+h3 {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+/* User Posts Section */
+.user-posts {
+    padding: 20px;
+}
+
+.user-posts h3 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.user-posts ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.user-posts li {
+    border-bottom: 1px solid var(--twitter-background);
+    padding: 10px 0;
+}
