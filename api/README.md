@@ -1,1 +1,0 @@
-## Portfolio and blogging application 
