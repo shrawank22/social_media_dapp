@@ -1,8 +1,8 @@
-const mongoose = require("mongoose")
+const mongoose = require('mongoose')
 
-var postSchema = new mongoose.Schema({
-    content: String,
-    viewPrice: { type: Number, default: 0 },
+const {Schema, model} = mongoose;
+
+const postSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
     creator: {
         id: {
@@ -19,4 +19,4 @@ var postSchema = new mongoose.Schema({
     ]
 });
 
-module.exports = mongoose.model("Post", postSchema);
+module.exports = model("Todo", postSchema)

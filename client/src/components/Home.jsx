@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
-import './CommonCSS.css';
 
 import PostContainer from './PostContainer';
-import FlipMove from 'react-flip-move'
 import Post from './Post';
 import axios from 'axios';
 
@@ -64,7 +62,7 @@ const Home = ({ state }) => {
 
 
     return (
-        <div className="feed">
+        <>
             <div className="feed-header">
                 <h2>Home</h2>
             </div>
@@ -74,22 +72,20 @@ const Home = ({ state }) => {
                 <div>Loading...</div> // Loading indicator
             ) : (
                 <>
-                    <FlipMove>
-                        {posts.map((post) => (
-                            // console.log(post.username, address)  // giving undefined don't know why
-                            <Post
-                                key={post[0]}
-                                displayName={post[1]}
-                                text={post.postText.text}
-                                price={Number(post.postText.viewPrice) / 100}
-                                onClick={deletePost(post[0])}
-                                isCreator={address === post.username}
-                            />
-                        ))}
-                    </FlipMove>
+                    {posts.map((post) => (
+                        // console.log(post.username, address)  // giving undefined don't know why
+                        <Post
+                            key={post[0]}
+                            displayName={post[1]}
+                            text={post.postText.text}
+                            price={Number(post.postText.viewPrice) / 100}
+                            onClick={deletePost(post[0])}
+                            isCreator={address === post.username}
+                        />
+                    ))}
                 </>
             )}
-        </div>
+        </>
     );
 }
 

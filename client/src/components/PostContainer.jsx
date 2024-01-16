@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./PostContainer.css";
-import { Button } from "@material-ui/core";
 import axios from "axios";
 
 
-function PostContainer({state}) {
-    const {contract, address, signer, provider} = state;
+function PostContainer({ state }) {
+    const { contract, address, signer, provider } = state;
 
     const [postText, setPostText] = useState('');
     const [isPaid, setIsPaid] = useState('');
@@ -70,42 +69,45 @@ function PostContainer({state}) {
     }
 
     return (
-        <div className="postContainer">
-            <form key={formKey}>
-                <div className="content">
-                    <div className="customAvatar">
-                        <img
-                            src="https://qph.cf2.quoracdn.net/main-thumb-401012302-200-qjrtpkfzscqeqnoirkesayialmrsiejk.jpeg"
-                            alt="Custom Avatar"
-                            style={{ width: '100px', height: '100px', marginRight: '10px', borderRadius: '50%' }}
-                        />
-                    </div>
-
+        <form key={formKey}>
+            <div className="row">
+                <div className="col-md-9">
                     <textarea
                         onChange={updatePostText}
                         placeholder="What's happening?"
                         required
                     />
-                    <div className="inputRow">
-                        <select onChange={updateIsPaid} className="input" required>
-                            <option value="">Paid?</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                        </select>
-                        <input
-                            onChange={updateViewPrice}
-                            type="text"
-                            placeholder="View Price"
-                            className="input"
-                            required
-                            value={viewPrice}
-                            disabled={!isPaid} // Enable when isPaid is true
-                        />
+                </div>
+
+                <div className="col-md-3">
+                    <div className="row">
+                        <div className="col-sm-6">
+                            <select className="form-control" onChange={updateIsPaid} required>
+                                <option value="">Paid?</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+
+                        <div className="col-sm-6">
+                            <input
+                                onChange={updateViewPrice}
+                                type="number"
+                                min={0}
+                                className="form-control"
+                                placeholder="Price"
+                                required
+                                value={viewPrice}
+                                disabled={!isPaid} // Enable when isPaid is true
+                            />
+                        </div>
+
+                        <div className="col-sm-12">Some Info Regarding view price and all</div>
                     </div>
                 </div>
-                <Button className="postBtn" type="submit" onClick={(e) => addPostHandler(e)}>Post</Button>
-            </form>
-        </div>
+            </div>
+            <button className="btn btn-primary btn-lg mt-2" type="submit" onClick={(e) => addPostHandler(e)}>Post</button>
+        </form>
     );
 }
 

@@ -1,35 +1,31 @@
-const Blog = require('../src/models/Blog');
+const middlewareObj = {};
+const Post = require('../src/models/Post')
 
-var middlewareObj = {};
 
-middlewareObj.checkBlogOwnership = function(req, res, next){
+middlewareObj.checkPostOwnership = async(req, res, next) => {
 	if(req.isAuthenticated()){
-		Blog.findById(req.params.id, (err, blog)=>{
-			if(err || !blog){
-				req.flash("error", 'Sorry, that blog does not exist!');
-				res.redirect('back');
-			} else {
-				//console.log(blog);
-				if(blog.author.id.equals(req.user._id)){
-					next();
-				} else {
-					req.flash('error', 'You are not allowed to do that');
-					res.redirect('back');
-				}
-			}
-		})
+        try {
+		    const post = await Post.findById(req.params.id);
+            // console.log(post);
+            if (post.author.id.equals(req.user._id)) {
+                return next();
+            } else {
+                return res.status(401).send("You need to be logged in to do that!");
+            }
+        } catch(err) {
+            return res.status(404).send(err)
+        }
 	} else {
-		req.flash('error', 'You need to be logged in to do that!');
-		res.redirect('/login');
+        return res.status(401).send("You need to be logged in to do that!");
 	}
 }
 
-middlewareObj.isLoggedIn = function (req, res, next){
+
+middlewareObj.isLoggedIn = (req, res, next) => {
     if(req.isAuthenticated()){
         return next();
     }
-	req.flash("error", "You need to be logged in to do that");
-    res.redirect('/login');
+    return res.status(401).send("You need to be logged in to do that!");
 }
 
 module.exports = middlewareObj;

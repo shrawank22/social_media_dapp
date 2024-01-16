@@ -1,60 +1,14 @@
-.postContainer {
-    padding-bottom: 10px;
-    border-bottom: 8px solid var(--app-background);
-    padding-right: 10px;
-}
-
-.postContainer > form {
-    display: flex;
-    flex-direction: column;
-}
-
-.content {
-    display: flex;
-    align-items: flex-start; 
-}
-    
-.content textarea {
-    width: 460px;
-    height: 100px;
-    border-radius: 5px;
+textarea {
     padding: 10px;
+    width: 100%;
+    height: 150px;
+    border-radius: 5px;
     border: none;
-    margin-left: 20px;
-    font-size: 20px;
+    background-color: #e9ecef;
 }
 
 textarea:focus {
     outline: none !important
-}
-
-.inputRow {
-    width: 110px;
-    display: flex;
-    flex-direction: column;
-    margin: 10px; 
-}
-
-.input {
-    padding: 6px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    margin-top: 10px;
-}
-
-  
-.postBtn {
-    background-color: var(--app-color) !important;
-    border: none !important;
-    color: white !important;
-    font-weight: 900 !important;
-    text-transform: inherit !important;
-    border-radius: 30px !important;
-    width: 80px;
-    height: 40px !important;
-    margin-top: 20px !important;
-    margin-left: auto !important;
 }
 
 

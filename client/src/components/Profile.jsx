@@ -1,19 +1,3 @@
-// import './CommonCSS.css';
-
-
-// const Profile = () => {
-//     return (
-//         <div className="feed">
-//             <div className="feed-header">
-//                 <h2>Profile</h2>
-//             </div>
-//         </div>
-//     );
-// }
-
-// export default Profile
-
-import React from 'react';
 import './Profile.css';
 
 const Profile = () => {
