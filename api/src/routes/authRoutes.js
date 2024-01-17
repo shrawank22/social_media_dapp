@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const passport = require('passport');
-const middleware = require('../../middleware');
 
 // Register route----------------
 router.post('/register', async (req, res) => {
@@ -35,9 +34,8 @@ router.get('/', (req, res) => {
 })
 
 // Login Route ------------------------
-router.post('/login', passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+router.post('/login', passport.authenticate('local'), (req, res) => {
 	res.send({user: req.user, authtoken: true});
-	// console.log(req.user)
 	// console.log(req.isAuthenticated());
 });
 
