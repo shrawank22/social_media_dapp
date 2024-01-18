@@ -9,7 +9,6 @@ function PostContainer({ state }) {
     const [postText, setPostText] = useState('');
     const [isPaid, setIsPaid] = useState('');
     const [viewPrice, setViewPrice] = useState('');
-    const [formKey, setFormKey] = useState(0);
 
     const updatePostText = event => {
         setPostText(event.target.value)
@@ -55,7 +54,6 @@ function PostContainer({ state }) {
                     setIsPaid('');
                     setViewPrice('');
 
-                    setFormKey(formKey + 1);
 
                 } catch (error) {
                     console.log(error);
