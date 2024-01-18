@@ -61,15 +61,13 @@ function PostContainer({ state }) {
                     console.log(error);
                 }
             }
-
-
         } catch (err) {
             console.log(err.message)
         }
     }
 
     return (
-        <form key={formKey}>
+        <form onSubmit={(e) => addPostHandler(e)}>
             <div className="row">
                 <div className="col-md-9">
                     <textarea
@@ -106,7 +104,7 @@ function PostContainer({ state }) {
                     </div>
                 </div>
             </div>
-            <button className="btn btn-primary btn-lg mt-2" type="submit" onClick={(e) => addPostHandler(e)}>Post</button>
+            <button className="btn btn-primary btn-lg mt-2" type="submit">Post</button>
         </form>
     );
 }
