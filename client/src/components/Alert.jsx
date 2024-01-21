@@ -1,17 +1,18 @@
-// import {useContext} from 'react'
-// import todoContext from '../context/todos/todoContext';
+import {useContext} from 'react'
+import web3Context from '../context/web3/web3Context';
 
 
-export default function Alert({alert}) {
-    // const context = useContext(todoContext);
-    // const { alert } = context;
+export default function Alert() {
+    const context = useContext(web3Context);
+    const { alert } = context;
 
 
     return (
-        <div style={{ height: "50px" }} >
-            { alert && <div className={`alert alert-${alert.type} alert-dismissible fade show container my-2`} role="alert">
+        <>
+            { alert && <div className={`container my-2 alert alert-${alert.type} alert-dismissible fade show`} role="alert">
                 {alert.msg}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div> }
-        </div>
+        </>
     )
 }

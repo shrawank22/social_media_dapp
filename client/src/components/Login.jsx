@@ -1,8 +1,14 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { useNavigate } from 'react-router'
 import axios from 'axios'
+import web3Context from '../context/web3/web3Context';
 
 const Login = ({ state }) => {
+
+    const context = useContext(web3Context);
+    const { showAlert } = context;
+
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const handleWallet = () => {
@@ -22,13 +28,15 @@ const Login = ({ state }) => {
                 },
             });
 
-            // console.log(response)
+            console.log(response.data)
 
             localStorage.setItem('token', response.data.authtoken);
             navigateTo("/");
+            showAlert("success", `Welcome ${response.data.user.username}!`)
 
 
         } catch (err) {
+            showAlert("danger", err.message)
             console.log(err);
            
         }

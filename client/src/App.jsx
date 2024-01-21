@@ -10,7 +10,9 @@ import Login from './components/Login'
 import Register from './components/Register'
 import Widgets from './components/Widgets'
 import Navbar from './components/Navbar'
+import Alert from './components/Alert'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Web3State from './context/web3/Web3State'
 
 function App() {
   const [state, setState] = useState({
@@ -54,8 +56,10 @@ function App() {
   // console.log(state);
 
   return (
+    <Web3State>
     <Router>
       <Navbar />
+      <Alert />
       <div className='container'>
         <div className='row'>
           <div className='col-md-9 col-sm-12 scrollable-content'>
@@ -73,6 +77,7 @@ function App() {
       </div>
 
     </Router>
+    </Web3State>
 
   )
 }

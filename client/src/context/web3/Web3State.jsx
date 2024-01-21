@@ -5,7 +5,6 @@ import axios from 'axios'
 const Web3State = ({ children }) => {
     const host = "http://localhost:8080"
 
-    const [todos, setTodos] = useState([])
 
     const [alert, setAlert] = useState(null);
 
