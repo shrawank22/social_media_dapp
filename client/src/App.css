@@ -5,12 +5,12 @@ body {
 
 .scrollable-content {
   max-height: calc(100vh - 56px);
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
 .scrollable-sidebar {
   max-height: calc(100vh - 56px);
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 }

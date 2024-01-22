@@ -4,7 +4,6 @@ import PostContainer from './PostContainer';
 import Post from './Post';
 import axios from 'axios';
 
-
 const Home = ({ state }) => {
 
     const { contract, address } = state;
@@ -21,7 +20,7 @@ const Home = ({ state }) => {
             setIsLoading(true);
             if (contract) {
                 let allPosts = await contract.getAllposts();
-                // console.log(allPosts[0].postText);
+                // console.log(allPosts);
 
                 // Fetching text from IPFS for each post
                 const postsWithData = await Promise.all(
@@ -73,14 +72,14 @@ const Home = ({ state }) => {
             ) : (
                 <>
                     {posts.map((post) => (
-                        // console.log(post.username, address)  // giving undefined don't know why
+                        // console.log(post) 
                         <Post
                             key={post[0]}
                             displayName={post[1]}
                             text={post.postText.text}
                             price={Number(post.postText.viewPrice) / 100}
                             onClick={deletePost(post[0])}
-                            isCreator={address === post.username}
+                            isCreator={address === post[1]}
                         />
                     ))}
                 </>
