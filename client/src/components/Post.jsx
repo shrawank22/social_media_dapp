@@ -1,7 +1,4 @@
 import "./Post.css";
-import ChatBubbleOutlineIcon from "@material-ui/icons/ChatBubbleOutline";
-import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
-import DeleteIcon from '@material-ui/icons/Delete';
 
 const Post = ({ displayName, text, price, onClick, isCreator }) => {
     return (
@@ -9,7 +6,7 @@ const Post = ({ displayName, text, price, onClick, isCreator }) => {
 
             <div className="post_avatar">
                 <img
-                    src="https://qph.cf2.quoracdn.net/main-thumb-401012302-200-qjrtpkfzscqeqnoirkesayialmrsiejk.jpeg"
+                    src="https://images.unsplash.com/photo-1500048993953-d23a436266cf?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                     alt="Custom Avatar"
                     style={{ width: '100px', height: '100px', marginRight: '10px', borderRadius: '50%' }}
                 />
@@ -29,10 +26,10 @@ const Post = ({ displayName, text, price, onClick, isCreator }) => {
                     <p>{price}</p>
                 </div>
                 <div className="post_footer">
-                    <ChatBubbleOutlineIcon fontSize="small" />
-                    <FavoriteBorderIcon fontSize="small" />
+                    <i class="bi bi-chat-left"></i>
+                    <i className="bi bi-heart"></i>
                     {isCreator && (
-                        <DeleteIcon fontSize="small" onClick={onClick} />
+                        <i className="bi bi-trash-fill" onClick={onClick}></i> 
                     )}
                 </div>
             </div>

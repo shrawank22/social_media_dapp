@@ -52,8 +52,6 @@ const Home = ({ state }) => {
     const deletePost = key => async () => {
         try {
             await contract.deletePost(key);
-            window.location.reload();
-
         } catch (error) {
             console.log(error);
         }
@@ -89,7 +87,4 @@ const Home = ({ state }) => {
 }
 
 export default Home;
-
-
-// Just for testing
 
