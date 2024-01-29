@@ -27,23 +27,7 @@ library DataTypes {
         bool isDeleted;
         uint likes;
         uint dislikes;
-        mapping(address => bool) likedBy;
-        mapping(address => bool) dislikedBy;
         Visibility visibility;
-        string[] tags;
-    }
-
-    struct PostData {
-        uint id;
-        address username;
-        string postText;
-        bool isPaid;
-        uint viewPrice;
-        bool isDeleted;
-        uint likes;
-        uint dislikes;
-        DataTypes.Visibility visibility;
-        string[] tags;
     }
 
     struct Comment {

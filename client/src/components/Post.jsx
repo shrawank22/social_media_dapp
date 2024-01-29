@@ -26,7 +26,7 @@ const Post = ({ displayName, text, price, onClick, isCreator }) => {
                     <p>{price}</p>
                 </div>
                 <div className="post_footer">
-                    <i class="bi bi-chat-left"></i>
+                    <i className="bi bi-chat-left"></i>
                     <i className="bi bi-heart"></i>
                     {isCreator && (
                         <i className="bi bi-trash-fill" onClick={onClick}></i> 

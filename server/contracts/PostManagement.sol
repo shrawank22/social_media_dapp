@@ -9,8 +9,6 @@ contract PostManagement is PostBase{
     // Counters
     using Counters for Counters.Counter;
     
-    // Mappings related to posts
-    // mapping(uint256 => DataTypes.Post) public posts;
     mapping(uint256 => DataTypes.Report) public reports;
     mapping(uint256 => DataTypes.Report[]) public postToReports;
     
@@ -62,22 +60,12 @@ contract PostManagement is PostBase{
         );
     }
 
-    function getAllposts() external view returns (DataTypes.PostData[] memory) {
-        return _getPostsByCriteria(address(0), "");
+    function getAllposts() external view returns (DataTypes.Post[] memory) {
+        return _getPostsByCriteria(address(0));
     }
 
-
-    function getMyposts() external view returns (DataTypes.PostData[] memory) {
-        return _getPostsByCriteria(msg.sender, "");
-    }
-
-    function searchPostsByUser(address _user) external view returns (DataTypes.PostData[] memory) {
-        return _getPostsByCriteria(_user, "");
-    }
-
-
-    function searchPostsByTag(string memory _tag) external view returns (DataTypes.PostData[] memory) {
-        return _getPostsByCriteria(address(0), _tag);
+    function getMyposts() external view returns (DataTypes.Post[] memory) {
+        return _getPostsByCriteria(msg.sender);
     }
 
     function deletePost(uint postId) external {
@@ -117,24 +105,22 @@ contract PostManagement is PostBase{
 
     
     // Helping Functions
-        function _getPostsByCriteria(address _user, string memory _tag) private view  returns (DataTypes.PostData[] memory) {
-        bytes32 emptyTagHash = keccak256(abi.encodePacked(""));
-        bytes32 tagHash = keccak256(abi.encodePacked(_tag));
+    function _getPostsByCriteria(address _user) private view  returns (DataTypes.Post[] memory) {
         uint counter = 0;
         for (uint i = 1; i <= postCounter.current(); i++) {
-            if ((_user == address(0) || posts[i].username == _user) && (tagHash == emptyTagHash || _containsTag(posts[i].tags, _tag)) && !posts[i].isDeleted) {
+            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
                 counter++;
             }
         }
 
-        DataTypes.PostData[] memory postDataArray = new DataTypes.PostData[](counter);
+        DataTypes.Post[] memory postDataArray = new DataTypes.Post[](counter);
 
         uint resultIndex = 0;
         for (uint i = 1; i <= postCounter.current(); i++) {
-            if ((_user == address(0) || posts[i].username == _user) && (tagHash == emptyTagHash || _containsTag(posts[i].tags, _tag)) && !posts[i].isDeleted) {
+            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
                 DataTypes.Post storage post = posts[i];
             
-                postDataArray[resultIndex] = DataTypes.PostData({
+                postDataArray[resultIndex] = DataTypes.Post({
                     id: post.id,
                     username: post.username,
                     postText: post.postText,
@@ -143,22 +129,12 @@ contract PostManagement is PostBase{
                     isDeleted: post.isDeleted,
                     likes: post.likes,
                     dislikes: post.dislikes,
-                    visibility: post.visibility,
-                    tags: post.tags
+                    visibility: post.visibility
                 });
                 resultIndex++;
             }
         }
         
         return postDataArray;
-    }
-
-    function _containsTag(string[] memory tags, string memory _tag) private pure returns (bool) {
-        for (uint i = 0; i < tags.length; i++) {
-            if (keccak256(abi.encodePacked(tags[i])) == keccak256(abi.encodePacked(_tag))) {
-                return true;
-            }
-        }
-        return false;
     }
 }

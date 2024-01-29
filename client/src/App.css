@@ -14,3 +14,14 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+@media screen and (max-width: 767px) {
+  .scrollable-content {
+    flex: 1;
+    overflow: visible;
+  }
+
+  .scrollable-sidebar {
+    display: none; /* Hide the sidebar on smaller screens */
+  }
+}
