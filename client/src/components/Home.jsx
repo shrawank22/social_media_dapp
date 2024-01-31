@@ -19,7 +19,7 @@ const Home = ({ state }) => {
         try {
             setIsLoading(true);
             if (contract) {
-                let allPosts = await contract.getAllposts();
+                let allPosts = await contract.getAllPosts();
                 // console.log(allPosts);
 
                 // Fetching text from IPFS for each post

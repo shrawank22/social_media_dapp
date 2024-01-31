@@ -3,43 +3,29 @@ pragma solidity >=0.7.0 <0.9.0;
 
 library DataTypes {
     enum Visibility { Public, FollowersOnly, Private }
-    enum NotificationType { NewFollower, NewComment, PostLiked, PostReported }
-
-    struct Notification {
-        NotificationType notificationType;
-        address fromUser;
-        uint associatedPostId;
-        string additionalInfo;
-    }
-
-    struct Profile {
-        string name;
-        string bio;
-        string profileImageLink;
-    }
 
     struct Post {
-        uint id;
+        uint256 id;
         address payable username;
         string postText;
-        uint viewPrice;
+        uint256 viewPrice;
         bool isDeleted;
-        uint likes;
-        uint dislikes;
+        uint256 likes;
+        uint256 dislikes;
         Visibility visibility;
+        Comment[] comments;
+        Report[] reports; 
     }
 
     struct Comment {
-        uint id;
+        uint256 id;
         address payable commenter;
-        uint postId;
         string commentText;
     }
 
     struct Report {
-        uint id;
+        uint256 id;
         address reporter;
-        uint postId;
         string reason;
     }
 

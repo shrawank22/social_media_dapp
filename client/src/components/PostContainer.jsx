@@ -75,19 +75,15 @@ function PostContainer({ state }) {
                     console.log(decryptedContent.data.content);
 
                 }
-                
+
 
                 // Storing encrypted content to IPFS
-                const res = await axios.post(
-                    "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-                    { content },
-                    {
-                        headers: {
-                            pinata_api_key: "b895eaa0c01051beab70",
-                            pinata_secret_api_key: "41fc26eb82d75c1893429a0cdb79afcb20dcc224d3f26ee7eeaff872c5373ffb",
-                        },
-                    }
-                );
+                const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { content }, {
+                    headers: {
+                        pinata_api_key: "b895eaa0c01051beab70",
+                        pinata_secret_api_key: "41fc26eb82d75c1893429a0cdb79afcb20dcc224d3f26ee7eeaff872c5373ffb",
+                    },
+                });
                 console.log(res.data.IpfsHash);
                 const ipfsHash = res.data.IpfsHash;
 
