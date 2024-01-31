@@ -22,7 +22,6 @@ library DataTypes {
         uint id;
         address payable username;
         string postText;
-        bool isPaid;
         uint viewPrice;
         bool isDeleted;
         uint likes;

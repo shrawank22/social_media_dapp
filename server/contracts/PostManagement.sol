@@ -13,12 +13,12 @@ contract PostManagement is PostBase{
     mapping(uint256 => DataTypes.Report[]) public postToReports;
     
     // Events
-    event AddPost(address indexed recipient, uint indexed postId, bool indexed isPaid);
+    event AddPost(address indexed recipient, uint indexed postId);
     event DeletePost(uint indexed postId, bool isDeleted);
     event TipPost(address indexed sender, uint indexed postId, uint tipAmount);
 
     // Functions
-    function addPost(string memory _postText, bool _isPaid, uint _viewPrice) external payable {
+    function addPost(string memory _postText, uint _viewPrice) external payable {
         postCounter.increment();
         uint256 postId = postCounter.current();
 
@@ -26,10 +26,9 @@ contract PostManagement is PostBase{
         newPost.id = postId;
         newPost.username = payable(msg.sender);
         newPost.postText = _postText;
-        newPost.isPaid = _isPaid;
         newPost.viewPrice = _viewPrice;
         newPost.isDeleted = false;
-        emit AddPost(msg.sender, postId, _isPaid);
+        emit AddPost(msg.sender, postId);
     }
 
     function editPost(uint _postId, string memory _newPostText) external {
@@ -40,7 +39,6 @@ contract PostManagement is PostBase{
     }
 
     function viewPaidPost(uint postId) external payable {
-        require(posts[postId].isPaid, "Post is not paid");
         uint viewPrice = posts[postId].viewPrice;
 
         payable(posts[postId].username).transfer(viewPrice);
@@ -48,13 +46,12 @@ contract PostManagement is PostBase{
         emit TipPost(msg.sender, postId, msg.value);
     }
 
-    function getpostDetails(uint256 postId) external view returns (uint256, address, string memory, bool, uint256, bool) {
+    function getpostDetails(uint256 postId) external view returns (uint256, address, string memory, uint256, bool) {
         DataTypes.Post storage post = posts[postId];
         return (
             post.id,
             post.username,
             post.postText,
-            post.isPaid,
             post.viewPrice,
             post.isDeleted
         );
@@ -64,9 +61,9 @@ contract PostManagement is PostBase{
         return _getPostsByCriteria(address(0));
     }
 
-    function getMyposts() external view returns (DataTypes.Post[] memory) {
-        return _getPostsByCriteria(msg.sender);
-    }
+    // function getMyposts() external view returns (DataTypes.Post[] memory) {
+    //     return _getPostsByCriteria(msg.sender);
+    // }
 
     function deletePost(uint postId) external {
         require(posts[postId].username == msg.sender, "You are not the owner of the post");
@@ -74,14 +71,14 @@ contract PostManagement is PostBase{
         emit DeletePost(postId, true);
     }
 
-    function tipPost(uint postId, uint tipAmnt) external payable {
-        require(!posts[postId].isDeleted, "post is deleted");
-        require(tipAmnt > 0, "Invalid tip amount");
-        require(posts[postId].username != msg.sender, "You cannot tip your own post");
+    // function tipPost(uint postId, uint tipAmnt) external payable {
+    //     require(!posts[postId].isDeleted, "post is deleted");
+    //     require(tipAmnt > 0, "Invalid tip amount");
+    //     require(posts[postId].username != msg.sender, "You cannot tip your own post");
 
-        posts[postId].username.transfer(tipAmnt);
-        emit TipPost(msg.sender, postId, tipAmnt);
-    }
+    //     posts[postId].username.transfer(tipAmnt);
+    //     emit TipPost(msg.sender, postId, tipAmnt);
+    // }
 
     function reportPost(uint _postId, string memory _reason) external {
         require(!posts[_postId].isDeleted, "Post is deleted");
@@ -124,7 +121,6 @@ contract PostManagement is PostBase{
                     id: post.id,
                     username: post.username,
                     postText: post.postText,
-                    isPaid: post.isPaid,
                     viewPrice: post.viewPrice,
                     isDeleted: post.isDeleted,
                     likes: post.likes,

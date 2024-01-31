@@ -27,6 +27,7 @@ const User = require('./models/User');
 //routes imported
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
+const gatekeeperRoutes = require('./routes/gatekeeper')
 
 //DB Connection
 const connectMongo = require('./connect');
@@ -94,7 +95,8 @@ app.use((req, res, next) => {
 
 //imported routes use
 app.use("/api", authRoutes);
-app.use("/api", postRoutes)
+app.use("/api", postRoutes);
+app.use("/api", gatekeeperRoutes)
 
 //app listen config
 const PORT = process.env.PORT || 8080;
