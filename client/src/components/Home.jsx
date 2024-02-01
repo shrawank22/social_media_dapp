@@ -25,10 +25,13 @@ const Home = ({ state }) => {
                 // Fetching text from IPFS for each post
                 const postsWithData = await Promise.all(
                     allPosts.map(async (post) => {
-                        const postText = await fetchTextFromIPFS(post.postText);
-                        return { ...post, postText };
+                        const { postText, viewPrice } = await fetchTextFromIPFS(post.postText);
+                        // console.log(postText, viewPrice)
+                        return { ...post, postText, viewPrice };
                     })
                 );
+
+                // console.log(postsWithData)
 
                 setPosts(postsWithData);
                 setIsLoading(false);
@@ -70,12 +73,12 @@ const Home = ({ state }) => {
             ) : (
                 <>
                     {posts.map((post) => (
-                        // console.log(post.postText) 
+                        // console.log(post.id)
                         <Post
                             key={post[0]}
                             displayName={post[1]}
-                            text={post.postText.content.text}
-                            price={Number(post.postText.content.viewPrice) / 100}
+                            text={post.postText}
+                            price={Number(post.viewPrice) / 100}
                             onClick={deletePost(post[0])}
                             isCreator={address === post[1]}
                         />

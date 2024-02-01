@@ -1,7 +1,10 @@
 import { useState } from "react";
 import "./PostContainer.css";
 import axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
 import EmojiPicker from 'emoji-picker-react';
+import CryptoJS from 'crypto-js'
+import { Buffer, combine, constants, split } from 'shamirs-secret-sharing'
 
 function PostContainer({ state }) {
     const { contract, address, signer, provider } = state;
@@ -36,23 +39,26 @@ function PostContainer({ state }) {
                 console.log("Input fields can't be empty");
             } else {
                 let content = {
-                    text: postText,
+                    postText: postText,
                     viewPrice: parseFloat(viewPrice) * 100,
                 };
 
+                const uniqueId = uuidv4();
+
                 if (content.viewPrice > 0) {
                     // Encrypt the content and split the key
-                    const response = await axios.post('http://localhost:8080/api/content/encrypt', { content, gatekeepersCount }, {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                    });
-                    const { ciphertext, keyShares } = response.data;
+                    let key = CryptoJS.lib.WordArray.random(256 / 8).toString(); // Generate a random encryption key
+                    const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(content), key).toString(); // Used AES to encrypt the content
 
+                    // Split the key into parts
+                    const shares = split(Buffer.from(key), { shares: gatekeepersCount, threshold: Math.ceil(gatekeepersCount * 2 / 3) });
+
+                    const keyShares = shares.map(share => share.toString('hex'))
+                    // console.log(keyShares, ciphertext)
 
                     // Send each share to a different gatekeeper
                     for (let i = 0; i < gatekeepersCount; i++) {
-                        await axios.post(`http://localhost:8080/api/gatekeepers/${i}/share`, { share: keyShares[i] }, {
+                        await axios.post(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`, { share: keyShares[i] }, {
                             headers: {
                                 'Content-Type': 'application/json'
                             },
@@ -62,33 +68,43 @@ function PostContainer({ state }) {
                     // Retrieve the shares from the gatekeepers
                     const retrievedShares = [];
                     for (let i = 0; i < threshold; i++) {
-                        const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share`);
-                        retrievedShares.push(response.data.share);
+                        const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`);
+                        retrievedShares.push(Buffer.from(response.data.share, 'hex'));
                     }
 
-                    // Decrypt the content
-                    const decryptedContent = await axios.post('http://localhost:8080/api/content/decrypt', { shares: retrievedShares, ciphertext: ciphertext }, {
+                    // Combine the shares to get the original key and then decrypt with this key
+                    let retrievedKey = combine(shares).toString();
+                    const bytes = CryptoJS.AES.decrypt(ciphertext, retrievedKey);
+                    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+                    console.log("Decrypted Content ", decrypted)
+
+                    // Storing paid content to IPFS
+                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId }, {
                         headers: {
-                            'Content-Type': 'application/json'
+                            pinata_api_key: import.meta.env.VITE_PINATA_KEY,
+                            pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
                         },
                     });
-                    console.log(decryptedContent.data.content);
+                    console.log(res.data.IpfsHash);
+                    const ipfsHash = res.data.IpfsHash;
 
+                    // Store hash onto blockchain
+                    await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
+
+                } else {
+                    // Storing free content to IPFS
+                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", content, {
+                        headers: {
+                            pinata_api_key: import.meta.env.VITE_PINATA_KEY,
+                            pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
+                        },
+                    });
+                    console.log(res.data.IpfsHash);
+                    const ipfsHash = res.data.IpfsHash;
+
+                    // Store hash onto blockchain
+                    await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
                 }
-
-
-                // Storing encrypted content to IPFS
-                const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { content }, {
-                    headers: {
-                        pinata_api_key: "b895eaa0c01051beab70",
-                        pinata_secret_api_key: "41fc26eb82d75c1893429a0cdb79afcb20dcc224d3f26ee7eeaff872c5373ffb",
-                    },
-                });
-                console.log(res.data.IpfsHash);
-                const ipfsHash = res.data.IpfsHash;
-
-                // Store hash onto blockchain
-                await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
 
                 // Resetting inputs
                 setPostText('');
@@ -105,6 +121,7 @@ function PostContainer({ state }) {
             <div className="row">
                 <div className="col-12">
                     <textarea
+                        value={postText}
                         onChange={updatePostText}
                         placeholder="What's happening?"
                         required

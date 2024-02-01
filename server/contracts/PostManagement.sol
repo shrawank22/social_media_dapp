@@ -7,8 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 
 contract PostManagement is ERC721 {
-    // // Post Count
-    // uint256 public postCounter;
+    // Counters
     using Counters for Counters.Counter;
     Counters.Counter public postCounter;
 
@@ -176,9 +175,9 @@ contract PostManagement is ERC721 {
         return posts[_postId].reports;
     }
 
-        // Helping Functions
+    // Helping Functions
     function _getPostsByCriteria(address _user) private view  returns (DataTypes.Post[] memory) {
-        uint counter = 0;
+        uint256 counter = 0;
         for (uint i = 1; i <= postCounter.current(); i++) {
             if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
                 counter++;
@@ -188,7 +187,7 @@ contract PostManagement is ERC721 {
         DataTypes.Post[] memory postDataArray = new DataTypes.Post[](counter);
 
         uint resultIndex = 0;
-        for (uint i = 1; i <= postCounter.current(); i++) {
+        for (uint256 i = 1; i <= postCounter.current(); i++) {
             if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
                 DataTypes.Post storage post = posts[i];
             

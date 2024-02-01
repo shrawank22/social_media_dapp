@@ -1,71 +1,63 @@
 const express = require('express');
-const CryptoJS = require('crypto-js');
-const sss = require('shamirs-secret-sharing')
-
-// sss was giving error, that's why added randombytes package
-const randombytes = require('randombytes');
-globalThis.crypto = {
-    getRandomValues: (buffer) => {
-        const random = randombytes(buffer.length);
-        const uint8Buffer = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-        return Buffer.from(random).copy(uint8Buffer);
-    },
-};
-
+const fs = require('fs').promises;
 
 const router = express.Router();
 
-const sharesDatabase = {};
-
-router.post('/content/encrypt', (req, res) => {
-    const {content, gatekeepersCount} = req.body;
- 
-    const key = CryptoJS.lib.WordArray.random(256 / 8).toString(); // Generate a random encryption key
-
-    const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(content), key).toString(); // Used AES to encrypt the content
-
-    const shares = sss.split(Buffer.from(key, 'hex'), { shares: gatekeepersCount, threshold: Math.ceil(2 * gatekeepersCount / 3) }); // Split the key into parts
-
-    res.status(200).send({ ciphertext, keyShares: shares.map(share => share.toString('hex')) });
-});
+const SHARES_DIR = './shares';
+// Create the shares directory if it doesn't exist
+fs.mkdir('./shares', { recursive: true })
+    .then(() => console.log(`Directory shares created successfully.`))
+    .catch((error) => console.error('Error creating directory:', error));
 
 
-router.post('/gatekeepers/:id/share', (req, res) => {
+router.post('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
     const id = req.params.id;
+    const uniqueId = req.params.uniqueId;
     const share = req.body.share;
 
-    // Store the share in the database
-    sharesDatabase[id] = share;
+    // Store the share in a file
+    const shareFileName = `${uniqueId}_share_${id}.txt`;
 
-    res.status(200).send({ message: 'Share stored successfully' });
+    try {
+        await fs.writeFile(`${SHARES_DIR}/${shareFileName}`, share);
+        res.status(200).send({ message: 'Share stored successfully' });
+    } catch (error) {
+        res.status(500).send({ message: 'Error storing share' });
+    }
 });
 
-router.get('/gatekeepers/:id/share', (req, res) => {
+router.get('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
     const id = req.params.id;
+    const uniqueId = req.params.uniqueId;
 
-    // Retrieve the share from the database
-    const share = sharesDatabase[id];
+    // Retrieve the share from the file
+    const shareFileName = `${uniqueId}_share_${id}.txt`;
 
-    if (share) {
-        res.status(200).send({ share });
-    } else {
+    try {
+        const hexString = await fs.readFile(`${SHARES_DIR}/${shareFileName}`, 'utf-8');
+        const shareBuffer = Buffer.from(hexString);
+        
+        res.status(200).send({ share: shareBuffer });
+    } catch (error) {
         res.status(404).send({ message: 'Share not found' });
     }
 });
 
-router.post('/content/decrypt', (req, res) => {
-    const shares = req.body.shares;
-    const ciphertext = req.body.ciphertext;
+// router.post('/content/decrypt/:uniqueId', (req, res) => {
+//     const shares = req.body.shares;
+//     const ciphertext = req.body.ciphertext;
+//     const uniqueId = req.params.uniqueId;
 
-    // Combine the shares to reconstruct the encryption key
-    const key = sss.combine(shares.map(share => Buffer.from(share, 'hex'))).toString('hex');
+//     // Combine the shares to reconstruct the encryption key
+//     const key = sss.combine(shares).toString();
 
-    // Use the key to decrypt the content
-    const bytes = CryptoJS.AES.decrypt(ciphertext, key);
-    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+//     // Use the key to decrypt the content
+//     const bytes = CryptoJS.AES.decrypt(ciphertext, key);
+//     const decrypted = bytes.toString(CryptoJS.enc.Utf8);
 
-    res.status(200).send({ content: JSON.parse(decrypted) });
-});
+//     console.log(decrypted)
 
+//     res.status(200).send({ content: decrypted });
 
-module.exports = router
+// });
+module.exports = router;
