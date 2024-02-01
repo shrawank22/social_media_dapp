@@ -70,12 +70,12 @@ const Home = ({ state }) => {
             ) : (
                 <>
                     {posts.map((post) => (
-                        // console.log(post) 
+                        // console.log(post.postText) 
                         <Post
                             key={post[0]}
                             displayName={post[1]}
-                            text={post.postText.text}
-                            price={Number(post.postText.viewPrice) / 100}
+                            text={post.postText.content.text}
+                            price={Number(post.postText.content.viewPrice) / 100}
                             onClick={deletePost(post[0])}
                             isCreator={address === post[1]}
                         />

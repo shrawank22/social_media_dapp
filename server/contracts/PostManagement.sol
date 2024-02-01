@@ -3,10 +3,14 @@
 pragma solidity >=0.7.0 <0.9.0;
 import "./DataTypes.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
 
 contract PostManagement is ERC721 {
-    // Post Count
-    uint256 public postCounter;
+    // // Post Count
+    // uint256 public postCounter;
+    using Counters for Counters.Counter;
+    Counters.Counter public postCounter;
 
     // Mappings
     mapping(uint256 => DataTypes.Post) public posts;
@@ -27,8 +31,10 @@ contract PostManagement is ERC721 {
         external
         payable
     {
-        postCounter++;
-        uint256 postId = postCounter;
+        // postCounter++;
+        // uint256 postId = postCounter;
+        postCounter.increment();
+        uint256 postId = postCounter.current();
 
         DataTypes.Post storage newPost = posts[postId];
         newPost.id = postId;
@@ -104,49 +110,16 @@ contract PostManagement is ERC721 {
         );
     }
 
-    function getMyPosts() external view returns (DataTypes.Post[] memory) {
-        address owner = msg.sender;
-        DataTypes.Post[] memory myPosts = new DataTypes.Post[](postCounter);
-
-        uint256 myPostCount = 0;
-        for (uint256 i = 1; i <= postCounter; i++) {
-            if (_isPostOwner(i, owner)) {
-                myPosts[myPostCount] = posts[i];
-                myPostCount++;
-            }
-        }
-
-        // Resize the array to remove unused slots
-        assembly {
-            mstore(myPosts, myPostCount)
-        }
-
-        return myPosts;
-    }
-
     function getAllPosts() external view returns (DataTypes.Post[] memory) {
-        DataTypes.Post[] memory allPosts = new DataTypes.Post[](postCounter);
-
-        for (uint256 i = 1; i <= postCounter; i++) {
-            allPosts[i - 1] = posts[i];
-        }
-
-        return allPosts;
+        return _getPostsByCriteria(address(0));
     }
 
-    function _isPostOwner(uint256 postId, address owner) // Helper function to check if the caller is the owner of the post
-        internal
-        view
-        returns (bool)
-    {
-        return posts[postId].username == owner && !posts[postId].isDeleted;
+    function getMyPosts() external view returns (DataTypes.Post[] memory) {
+        return _getPostsByCriteria(msg.sender);
     }
 
-    function deletePost(uint256 postId) external {
-        require(
-            posts[postId].username == msg.sender,
-            "You are not the owner of the post"
-        );
+    function deletePost(uint postId) external {
+        require(posts[postId].username == msg.sender, "You are not the owner of the post");
         posts[postId].isDeleted = true;
         emit DeletePost(postId, true);
     }
@@ -201,5 +174,40 @@ contract PostManagement is ERC721 {
         returns (DataTypes.Report[] memory)
     {
         return posts[_postId].reports;
+    }
+
+        // Helping Functions
+    function _getPostsByCriteria(address _user) private view  returns (DataTypes.Post[] memory) {
+        uint counter = 0;
+        for (uint i = 1; i <= postCounter.current(); i++) {
+            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
+                counter++;
+            }
+        }
+
+        DataTypes.Post[] memory postDataArray = new DataTypes.Post[](counter);
+
+        uint resultIndex = 0;
+        for (uint i = 1; i <= postCounter.current(); i++) {
+            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
+                DataTypes.Post storage post = posts[i];
+            
+                postDataArray[resultIndex] = DataTypes.Post({
+                    id: post.id,
+                    username: post.username,
+                    postText: post.postText,
+                    viewPrice: post.viewPrice,
+                    isDeleted: post.isDeleted,
+                    likes: post.likes,
+                    dislikes: post.dislikes,
+                    visibility: post.visibility,
+                    comments: post.comments,
+                    reports: post.reports
+                });
+                resultIndex++;
+            }
+        }
+        
+        return postDataArray;
     }
 }
