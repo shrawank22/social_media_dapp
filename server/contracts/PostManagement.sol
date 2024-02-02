@@ -30,8 +30,6 @@ contract PostManagement is ERC721 {
         external
         payable
     {
-        // postCounter++;
-        // uint256 postId = postCounter;
         postCounter.increment();
         uint256 postId = postCounter.current();
 

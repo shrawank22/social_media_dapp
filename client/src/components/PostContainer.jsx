@@ -13,8 +13,7 @@ function PostContainer({ state }) {
     const [viewPrice, setViewPrice] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-    const gatekeepersCount = 7;
-    const threshold = Math.ceil(2 * gatekeepersCount / 3);
+    const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
 
     const updatePostText = (event) => {
         setPostText(event.target.value);
@@ -64,19 +63,6 @@ function PostContainer({ state }) {
                             },
                         });
                     }
-
-                    // Retrieve the shares from the gatekeepers
-                    const retrievedShares = [];
-                    for (let i = 0; i < threshold; i++) {
-                        const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`);
-                        retrievedShares.push(Buffer.from(response.data.share, 'hex'));
-                    }
-
-                    // Combine the shares to get the original key and then decrypt with this key
-                    let retrievedKey = combine(shares).toString();
-                    const bytes = CryptoJS.AES.decrypt(ciphertext, retrievedKey);
-                    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-                    console.log("Decrypted Content ", decrypted)
 
                     // Storing paid content to IPFS
                     const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId }, {

@@ -34,10 +34,10 @@ router.get('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
     const shareFileName = `${uniqueId}_share_${id}.txt`;
 
     try {
-        const hexString = await fs.readFile(`${SHARES_DIR}/${shareFileName}`, 'utf-8');
-        const shareBuffer = Buffer.from(hexString);
-        
-        res.status(200).send({ share: shareBuffer });
+        const share = await fs.readFile(`${SHARES_DIR}/${shareFileName}`, 'utf8');
+
+        // Send the share as the response
+        res.status(200).send({ share });
     } catch (error) {
         res.status(404).send({ message: 'Share not found' });
     }

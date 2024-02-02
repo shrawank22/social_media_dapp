@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import PostContainer from './PostContainer';
 import Post from './Post';
 import axios from 'axios';
+import CryptoJS from 'crypto-js'
+import { Buffer, combine } from 'shamirs-secret-sharing'
 
 const Home = ({ state }) => {
 
@@ -25,9 +27,37 @@ const Home = ({ state }) => {
                 // Fetching text from IPFS for each post
                 const postsWithData = await Promise.all(
                     allPosts.map(async (post) => {
-                        const { postText, viewPrice } = await fetchTextFromIPFS(post.postText);
-                        // console.log(postText, viewPrice)
-                        return { ...post, postText, viewPrice };
+                        if (post.viewPrice > 0) {
+                            const { ciphertext, uniqueId } = await fetchTextFromIPFS(post.postText);
+                            console.log(ciphertext, uniqueId);
+
+                            // Retrieve the shares from the gatekeepers
+                            const retrievedShares = [];
+                            const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
+                            for (let i = 0; i < gatekeepersCount; i++) {
+                                const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`);
+                                retrievedShares.push(Buffer.from(response.data.share, 'hex'));
+
+                                if (retrievedShares.length === Math.ceil(2 * gatekeepersCount / 3)) break;
+                            }
+
+                            let retrievedKey = combine(retrievedShares).toString();
+                            // console.log(retrievedKey)
+
+                            // Retrieving content with retrieved key
+                            const bytes = CryptoJS.AES.decrypt(ciphertext, retrievedKey);
+                            const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+                            console.log("Decrypted Content ", decrypted)
+
+                            const {postText, viewPrice} = JSON.parse(decrypted)
+
+                            return {...post, postText, viewPrice }
+
+                        } else {
+                            const { postText, viewPrice } = await fetchTextFromIPFS(post.postText);
+                            // console.log(postText, viewPrice)
+                            return { ...post, postText, viewPrice };
+                        }
                     })
                 );
 
@@ -73,7 +103,7 @@ const Home = ({ state }) => {
             ) : (
                 <>
                     {posts.map((post) => (
-                        // console.log(post.id)
+                        // console.log(post)
                         <Post
                             key={post[0]}
                             displayName={post[1]}
