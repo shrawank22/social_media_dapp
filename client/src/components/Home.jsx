@@ -29,7 +29,7 @@ const Home = ({ state }) => {
                     allPosts.map(async (post) => {
                         if (post.viewPrice > 0) {
                             const { ciphertext, uniqueId } = await fetchTextFromIPFS(post.postText);
-                            console.log(ciphertext, uniqueId);
+                            // console.log(ciphertext, uniqueId);
 
                             // Retrieve the shares from the gatekeepers
                             const retrievedShares = [];
@@ -47,7 +47,7 @@ const Home = ({ state }) => {
                             // Retrieving content with retrieved key
                             const bytes = CryptoJS.AES.decrypt(ciphertext, retrievedKey);
                             const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-                            console.log("Decrypted Content ", decrypted)
+                            // console.log("Decrypted Content ", decrypted)
 
                             const {postText, viewPrice} = JSON.parse(decrypted)
 

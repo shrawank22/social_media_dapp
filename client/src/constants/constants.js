@@ -1,4 +1,4 @@
-const contractAddress = "0xE222C2683917356747D304951e43508879109BEB";
+const contractAddress = "0x16E0cb0E25a2F7D1889AE1C517018CBAb5C7483f";
 
 const contractABI = [
 	{
@@ -717,7 +717,7 @@ const contractABI = [
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "_value",
+				"name": "",
 				"type": "uint256"
 			}
 		],

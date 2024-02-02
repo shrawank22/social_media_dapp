@@ -13,6 +13,10 @@ function PostContainer({ state }) {
     const [viewPrice, setViewPrice] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [filePreviews, setFilePreviews] = useState([]);
+    const [fileIpfsHashes, setFileIpfsHashes] = useState([])
+
     const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
 
     const updatePostText = (event) => {
@@ -30,6 +34,38 @@ function PostContainer({ state }) {
         setShowEmojiPicker(!showEmojiPicker);
     };
 
+    const addEmojiToPostText = (emoji) => {
+        setPostText(prevPostText => prevPostText + emoji.emoji);
+    };
+
+    const handleFileChange = async (e) => {
+        const files = e.target.files;
+        setSelectedFiles(files);
+
+        // Create previews for the selected files
+        const previews = Array.from(files).map((file) => URL.createObjectURL(file));
+        setFilePreviews(previews);
+
+        // Upload each file to IPFS
+        const fileHashes = await Promise.all(Array.from(files).map(async (file) => {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'pinata_api_key': import.meta.env.VITE_PINATA_KEY,
+                    'pinata_secret_api_key': import.meta.env.VITE_PINATA_SECRET_KEY,
+                },
+            });
+
+            return response.data.IpfsHash;
+        }));
+
+        setFileIpfsHashes(fileHashes);
+    };
+
+
     const addPostHandler = async (event) => {
         event.preventDefault();
         try {
@@ -39,7 +75,7 @@ function PostContainer({ state }) {
             } else {
                 let content = {
                     postText: postText,
-                    viewPrice: parseFloat(viewPrice) * 100,
+                    viewPrice: parseFloat(viewPrice) * 100
                 };
 
                 const uniqueId = uuidv4();
@@ -65,7 +101,7 @@ function PostContainer({ state }) {
                     }
 
                     // Storing paid content to IPFS
-                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId }, {
+                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId, fileIpfsHashes }, {
                         headers: {
                             pinata_api_key: import.meta.env.VITE_PINATA_KEY,
                             pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
@@ -73,6 +109,11 @@ function PostContainer({ state }) {
                     });
                     console.log(res.data.IpfsHash);
                     const ipfsHash = res.data.IpfsHash;
+                    
+                    // -----------Retrieving content---------
+                    // const response = await axios.get(`https://ipfs.io/ipfs/${ipfsHash}`);
+                    // const data = response.data;
+                    // console.log(data);
 
                     // Store hash onto blockchain
                     await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
@@ -113,16 +154,22 @@ function PostContainer({ state }) {
                         required
                     />
                 </div>
+                <div className="col-12 card">
+                    {filePreviews.map((preview, index) => (
+                        <img key={index} src={preview} alt={`Preview ${index}`} style={{ width: "100%" }} />
+                    ))}
+
+                </div>
             </div>
             <div className="row">
                 <div className="col-1">
                     <label htmlFor="media" className="form-label"><i className="bi bi-card-image text-primary fs-3"></i> </label>
-                    <input accept="image/jpeg, image/png, image/webp, image/gif, video/mp4, video/quicktime" type="file" className="d-none" id="media" />
+                    <input accept="image/jpeg, image/png, image/webp, image/gif, video/mp4, video/quicktime" type="file" className="d-none" id="media" onChange={handleFileChange} multiple="multiple" />
                 </div>
 
                 <div className="col-1">
                     <i className="bi bi-emoji-smile text-primary fs-3" onClick={toggleEmojiPicker}></i>
-                    {showEmojiPicker && <EmojiPicker />}
+                    {showEmojiPicker && <EmojiPicker onEmojiClick={(emoji) => addEmojiToPostText(emoji)} />}
                 </div>
 
                 <div className="col-2">

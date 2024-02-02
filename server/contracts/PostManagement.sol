@@ -3,13 +3,14 @@
 pragma solidity >=0.7.0 <0.9.0;
 import "./DataTypes.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+// import "@openzeppelin/contracts/utils/Counters.sol";
 
 
 contract PostManagement is ERC721 {
     // Counters
-    using Counters for Counters.Counter;
-    Counters.Counter public postCounter;
+    // using Counters for Counters.Counter;
+    // Counters.Counter public postCounter;
+    uint256 public postCounter;
 
     // Mappings
     mapping(uint256 => DataTypes.Post) public posts;
@@ -30,8 +31,10 @@ contract PostManagement is ERC721 {
         external
         payable
     {
-        postCounter.increment();
-        uint256 postId = postCounter.current();
+        postCounter++;
+        uint256 postId = postCounter;
+        // postCounter.increment();
+        // uint256 postId = postCounter.current();
 
         DataTypes.Post storage newPost = posts[postId];
         newPost.id = postId;
@@ -176,7 +179,7 @@ contract PostManagement is ERC721 {
     // Helping Functions
     function _getPostsByCriteria(address _user) private view  returns (DataTypes.Post[] memory) {
         uint256 counter = 0;
-        for (uint i = 1; i <= postCounter.current(); i++) {
+        for (uint i = 1; i <= postCounter; i++) {
             if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
                 counter++;
             }
@@ -185,7 +188,7 @@ contract PostManagement is ERC721 {
         DataTypes.Post[] memory postDataArray = new DataTypes.Post[](counter);
 
         uint resultIndex = 0;
-        for (uint256 i = 1; i <= postCounter.current(); i++) {
+        for (uint256 i = 1; i <= postCounter; i++) {
             if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
                 DataTypes.Post storage post = posts[i];
             
