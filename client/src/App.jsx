@@ -13,6 +13,7 @@ import Navbar from './components/Navbar'
 import Alert from './components/Alert'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Web3State from './context/web3/Web3State'
+import Temp from './components/Temp'
 
 function App() {
   const [state, setState] = useState({
@@ -73,6 +74,7 @@ function App() {
           <div className='col-md-3 col-sm-12 scrollable-sidebar'>
             <Widgets />
           </div>
+          <Temp />
         </div>
       </div>
 

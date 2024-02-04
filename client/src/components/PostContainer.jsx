@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./PostContainer.css";
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPicker from 'emoji-picker-react';
 import CryptoJS from 'crypto-js'
-import { Buffer, combine, constants, split } from 'shamirs-secret-sharing'
+import { Buffer, split } from 'shamirs-secret-sharing'
 
 function PostContainer({ state }) {
     const { contract, address, signer, provider } = state;
@@ -109,7 +109,7 @@ function PostContainer({ state }) {
                     });
                     console.log(res.data.IpfsHash);
                     const ipfsHash = res.data.IpfsHash;
-                    
+
                     // -----------Retrieving content---------
                     // const response = await axios.get(`https://ipfs.io/ipfs/${ipfsHash}`);
                     // const data = response.data;
@@ -142,7 +142,6 @@ function PostContainer({ state }) {
         }
     };
 
-
     return (
         <form onSubmit={(e) => addPostHandler(e)}>
             <div className="row">
@@ -154,7 +153,7 @@ function PostContainer({ state }) {
                         required
                     />
                 </div>
-                <div className="col-12 card">
+                <div className="col-12">
                     {filePreviews.map((preview, index) => (
                         <img key={index} src={preview} alt={`Preview ${index}`} style={{ width: "100%" }} />
                     ))}
@@ -164,7 +163,7 @@ function PostContainer({ state }) {
             <div className="row">
                 <div className="col-1">
                     <label htmlFor="media" className="form-label"><i className="bi bi-card-image text-primary fs-3"></i> </label>
-                    <input accept="image/jpeg, image/png, image/webp, image/gif, video/mp4, video/quicktime" type="file" className="d-none" id="media" onChange={handleFileChange} multiple="multiple" />
+                    <input accept="image/jpeg, image/png, image/webp, image/gif, video/mp4, video/quicktime" type="file" className="d-none" id="media" onChange={handleFileChange} multiple />
                 </div>
 
                 <div className="col-1">
