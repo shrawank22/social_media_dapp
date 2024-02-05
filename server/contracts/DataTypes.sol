@@ -15,6 +15,8 @@ library DataTypes {
         Visibility visibility;
         Comment[] comments;
         Report[] reports; 
+        address[] userWhoPaid; 
+
     }
 
     struct Comment {

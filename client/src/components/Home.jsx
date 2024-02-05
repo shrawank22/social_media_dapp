@@ -29,7 +29,7 @@ const Home = ({ state }) => {
                     allPosts.map(async (post) => {
                         if (post.viewPrice > 0) {
                             const { ciphertext, uniqueId } = await fetchTextFromIPFS(post.postText);
-                            // console.log(ciphertext, uniqueId);
+                            console.log(ciphertext, uniqueId);
 
                             // Retrieve the shares from the gatekeepers
                             const retrievedShares = [];
@@ -50,13 +50,19 @@ const Home = ({ state }) => {
                             // console.log("Decrypted Content ", decrypted)
 
                             const {postText, viewPrice} = JSON.parse(decrypted)
+                            var postId = post.id; 
+                            let usersWhoPaid = await contract.getPaidUsersByPostId(postId);
+                            const hasPaid = usersWhoPaid.includes(address);
+                            console.log(hasPaid);
+                            
+                            return {...post, postText, viewPrice,hasPaid,postId }
 
-                            return {...post, postText, viewPrice }
+                            
 
                         } else {
                             const { postText, viewPrice } = await fetchTextFromIPFS(post.postText);
                             // console.log(postText, viewPrice)
-                            return { ...post, postText, viewPrice };
+                            return { ...post, postText, viewPrice, hasPaid: true,postId};
                         }
                     })
                 );
@@ -111,6 +117,9 @@ const Home = ({ state }) => {
                             price={Number(post.viewPrice) / 100}
                             onClick={deletePost(post[0])}
                             isCreator={address === post[1]}
+                            postId = {post.postId}
+                            state = {state}
+                            hasPaid={post.hasPaid}
                         />
                     ))}
                 </>
