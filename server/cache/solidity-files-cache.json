@@ -2,15 +2,15 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/shrawan/OneDrive/VS Code/3. Social Media/1/social_media/social_media_curr/server/contracts/DataTypes.sol": {
-      "lastModificationDate": 1706730670216,
-      "contentHash": "d55ae225fa12ceef1c5b97307a97b1a9",
+      "lastModificationDate": 1707132644996,
+      "contentHash": "088d6ed360f196029c8e275e7af44159",
       "sourceName": "contracts/DataTypes.sol",
       "solcConfig": {
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -72,15 +72,15 @@
       ]
     },
     "/home/shrawan/OneDrive/VS Code/3. Social Media/1/social_media/social_media_curr/server/contracts/main.sol": {
-      "lastModificationDate": 1706730806600,
+      "lastModificationDate": 1707134949332,
       "contentHash": "37780e852c52288f1583b54092b53879",
       "sourceName": "contracts/main.sol",
       "solcConfig": {
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -113,15 +113,15 @@
       ]
     },
     "/home/shrawan/OneDrive/VS Code/3. Social Media/1/social_media/social_media_curr/server/contracts/PostManagement.sol": {
-      "lastModificationDate": 1706875173514,
-      "contentHash": "295fe8e08ea37438714c35d5f9c59a6b",
+      "lastModificationDate": 1707134856140,
+      "contentHash": "0a9401f68351f7d3b852e469f2d8a545",
       "sourceName": "contracts/PostManagement.sol",
       "solcConfig": {
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -158,8 +158,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -195,8 +195,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -230,8 +230,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -265,8 +265,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -308,8 +308,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -343,8 +343,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -378,8 +378,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -416,8 +416,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -453,8 +453,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -490,8 +490,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -527,8 +527,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -562,8 +562,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -597,8 +597,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {
@@ -632,8 +632,8 @@
         "version": "0.8.19",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1
           },
           "outputSelection": {
             "*": {

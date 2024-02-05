@@ -3,14 +3,8 @@
 pragma solidity >=0.7.0 <0.9.0;
 import "./DataTypes.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-// import "@openzeppelin/contracts/utils/Counters.sol";
 
-
-contract PostManagement is ERC721, Ownable{
-    // Counters
-    // using Counters for Counters.Counter;
-    // Counters.Counter public postCounter;
+contract PostManagement is ERC721 {
     uint256 public postCounter;
 
     // Mappings
@@ -24,10 +18,9 @@ contract PostManagement is ERC721, Ownable{
     event TipPost(address indexed sender, uint256 indexed postId, uint256 tipAmount);
     event LikePost(address indexed sender, uint256 indexed postId);
     event DislikePost(address indexed sender, uint256 indexed postId);
-    //event for viewPost
-    event ViewPost(address indexed sender, uint indexed postId, uint postAmnt);
+    event ViewPost(address indexed sender, uint indexed postId);
 
-    constructor() ERC721("PostNFT", "PNFT") Ownable(0x9e7189d1e12176F482b59eC1D15BE7D3A66440f4) {}
+    constructor() ERC721("PostNFT", "PNFT") {}
 
     // Functions
     function addPost(string memory _postText, uint256 _viewPrice)
@@ -36,8 +29,6 @@ contract PostManagement is ERC721, Ownable{
     {
         postCounter++;
         uint256 postId = postCounter;
-        // postCounter.increment();
-        // uint256 postId = postCounter.current();
 
         DataTypes.Post storage newPost = posts[postId];
         newPost.id = postId;
@@ -80,12 +71,17 @@ contract PostManagement is ERC721, Ownable{
         return posts[_postId].comments;
     }
 
-    function viewPaidPost(uint256 postId) external payable {
-        uint256 viewPrice = posts[postId].viewPrice;
+    function viewPaidPost(uint postId) external payable {
+        require(!posts[postId].isDeleted, "post is deleted");
+        require(posts[postId].username != msg.sender, "You cannot pay to view your own post");
 
-        payable(posts[postId].username).transfer(viewPrice);
+        posts[postId].username.transfer(msg.value); 
+        posts[postId].userWhoPaid.push(msg.sender); 
+        emit ViewPost(msg.sender, postId);
+    }
 
-        emit TipPost(msg.sender, postId, msg.value);
+    function getPaidUsersByPostId(uint256 postId) public view returns(address[] memory)  {
+        return posts[postId].userWhoPaid; 
     }
 
     function getpostDetails(uint256 postId)
@@ -213,50 +209,5 @@ contract PostManagement is ERC721, Ownable{
         }
         
         return postDataArray;
-    }
-
-
-    //POst view part 
-    function mint(address to, uint256 tokenId) external onlyOwner {
-        _mint(to, tokenId);
-    }
-
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual override {
-        require(false, "NonTransferableNFT: transfer disabled");
-    }
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual override {
-        require(false, "NonTransferableNFT: transfer disabled");
-    }
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) public virtual override {
-        require(false, "NonTransferableNFT: transfer disabled");
-    }
-    
-    function getPaidUsersByPostId(uint256 postId) public view returns(address[] memory)  {
-        return posts[postId].userWhoPaid; 
-    }
-    function viewPaidPost(uint postId, uint postAmnt) external payable {
-        require(!posts[postId].isDeleted, "post is deleted");
-        require(postAmnt > 0, "Invalid tip amount");
-        require(posts[postId].username != msg.sender, "You cannot pay to view your own post");
-
-        posts[postId].username.transfer(postAmnt); 
-        _mint(msg.sender, postId); 
-        posts[postId].userWhoPaid.push(msg.sender); 
-        emit ViewPost(msg.sender, postId, postAmnt);
     }
 }

@@ -259,7 +259,7 @@ function PostContainer({ state }) {
                         </div>
                     ))}
                 </div>
-            )} */}
+            )}  */}
 
         </form>
     );

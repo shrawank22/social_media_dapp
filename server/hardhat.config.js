@@ -4,12 +4,20 @@ require("@nomiclabs/hardhat-ethers")
 require("@nomiclabs/hardhat-waffle")
 
 module.exports = {
-  solidity: "0.8.19",
+  solidity: {
+    version: "0.8.19",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1
+      }
+    }
+  },
   networks: {
     polygon: {
       url: 'https://polygon-mumbai.g.alchemy.com/v2/MYPwc49ru8kphdLXanN10Z8ye9VWcH_W',
       accounts: [
-        '0xd4eb6f52a580ff9448140319173ca779a0eba238a36e0079e03d28e8054ae763',
+        '0xc9891405696022967f401859c6947d9903e1a952447ce6609d4675dc90ec0c8d',
       ],
     },
     localhost: {
