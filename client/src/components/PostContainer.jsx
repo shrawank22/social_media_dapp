@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./PostContainer.css";
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
@@ -14,8 +14,8 @@ function PostContainer({ state }) {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const [filePreviews, setFilePreviews] = useState([]);
-    const [fileIpfsHashes, setFileIpfsHashes] = useState([])
+    const [decryptedFiles, setDecryptedFiles] = useState([]);
+
 
     const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
 
@@ -38,31 +38,49 @@ function PostContainer({ state }) {
         setPostText(prevPostText => prevPostText + emoji.emoji);
     };
 
-    const handleFileChange = async (e) => {
-        const files = e.target.files;
-        setSelectedFiles(files);
+    const handleFileChange = (event) => {
+        const files = event.target.files;
+        setSelectedFiles(Array.from(files)); // Convert FileList to an array
+    };
 
-        // Create previews for the selected files
-        const previews = Array.from(files).map((file) => URL.createObjectURL(file));
-        setFilePreviews(previews);
+    const handleFileEncrypt = (key) => {
+        const encryptedFilesArray = [];
 
-        // Upload each file to IPFS
-        const fileHashes = await Promise.all(Array.from(files).map(async (file) => {
-            const formData = new FormData();
-            formData.append('file', file);
+        selectedFiles.forEach((file) => {
+            const reader = new FileReader();
 
-            const response = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'pinata_api_key': import.meta.env.VITE_PINATA_KEY,
-                    'pinata_secret_api_key': import.meta.env.VITE_PINATA_SECRET_KEY,
-                },
-            });
+            reader.onload = (event) => {
+                const fileContent = event.target.result;
+                const base64Content = btoa(fileContent);
+                const encryptedContent = CryptoJS.AES.encrypt(base64Content, key).toString();
+                encryptedFilesArray.push(encryptedContent);
+            };
+            reader.readAsBinaryString(file);
+        });
+        return encryptedFilesArray
+    };
 
-            return response.data.IpfsHash;
-        }));
+    const handleFileDecrypt = (key, encryptedFiles) => {
+        const decryptedFilesArray = [];
 
-        setFileIpfsHashes(fileHashes);
+        encryptedFiles.forEach((encryptedFile, index) => {
+            const decryptedContent = CryptoJS.AES.decrypt(encryptedFile, key).toString(CryptoJS.enc.Utf8);
+            const binaryContent = atob(decryptedContent);
+            const byteArray = new Uint8Array(binaryContent.length);
+
+            for (let i = 0; i < binaryContent.length; i++) {
+                byteArray[i] = binaryContent.charCodeAt(i);
+            }
+
+            const decryptedBlob = new Blob([byteArray], { type: selectedFiles[index].type });
+            decryptedFilesArray.push(URL.createObjectURL(decryptedBlob));
+
+            if (decryptedFilesArray.length === encryptedFiles.length) {
+                setDecryptedFiles([...decryptedFilesArray]);
+            }
+        });
+
+        return decryptedFilesArray;
     };
 
 
@@ -85,6 +103,12 @@ function PostContainer({ state }) {
                     let key = CryptoJS.lib.WordArray.random(256 / 8).toString(); // Generate a random encryption key
                     const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(content), key).toString(); // Used AES to encrypt the content
 
+                    // Encrypt all the selected files
+                    let encryptedFiles = [];
+                    if (selectedFiles) {
+                        encryptedFiles = handleFileEncrypt(key);
+                    }
+
                     // Split the key into parts
                     const shares = split(Buffer.from(key), { shares: gatekeepersCount, threshold: Math.ceil(gatekeepersCount * 2 / 3) });
 
@@ -101,7 +125,7 @@ function PostContainer({ state }) {
                     }
 
                     // Storing paid content to IPFS
-                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId, fileIpfsHashes }, {
+                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId, encryptedFiles }, {
                         headers: {
                             pinata_api_key: import.meta.env.VITE_PINATA_KEY,
                             pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
@@ -111,16 +135,49 @@ function PostContainer({ state }) {
                     const ipfsHash = res.data.IpfsHash;
 
                     // -----------Retrieving content---------
-                    // const response = await axios.get(`https://ipfs.io/ipfs/${ipfsHash}`);
+                    // const response = await axios.get(`https://brown-bright-emu-470.mypinata.cloud/ipfs/${ipfsHash}`);
                     // const data = response.data;
                     // console.log(data);
+
+                    // Decrypting the encrypted fetched file from IPFS
+                    const response = await axios.get(`https://brown-bright-emu-470.mypinata.cloud/ipfs/${ipfsHash}`);
+                    const d = response.data.encryptedFiles;
+                    const dc = handleFileDecrypt(key, d);
+                    setDecryptedFiles(dc);
 
                     // Store hash onto blockchain
                     await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
 
                 } else {
+                    const ipfsHashes = [];
+                    for (const file of selectedFiles) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('pinataMetadata', JSON.stringify({ name: file.name }));
+
+                        const res = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", formData, {
+                            maxBodyLength: 'Infinity',
+                            headers: {
+                                'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
+                                pinata_api_key: import.meta.env.VITE_PINATA_KEY,
+                                pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
+                            },
+                        });
+                        // console.log(res.data.IpfsHash);
+                        const ipfsHash = res.data.IpfsHash;
+                        ipfsHashes.push(ipfsHash);
+                    }
+
+                    content.ipfsHashes = ipfsHashes;
+
+
                     // Storing free content to IPFS
-                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", content, {
+                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+                        pinataContent: content,
+                        pinataMetadata: {
+                            name: uniqueId
+                        }
+                    }, {
                         headers: {
                             pinata_api_key: import.meta.env.VITE_PINATA_KEY,
                             pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
@@ -145,7 +202,7 @@ function PostContainer({ state }) {
     return (
         <form onSubmit={(e) => addPostHandler(e)}>
             <div className="row">
-                <div className="col-12">
+                <div className="col-9">
                     <textarea
                         value={postText}
                         onChange={updatePostText}
@@ -153,11 +210,9 @@ function PostContainer({ state }) {
                         required
                     />
                 </div>
-                <div className="col-12">
-                    {filePreviews.map((preview, index) => (
-                        <img key={index} src={preview} alt={`Preview ${index}`} style={{ width: "100%" }} />
-                    ))}
-
+                <div className="col-3">
+                    <i className="bi bi-emoji-smile text-primary fs-3" onClick={toggleEmojiPicker}></i>
+                    {showEmojiPicker && <EmojiPicker onEmojiClick={(emoji) => addEmojiToPostText(emoji)} style={{ width: "100%" }} />}
                 </div>
             </div>
             <div className="row">
@@ -187,6 +242,25 @@ function PostContainer({ state }) {
                     <button className="btn btn-primary rounded-pill" type="submit">Post</button>
                 </div>
             </div>
+
+            {/* {decryptedFiles.length > 0 && (
+                <div>
+                    <p>Decrypted Content:</p>
+                    {selectedFiles.map((file, index) => (
+                        <div key={index}>
+                            <p>{file.name}</p>
+                            {file.type.startsWith('image/') ? (
+                                <img src={decryptedFiles[index]} alt={`Decrypted ${file.name}`} />
+                            ) : (
+                                <a href={decryptedFiles[index]} download={`decrypted_${file.name}`}>
+                                    Download Decrypted {file.name}
+                                </a>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )} */}
+
         </form>
     );
 }

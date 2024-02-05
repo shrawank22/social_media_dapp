@@ -67,7 +67,7 @@
 
 
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import CryptoJS from 'crypto-js';
 
 const Temp = () => {

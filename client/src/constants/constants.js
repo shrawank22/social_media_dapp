@@ -1,4 +1,4 @@
-const contractAddress = "0x16E0cb0E25a2F7D1889AE1C517018CBAb5C7483f";
+const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS
 
 const contractABI = [
 	{
