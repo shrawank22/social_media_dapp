@@ -1,5 +1,8 @@
 import "./Post.css";
 import { useState } from "react";
+import axios from "axios";
+
+
 const Post = ({
     displayName,
     text,
@@ -9,6 +12,8 @@ const Post = ({
     postId,
     state,
     hasPaid,
+    decryptedFiles,
+    ipfsHashes
 }) => {
     const [isBlurred, setIsBlurred] = useState(!isCreator && !hasPaid);
     const { contract, address } = state;
@@ -44,57 +49,50 @@ const Post = ({
                     </div>
                     <div className="col-11">
                         <div className="mb-2" style={{ fontSize: "15px" }}>
-                            <span className="fw-bold">{displayName} </span>
-                            <span className="text-secondary">@shrawank22 · </span>
-                            <span className="text-secondary">49m</span>
+                            <span className="fw-bold">{displayName}</span>
+                            <span className="text-secondary"> @shrawank22 ·</span>
+                            <span className="text-secondary"> 49m  ·</span>
+                            <span className="text-primary fw-bolder text-end"> viewPice: {price}</span>
                         </div>
+
 
                         <div className="post_description">
                             <p>{text}</p>
                         </div>
 
                         <div className="media-container">
-                            <div className="media-item">
-                                <img src="https://images.unsplash.com/photo-1707159432991-ac67eace0014?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    alt="Media 1" className="img-fluid" />
+
+                            {decryptedFiles && decryptedFiles.map((src) => (
+                                <div key={src} className="media-item">
+                                    <img src={src} alt="media" className="img-fluid" />
+                                </div>
+                            ))}
+
+                            {ipfsHashes && ipfsHashes.map((key) => (
+                                <div key={key} className="media-item">
+                                    <img src={`https://ipfs.io/ipfs/${key}`} alt="media" className="img-fluid" />
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="row bg-body-tertiary rounded p-2">
+                            <div className="col-3">
+                                <i className="bi bi-chat-left"></i>
                             </div>
-                            <div className="media-item">
-                                <img src="https://images.unsplash.com/photo-1707159432991-ac67eace0014?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    alt="Media 2" className="img-fluid" />
+                            <div className="col-3">
+                                <i className="bi bi-heart"></i>
                             </div>
-                            <div className="media-item">
-                                <img src="https://images.unsplash.com/photo-1707159432991-ac67eace0014?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    alt="Media 3" className="img-fluid" />
+                            <div className="col-3">
+                                <i className="bi bi-flag"></i>
                             </div>
-                            <div className="media-item">
-                                <img src="example-image4.jpg" alt="Media 4" className="img-fluid" />
+                            <div className="col-3">
+                                {isCreator && (
+                                    <i className="bi bi-trash-fill" onClick={onClick}></i>
+                                )}
                             </div>
                         </div>
                     </div>
-
                 </div>
-
-
-
-                {/* <div className="post_body">
-                    <div className="post_header">
-                        <div className="post_headerText">
-                            <h3>{displayName} </h3>
-                        </div>
-                        <div className="post_headerDescription">
-                            <pre id="contents">{text}</pre>
-                        </div>
-
-                        <p>{price}</p>
-                    </div>
-                    <div className="post_footer">
-                        <i className="bi bi-chat-left"></i>
-                        <i className="bi bi-heart"></i>
-                        {isCreator && (
-                            <i className="bi bi-trash-fill" onClick={onClick}></i>
-                        )}
-                    </div>
-                </div> */}
             </div>
         </div>
     );

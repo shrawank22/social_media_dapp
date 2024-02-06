@@ -17,6 +17,26 @@ const Home = ({ state }) => {
         getAllPosts();
     }, [address]);
 
+    const handleFileDecrypt = (key, encryptedFiles) => {
+        const decryptedFilesArray = [];
+
+        encryptedFiles.forEach((encryptedFile, index) => {
+            const decryptedContent = CryptoJS.AES.decrypt(encryptedFile, key).toString(CryptoJS.enc.Utf8);
+            const binaryContent = atob(decryptedContent);
+            const byteArray = new Uint8Array(binaryContent.length);
+
+            for (let i = 0; i < binaryContent.length; i++) {
+                byteArray[i] = binaryContent.charCodeAt(i);
+            }
+
+            // const decryptedBlob = new Blob([byteArray], { type: "selectedFiles[index].type" });
+            const decryptedBlob = new Blob([byteArray], { type: "image/jpeg" });
+            decryptedFilesArray.push(URL.createObjectURL(decryptedBlob));
+        });
+
+        return decryptedFilesArray;
+    };
+
     const getAllPosts = async () => {
         try {
             setIsLoading(true);
@@ -28,8 +48,8 @@ const Home = ({ state }) => {
                 const postsWithData = await Promise.all(
                     allPosts.map(async (post) => {
                         if (post.viewPrice > 0) {
-                            const { ciphertext, uniqueId } = await fetchTextFromIPFS(post.postText);
-                            console.log(ciphertext, uniqueId);
+                            const { ciphertext, uniqueId, encryptedFiles } = await fetchTextFromIPFS(post.postText);
+                            console.log(ciphertext, uniqueId, encryptedFiles);
 
                             // Retrieve the shares from the gatekeepers
                             const retrievedShares = [];
@@ -49,20 +69,22 @@ const Home = ({ state }) => {
                             const decrypted = bytes.toString(CryptoJS.enc.Utf8);
                             // console.log("Decrypted Content ", decrypted)
 
-                            const {postText, viewPrice} = JSON.parse(decrypted)
-                            var postId = post.id; 
-                            let usersWhoPaid = await contract.getPaidUsersByPostId(postId);
+                            // Retrieving encrypted files
+                            const decryptedFiles = handleFileDecrypt(retrievedKey, encryptedFiles);
+                            const { postText, viewPrice } = JSON.parse(decrypted)
+                            
+                            let usersWhoPaid = await contract.getPaidUsersByPostId(post.postId);
                             const hasPaid = usersWhoPaid.includes(address);
                             console.log(hasPaid);
-                            
-                            return {...post, postText, viewPrice,hasPaid,postId }
 
-                            
+                            return { ...post, postText, viewPrice, decryptedFiles, hasPaid, ipfsHashes:[] }
+
+
 
                         } else {
-                            const { postText, viewPrice } = await fetchTextFromIPFS(post.postText);
-                            // console.log(postText, viewPrice)
-                            return { ...post, postText, viewPrice, hasPaid: true,postId};
+                            const { postText, viewPrice, ipfsHashes } = await fetchTextFromIPFS(post.postText);
+                            // console.log(postText, viewPrice, ipfsHashes)
+                            return { ...post, postText, viewPrice, ipfsHashes, hasPaid: true, decryptedFiles: [] };
                         }
                     })
                 );
@@ -80,7 +102,7 @@ const Home = ({ state }) => {
 
     const fetchTextFromIPFS = async (ipfsHash) => {
         try {
-            const response = await axios.get(`https://ipfs.io/ipfs/${ipfsHash}`);
+            const response = await axios.get(`https://brown-bright-emu-470.mypinata.cloud/ipfs/${ipfsHash}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching text from IPFS:', error);
@@ -117,9 +139,11 @@ const Home = ({ state }) => {
                             price={Number(post.viewPrice) / 100}
                             onClick={deletePost(post[0])}
                             isCreator={address === post[1]}
-                            postId = {post.postId}
+                            postId = {post[0]}
                             state = {state}
                             hasPaid={post.hasPaid}
+                            decryptedFiles = {post.decryptedFiles}
+                            ipfsHashes = {post.ipfsHashes}
                         />
                     ))}
                 </>

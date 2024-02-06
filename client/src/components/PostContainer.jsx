@@ -12,10 +12,7 @@ function PostContainer({ state }) {
     const [postText, setPostText] = useState('');
     const [viewPrice, setViewPrice] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
     const [selectedFiles, setSelectedFiles] = useState([]);
-    const [decryptedFiles, setDecryptedFiles] = useState([]);
-
 
     const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
 
@@ -59,30 +56,6 @@ function PostContainer({ state }) {
         });
         return encryptedFilesArray
     };
-
-    const handleFileDecrypt = (key, encryptedFiles) => {
-        const decryptedFilesArray = [];
-
-        encryptedFiles.forEach((encryptedFile, index) => {
-            const decryptedContent = CryptoJS.AES.decrypt(encryptedFile, key).toString(CryptoJS.enc.Utf8);
-            const binaryContent = atob(decryptedContent);
-            const byteArray = new Uint8Array(binaryContent.length);
-
-            for (let i = 0; i < binaryContent.length; i++) {
-                byteArray[i] = binaryContent.charCodeAt(i);
-            }
-
-            const decryptedBlob = new Blob([byteArray], { type: selectedFiles[index].type });
-            decryptedFilesArray.push(URL.createObjectURL(decryptedBlob));
-
-            if (decryptedFilesArray.length === encryptedFiles.length) {
-                setDecryptedFiles([...decryptedFilesArray]);
-            }
-        });
-
-        return decryptedFilesArray;
-    };
-
 
     const addPostHandler = async (event) => {
         event.preventDefault();
@@ -138,12 +111,6 @@ function PostContainer({ state }) {
                     // const response = await axios.get(`https://brown-bright-emu-470.mypinata.cloud/ipfs/${ipfsHash}`);
                     // const data = response.data;
                     // console.log(data);
-
-                    // Decrypting the encrypted fetched file from IPFS
-                    const response = await axios.get(`https://brown-bright-emu-470.mypinata.cloud/ipfs/${ipfsHash}`);
-                    const d = response.data.encryptedFiles;
-                    const dc = handleFileDecrypt(key, d);
-                    setDecryptedFiles(dc);
 
                     // Store hash onto blockchain
                     await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
@@ -227,17 +194,22 @@ function PostContainer({ state }) {
                                 required
                             />
                         </div>
+
+                        <div className="col-12">
+                            <p className="text-secondary mb-0">ViewPrice , Enter 0 if free</p>
+                        </div>
+
                         <div className="col-6">
-                            <i className="bi bi-emoji-smile text-primary fs-2" onClick={toggleEmojiPicker}></i>
+                            <i className="bi bi-emoji-smile text-primary fs-2" onClick={toggleEmojiPicker} title="emoji" ></i>
                             {showEmojiPicker && (
-                                <div style={{ position: 'absolute', top: '200px', zIndex: '1' }}>
+                                <div style={{ position: 'absolute', top: '250px', zIndex: '1' }}>
                                     <EmojiPicker className="emoji-picker" onEmojiClick={(emoji) => addEmojiToPostText(emoji)} height={400} width={250} />
                                 </div>
                             )}
                         </div>
 
                         <div className="col-6">
-                            <label htmlFor="media" className="form-label"><i className="bi bi-card-image text-primary fs-2"></i> </label>
+                            <label htmlFor="media" className="form-label"><i className="bi bi-card-image text-primary fs-2" title="media"></i> </label>
                             <input accept="image/jpeg, image/png, image/webp, image/gif, video/mp4, video/quicktime" type="file" className="d-none" id="media" onChange={handleFileChange} multiple />
                         </div>
 

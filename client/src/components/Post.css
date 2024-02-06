@@ -47,6 +47,7 @@
 
 .media-item img {
     width: 100%;
-    height: auto;
+    height: 230px;
+    background-size: cover;
     border-radius: 5px;
 }
