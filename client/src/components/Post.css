@@ -1,57 +1,11 @@
 .post {
-    display: flex;
-    align-items: flex-start;
-    border-bottom: 1px solid var(--twitter-background);
-    padding-bottom: 10px;
-}
-
-.post_body {
-    flex: 1;
+    border-bottom: 1px solid #d6cfcf;
     padding: 10px;
-}
-
-.post_body>img {
-    border-radius: 20px;
-}
-
-.post_footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.post_headerDescription {
-    margin-bottom: 10px;
-    font-size: 15px;
-}
-
-.post_headerText>h3 {
-    font-size: 15px;
-    margin-bottom: 5px;
-}
-
-.post_headerSpecial {
-    font-weight: 600;
-    font-size: 12px;
-    color: gray;
-}
-
-.post_avatar {
-    padding: 20px;
-}
-
-#contents {
-    white-space: pre-line;
-    line-height: 1.2;
-    font-size: 18px;
-    word-spacing: 1px;
-    color: black;
 }
 
 .post_content.blurred {
     filter: blur(3px);
 }
-
 
 .viewButton {
     filter: none;
@@ -78,4 +32,21 @@
     filter:none;
     display: block;
     z-index: 2;
+}
+
+.media-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.media-item {
+    width: 48%;
+    margin-bottom: 10px;
+}
+
+.media-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
 }

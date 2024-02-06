@@ -12,4 +12,8 @@ textarea:focus {
 }
 
 
-  
+@media (max-width: 767px) {
+    .emoji-picker {
+        width: 150px !important;
+    }
+}
