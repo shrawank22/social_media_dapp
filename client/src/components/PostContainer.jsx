@@ -13,6 +13,7 @@ function PostContainer({ state }) {
     const [viewPrice, setViewPrice] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [isPosting, setIsPosting] = useState(false);
 
     const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
 
@@ -37,7 +38,13 @@ function PostContainer({ state }) {
 
     const handleFileChange = (event) => {
         const files = event.target.files;
-        setSelectedFiles(Array.from(files)); // Convert FileList to an array
+        const filesArray = Array.from(files); // Convert FileList to an array
+
+        // filesArray.forEach(file => {
+        //     console.log(`File: ${file.name}, Size: ${file.size} bytes`);
+        // });
+
+        setSelectedFiles(filesArray);
     };
 
     const handleFileEncrypt = (key) => {
@@ -59,6 +66,7 @@ function PostContainer({ state }) {
 
     const addPostHandler = async (event) => {
         event.preventDefault();
+        setIsPosting(true);
         try {
             console.log("Trying to add a post");
             if (postText === '' || viewPrice === '') {
@@ -113,8 +121,8 @@ function PostContainer({ state }) {
                     // console.log(data);
 
                     // Store hash onto blockchain
-                    await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
-
+                    const receipt = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
+                    await receipt.wait();
                 } else {
                     const ipfsHashes = [];
                     for (const file of selectedFiles) {
@@ -154,12 +162,15 @@ function PostContainer({ state }) {
                     const ipfsHash = res.data.IpfsHash;
 
                     // Store hash onto blockchain
-                    await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
+                    const receipt = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
+                    await receipt.wait();
                 }
 
                 // Resetting inputs
                 setPostText('');
                 setViewPrice('');
+                // getAllPosts();
+                setIsPosting(false);
             }
         } catch (err) {
             console.log(err);
@@ -177,7 +188,7 @@ function PostContainer({ state }) {
                         required
                     />
                     <div className="col-12 text-end">
-                        <button className="btn btn-primary rounded-pill" type="submit">Post</button>
+                        <button disabled={isPosting} className="btn btn-primary rounded-pill" type="submit">Post</button>
                     </div>
                 </div>
 

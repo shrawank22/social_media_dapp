@@ -73,7 +73,7 @@ const Home = ({ state }) => {
                             const decryptedFiles = handleFileDecrypt(retrievedKey, encryptedFiles);
                             const { postText, viewPrice } = JSON.parse(decrypted)
                             
-                            let usersWhoPaid = await contract.getPaidUsersByPostId(post.postId);
+                            let usersWhoPaid = await contract.getPaidUsersByPostId(post.id);
                             const hasPaid = usersWhoPaid.includes(address);
                             console.log(hasPaid);
 
@@ -102,7 +102,7 @@ const Home = ({ state }) => {
 
     const fetchTextFromIPFS = async (ipfsHash) => {
         try {
-            const response = await axios.get(`https://brown-bright-emu-470.mypinata.cloud/ipfs/${ipfsHash}`);
+            const response = await axios.get(`https://ipfs.io/ipfs/${ipfsHash}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching text from IPFS:', error);
@@ -112,7 +112,9 @@ const Home = ({ state }) => {
 
     const deletePost = key => async () => {
         try {
-            await contract.deletePost(key);
+            const receipt = await contract.deletePost(key);
+            await receipt.wait();
+            setPosts(posts.filter(post => post[0] !== key));
         } catch (error) {
             console.log(error);
         }
@@ -124,7 +126,7 @@ const Home = ({ state }) => {
             <div className="feed-header">
                 <h2>Home</h2>
             </div>
-            <PostContainer state={state} />
+            <PostContainer state={state} getAllPosts={getAllPosts}/>
 
             {isLoading ? (
                 <div>Loading...</div> // Loading indicator
