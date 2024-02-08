@@ -30,20 +30,18 @@ const Post = ({
 
     return (
         <div className="post">
+            <div className={`viewButton ${!isCreator && isBlurred ? "visible" : "hidden"}`}>
+                <i
+                    className="bi bi-eye-slash fs-1 text-primary fw-bold"
+                    onClick={() => handleViewClick()}
+                ></i>
+            </div>
+
             <div className={`post_content ${isBlurred ? "blurred" : ""}`}>
-                <div className={`viewButton ${!isCreator && isBlurred ? "visible" : "hidden"}`}>
-                    <i
-                        className="bi bi-eye-slash"
-                        style={{ fontSize: "40px", color: "red" }}
-                        onClick={() => handleViewClick()}
-                    ></i>
-                </div>
-
-
                 <div className="row">
                     <div className="col-1">
                         <img src="https://images.unsplash.com/photo-1707159432991-ac67eace0014?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="Profile Picture" className="rounded-circle" style={{ width: "40px", height: "40px" }} />
+                            alt="dp" className="rounded-circle" style={{ width: "40px", height: "40px" }} />
                     </div>
                     <div className="col-11">
                         <div className="mb-2" style={{ fontSize: "15px" }}>
@@ -60,7 +58,7 @@ const Post = ({
 
                         <div className="media-container">
 
-                            {decryptedFiles && decryptedFiles.map((src) => (
+                            {!isBlurred && decryptedFiles && decryptedFiles.map((src) => (
                                 <div key={src} className="media-item">
                                     <img src={src} alt="media" className="img-fluid" />
                                 </div>
