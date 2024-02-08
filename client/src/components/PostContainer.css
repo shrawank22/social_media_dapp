@@ -11,9 +11,22 @@ textarea:focus {
     outline: none !important
 }
 
+.emoji-picker-container {
+    position: absolute;
+    top: 250px;
+    z-index: 1;
+}
+
 @media (max-width: 767px) {
     .emoji-picker {
         width: 150px !important;
+        left: 0;
+    }
+}
+
+@media (max-width: 683px) {
+    .emoji-picker {
+        width: 120px !important;
         left: 0;
     }
 }

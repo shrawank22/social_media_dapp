@@ -211,17 +211,18 @@ function PostContainer({ state }) {
                         </div>
 
                         <div className="col-6">
-                            <i className="bi bi-emoji-smile text-primary fs-2" onClick={toggleEmojiPicker} title="emoji" ></i>
+                            <i className="bi bi-emoji-smile text-primary fs-4" onClick={toggleEmojiPicker} title="emoji" ></i>
                             {showEmojiPicker && (
-                                <div style={{ position: 'absolute', top: '250px', zIndex: '1' }}>
+                                <div className="emoji-picker-container">
                                     <EmojiPicker className="emoji-picker" onEmojiClick={(emoji) => addEmojiToPostText(emoji)} height={400} width={250} />
                                 </div>
                             )}
                         </div>
 
                         <div className="col-6">
-                            <label htmlFor="media" className="form-label"><i className="bi bi-card-image text-primary fs-2" title="media"></i> </label>
+                            <label htmlFor="media" className="form-label"><i className="bi bi-card-image text-primary fs-4" title="media"></i> </label>
                             <input accept="image/jpeg, image/png, image/webp, image/gif, video/mp4, video/quicktime" type="file" className="d-none" id="media" onChange={handleFileChange} multiple />
+                            {selectedFiles.length > 0 && <p className="text-secondary" style={{fontSize: "10px", fontWeight: "bold"}}>{selectedFiles.length} selected</p>}
                         </div>
 
                     </div>

@@ -1,7 +1,5 @@
 import "./Post.css";
 import { useState } from "react";
-import axios from "axios";
-
 
 const Post = ({
     displayName,
@@ -75,7 +73,7 @@ const Post = ({
                             ))}
                         </div>
 
-                        <div className="row bg-body-tertiary rounded p-2">
+                        <div className="row bg-body-tertiary rounded p-1">
                             <div className="col-3">
                                 <i className="bi bi-chat-left"></i>
                             </div>
