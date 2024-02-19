@@ -17,6 +17,7 @@ router.post('/register', async (req, res) => {
     };
 
     try {
+        // create credential
         const issuerRes = await axios.post(`${API_URL}/v1/credentials`, req.body, {
             headers: {
                 'Content-Type': 'application/json',
@@ -27,7 +28,26 @@ router.post('/register', async (req, res) => {
 
         console.log('res: ', issuerRes.data);
 
-        res.status(200).send(issuerRes.data);
+        // create VC qr code
+        const qrCodeRes = await axios.get(`${API_URL}/v1/credentials/${issuerRes.data.id}/qrcode`, {
+            headers: {
+                'Accept' : 'application/json'
+            }
+        });
+
+        console.log('qrCodeRes: ', qrCodeRes.data);
+
+        // send qr code to user
+        const qrCodeLink = qrCodeRes.data.qrCodeLink.split('=')[1]+ '=' + qrCodeRes.data.qrCodeLink.split('=')[2];
+
+        console.log('qrCodeLink: ', qrCodeLink);
+
+        // get qr code link
+        const qrCodeLinkRes = await axios.get(`${qrCodeLink}`);
+        
+        console.log('qrCodeLinkRes: ', qrCodeLinkRes.data);
+
+        res.status(200).send(qrCodeLinkRes.data);
     } catch (err) {
         console.log(err);
     }
