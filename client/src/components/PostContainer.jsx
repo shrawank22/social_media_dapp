@@ -14,6 +14,8 @@ function PostContainer({ state }) {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [isPosting, setIsPosting] = useState(false);
+    const [fileURLs, setFileURLs] = useState([]);
+
 
     const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
 
@@ -43,6 +45,9 @@ function PostContainer({ state }) {
         // filesArray.forEach(file => {
         //     console.log(`File: ${file.name}, Size: ${file.size} bytes`);
         // });
+
+        const urls = filesArray.map(file => ({ name: file.name, url: URL.createObjectURL(file) }));
+        setFileURLs(urls);
 
         setSelectedFiles(filesArray);
     };
@@ -180,53 +185,53 @@ function PostContainer({ state }) {
     return (
         <form onSubmit={(e) => addPostHandler(e)}>
             <div className="row">
-                <div className="col-10">
+                <div className="col-12">
                     <textarea
                         value={postText}
                         onChange={updatePostText}
                         placeholder="What's happening?"
                         required
                     />
-                    <div className="col-12 text-end">
-                        <button disabled={isPosting} className="btn btn-primary rounded-pill" type="submit">Post</button>
-                    </div>
+                </div>
+            </div>
+
+            <div className="d-flex justify-content-between">
+                <div>
+                    <i className="bi bi-emoji-smile text-primary fs-4" onClick={toggleEmojiPicker} title="emoji" ></i>
+                    {showEmojiPicker && (
+                        <div className="emoji-picker-container">
+                            <EmojiPicker className="emoji-picker" onEmojiClick={(emoji) => addEmojiToPostText(emoji)} height={400} width={250} />
+                        </div>
+                    )}
                 </div>
 
-                <div className="col-2">
-                    <div className="row">
-                        <div className="col-12">
-                            <input
-                                onChange={updateViewPrice}
-                                type="number"
-                                min={0}
-                                className="form-control"
-                                placeholder="Price"
-                                value={viewPrice}
-                                required
-                            />
-                        </div>
+                <div>
+                    <label htmlFor="media" className="form-label"><i className="bi bi-card-image text-primary fs-4" title="media"></i> </label>
+                    <input accept="image/jpeg, image/png, image/webp, image/gif, video/mp4, video/quicktime" type="file" className="d-none" id="media" onChange={handleFileChange} multiple />
+                    <ul>
+                        {fileURLs.map((file, index) => (
+                            <li key={index}>
+                                <a href={file.url} target="_blank" rel="noopener noreferrer">{file.name}</a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
 
-                        <div className="col-12">
-                            <p className="text-secondary mb-0">ViewPrice , Enter 0 if free</p>
-                        </div>
+                <div style={{ flexBasis: "120px" }}>
+                    <input
+                        onChange={updateViewPrice}
+                        type="number"
+                        min={0}
+                        className="form-control"
+                        placeholder="Price"
+                        value={viewPrice}
+                        required
+                    />
+                    <div className="form-text">ViewPrice, Enter 0 if free</div>
+                </div>
 
-                        <div className="col-6">
-                            <i className="bi bi-emoji-smile text-primary fs-4" onClick={toggleEmojiPicker} title="emoji" ></i>
-                            {showEmojiPicker && (
-                                <div className="emoji-picker-container">
-                                    <EmojiPicker className="emoji-picker" onEmojiClick={(emoji) => addEmojiToPostText(emoji)} height={400} width={250} />
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="col-6">
-                            <label htmlFor="media" className="form-label"><i className="bi bi-card-image text-primary fs-4" title="media"></i> </label>
-                            <input accept="image/jpeg, image/png, image/webp, image/gif, video/mp4, video/quicktime" type="file" className="d-none" id="media" onChange={handleFileChange} multiple />
-                            {selectedFiles.length > 0 && <p className="text-secondary" style={{fontSize: "10px", fontWeight: "bold"}}>{selectedFiles.length} selected</p>}
-                        </div>
-
-                    </div>
-
+                <div>
+                    <button disabled={isPosting} className="btn btn-primary rounded-pill" type="submit">Post</button>
                 </div>
             </div>
 
@@ -248,7 +253,7 @@ function PostContainer({ state }) {
                 </div>
             )}  */}
 
-        </form>
+        </form >
     );
 }
 
