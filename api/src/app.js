@@ -11,7 +11,8 @@ const app = express();
 //App config
 const options = {
     credentials: true,
-    origin: "http://localhost:5173",
+    // origin: "http://localhost:5173",
+    origin: "*",
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
 };
 app.use(cors(options));
@@ -27,7 +28,8 @@ const User = require('./models/User');
 //routes imported
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
-const gatekeeperRoutes = require('./routes/gatekeeper')
+const gatekeeperRoutes = require('./routes/gatekeeper');
+const ssiRoutes = require('./routes/ssiRoutes');
 
 //DB Connection
 const connectMongo = require('./connect');
@@ -96,7 +98,8 @@ app.use((req, res, next) => {
 //imported routes use
 app.use("/api", authRoutes);
 app.use("/api", postRoutes);
-app.use("/api", gatekeeperRoutes)
+app.use("/api", gatekeeperRoutes);
+app.use("/ssi", ssiRoutes);
 
 //app listen config
 const PORT = process.env.PORT || 8080;
