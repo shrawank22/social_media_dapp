@@ -49,7 +49,7 @@ const Home = ({ state }) => {
                     allPosts.map(async (post) => {
                         if (post.viewPrice > 0) {
                             const { ciphertext, uniqueId, encryptedFiles } = await fetchTextFromIPFS(post.postText);
-                            console.log(ciphertext, uniqueId, encryptedFiles);
+                            // console.log(ciphertext, uniqueId, encryptedFiles);
 
                             // Retrieve the shares from the gatekeepers
                             const retrievedShares = [];

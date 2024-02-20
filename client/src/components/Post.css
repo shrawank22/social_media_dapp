@@ -7,7 +7,12 @@
 .post_content.blurred {
     filter: blur(3px);
 }
-
+.modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: inherit; /* match the background color of the modal */
+}
 .viewButton {
     filter: none;
     position: absolute;

@@ -1,5 +1,6 @@
 import "./Post.css";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import PostHelper from "./PostHelper";
 
 const Post = ({
     displayName,
@@ -29,28 +30,38 @@ const Post = ({
     };
 
     const commentRef = useRef(null);
-    const [isInputVisible, setInputVisible] = useState(false);
+    const [comments, setComments] = useState([]);
 
-    const handleCommentClick = () => {
-        setInputVisible(!isInputVisible);
-        if (commentRef.current) {
-            commentRef.current.focus();
-        }
-    };
-
-    const handleCommentPost = async () => { 
+    const handleCommentPost = async () => {
         const comment = commentRef.current.value;
-        if (!comment) { 
+        if (!comment) {
             return;
         }
-        const tx = await contract.addComment(postId, comment);
-        const receipt = await tx.wait();
-        if (receipt.status === 1) {
-            console.log("Comment posted successfully");
-        } else {
-            console.error("Comment posting failed");
+        try {
+            const tx = await contract.addComment(postId, comment);
+            const receipt = await tx.wait();
+            if (receipt.status === 1) {
+                console.log("Comment posted successfully");
+            } else {
+                console.error("Comment posting failed");
+            }
+        }
+        catch (error) {
+            console.error("Error posting comment:", error);
         }
     };
+
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                const comments = await contract.getPostComments(postId);
+                setComments(comments);
+            } catch (error) {
+                console.error("Error fetching comments:", error);
+            }
+        };
+        fetchComments();
+    }, []);
 
     return (
         <div className="post">
@@ -62,41 +73,9 @@ const Post = ({
             </div>
 
             <div className={`post_content ${isBlurred ? "blurred" : ""}`}>
-                <div className="d-flex justify-content-start">
-                    <div style={{ marginRight: "5px" }}>
-                        <img src="https://images.unsplash.com/photo-1707159432991-ac67eace0014?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                            alt="dp" className="rounded-circle" style={{ width: "50px", height: "50px" }} />
-                    </div>
-                    <div>
-                        <div className="m-2" style={{ fontSize: "15px" }}>
-                            <span className="fw-bold">{displayName}</span>
-                            <span className="text-secondary"> @shrawank22 ·</span>
-                            <span className="text-secondary"> 49m  ·</span>
-                            <span className="text-primary fw-bolder text-end"> viewPice: {price}</span>
-                        </div>
-
-
-                        <div className="post_description">
-                            <p>{text}</p>
-                        </div>
-
-                        <div className="media-container">
-                            {!isBlurred && decryptedFiles && decryptedFiles.map((src) => (
-                                <div key={src} className="media-item">
-                                    <img src={src} alt="media" className="img-fluid" />
-                                </div>
-                            ))}
-
-                            {ipfsHashes && ipfsHashes.map((key) => (
-                                <div key={key} className="media-item">
-                                    <img src={`https://ipfs.io/ipfs/${key}`} alt="media" className="img-fluid" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} isBlurred={isBlurred} />
                 <div className="d-flex bg-body-tertiary rounded p-1 justify-content-around">
-                    <i className="bi bi-chat-left" onClick={handleCommentClick}></i>
+                    <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target="#commentModal"></i>
                     <i className="bi bi-heart"></i>
                     <i className="bi bi-flag"></i>
                     {isCreator && (
@@ -107,12 +86,49 @@ const Post = ({
                     )}
                 </div>
 
-                {isInputVisible && (
-                    <span>
-                        <input className="mx-2 p-1 rounded" ref={commentRef} type="text" placeholder="Write a comment..." />
-                        <button className="btn btn-primary rounded-pill" onClick={handleCommentPost}>Comment</button>
-                    </span>
-                )}
+
+                {/* Modal */}
+                <div className="modal fade" id="commentModal" tabIndex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+                    <div className="modal-dialog modal-xl">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h1 className="modal-title fs-5" id="commentModalLabel">Someone's Post</h1>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div className="modal-body">
+                                <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} isBlurred={false} />
+                                <div className="d-flex bg-body-tertiary rounded p-1 justify-content-around">
+                                    <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target="#commentModal"></i>
+                                    <i className="bi bi-heart"></i>
+                                    <i className="bi bi-flag"></i>
+                                    {isCreator && (
+                                        <i className="bi bi-pencil-square"></i>
+                                    )}
+                                    {isCreator && (
+                                        <i className="bi bi-trash-fill" onClick={onClick}></i>
+                                    )}
+                                </div>
+
+                                <div className="comments">
+                                    {comments.map((comment) => (
+                                        <div key={comment} className="comment">
+                                            <h4>{comment[1]}</h4>
+                                            <p>{comment[2]}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                                <span>
+                                    <input className="mx-2 p-1 rounded" ref={commentRef} type="text" placeholder="Write a comment..." />
+                                    <button className="btn btn-primary rounded-pill" onClick={handleCommentPost}>Comment</button>
+                                </span>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" className="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
