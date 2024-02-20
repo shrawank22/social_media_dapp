@@ -42,7 +42,7 @@ contract PostManagement is ERC721 {
         emit AddPost(msg.sender, postId);
     }
 
-    function editPost(uint256 _postId, string memory _newPostText) external {
+    function editPost(uint256 _postId, string memory _newPostText, uint256 _newPrice) external {
         require(
             posts[_postId].username == msg.sender,
             "You are not the owner of the post"
@@ -50,6 +50,7 @@ contract PostManagement is ERC721 {
         require(!posts[_postId].isDeleted, "Post is deleted");
 
         posts[_postId].postText = _newPostText;
+        posts[_postId].viewPrice = _newPrice;
     }
 
     function addComment(uint256 _postId, string memory _commentText) external {
