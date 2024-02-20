@@ -108,24 +108,35 @@ const Post = ({
                                         <i className="bi bi-trash-fill" onClick={onClick}></i>
                                     )}
                                 </div>
-
-                                <div className="comments">
-                                    {comments.map((comment) => (
-                                        <div key={comment} className="comment">
-                                            <h4>{comment[1]}</h4>
-                                            <p>{comment[2]}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                                <span>
-                                    <input className="mx-2 p-1 rounded" ref={commentRef} type="text" placeholder="Write a comment..." />
-                                    <button className="btn btn-primary rounded-pill" onClick={handleCommentPost}>Comment</button>
+                                <hr />
+                                <span className="d-flex">
+                                    <input className="form-control" ref={commentRef} type="text" placeholder="Write a comment..." />
+                                    <button className="btn btn-success rounded-pill" onClick={handleCommentPost}>Comment</button>
                                 </span>
+
+
+                                {comments.map((comment) => (
+                                    <div key={comment} className="p-1 bg-body-tertiary rounded-2">
+                                        <div className="d-flex justify-content-start">
+                                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Profile" style={{
+                                                height: '50px',
+                                                width: '50px',
+                                                borderRadius: '50%',
+                                                marginRight: '10px'
+                                            }} />
+                                            <h6 className="mt-3 text-primary">{comment[1]}</h6>
+                                        </div>
+                                        <p className="ms-5">{comment[2]}</p>
+                                        
+                                    </div>
+                                ))}
+
+
                             </div>
-                            <div className="modal-footer">
+                            {/* <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="button" className="btn btn-primary">Save changes</button>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
