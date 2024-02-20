@@ -75,7 +75,7 @@ const Home = ({ state }) => {
                             
                             let usersWhoPaid = await contract.getPaidUsersByPostId(post.id);
                             const hasPaid = usersWhoPaid.includes(address);
-                            console.log(hasPaid);
+                            // console.log(hasPaid);
 
                             return { ...post, postText, viewPrice, decryptedFiles, hasPaid, ipfsHashes:[] }
 

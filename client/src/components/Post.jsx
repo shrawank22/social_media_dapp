@@ -61,7 +61,7 @@ const Post = ({
             }
         };
         fetchComments();
-    }, []);
+    }, [postId, comments]);
 
     return (
         <div className="post">
@@ -75,7 +75,7 @@ const Post = ({
             <div className={`post_content ${isBlurred ? "blurred" : ""}`}>
                 <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} isBlurred={isBlurred} />
                 <div className="d-flex bg-body-tertiary rounded p-1 justify-content-around">
-                    <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target="#commentModal"></i>
+                    <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target={`#commentModal-${postId}`}></i>
                     <i className="bi bi-heart"></i>
                     <i className="bi bi-flag"></i>
                     {isCreator && (
@@ -88,7 +88,7 @@ const Post = ({
 
 
                 {/* Modal */}
-                <div className="modal fade" id="commentModal" tabIndex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+                <div className="modal fade" id={`commentModal-${postId}`} tabIndex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
                     <div className="modal-dialog modal-xl">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -98,7 +98,7 @@ const Post = ({
                             <div className="modal-body">
                                 <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} isBlurred={false} />
                                 <div className="d-flex bg-body-tertiary rounded p-1 justify-content-around">
-                                    <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target="#commentModal"></i>
+                                    <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target={`#commentModal-${postId}`}></i>
                                     <i className="bi bi-heart"></i>
                                     <i className="bi bi-flag"></i>
                                     {isCreator && (
@@ -127,16 +127,9 @@ const Post = ({
                                             <h6 className="mt-3 text-primary">{comment[1]}</h6>
                                         </div>
                                         <p className="ms-5">{comment[2]}</p>
-                                        
                                     </div>
                                 ))}
-
-
                             </div>
-                            {/* <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="button" className="btn btn-primary">Save changes</button>
-                            </div> */}
                         </div>
                     </div>
                 </div>
