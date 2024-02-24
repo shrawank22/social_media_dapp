@@ -64,11 +64,7 @@ contract PostManagement is ERC721 {
         posts[_postId].comments.push(newComment);
     }
 
-    function getPostComments(uint256 _postId)
-        external
-        view
-        returns (DataTypes.Comment[] memory)
-    {
+    function getPostComments(uint256 _postId) external view returns (DataTypes.Comment[] memory) {
         return posts[_postId].comments;
     }
 
@@ -85,19 +81,7 @@ contract PostManagement is ERC721 {
         return posts[postId].userWhoPaid; 
     }
 
-    function getpostDetails(uint256 postId)
-        external
-        view
-        returns (
-            uint256,
-            address,
-            string memory,
-            uint256,
-            bool,
-            DataTypes.Comment[] memory,
-            DataTypes.Report[] memory
-        )
-    {
+    function getpostDetails(uint256 postId) external view returns (uint256, address, string memory, uint256, bool, DataTypes.Comment[] memory, DataTypes.Report[] memory) {
         DataTypes.Post storage post = posts[postId];
         return (
             post.id,
@@ -168,11 +152,7 @@ contract PostManagement is ERC721 {
     }
 
 
-    function viewReports(uint256 _postId)
-        external
-        view
-        returns (DataTypes.Report[] memory)
-    {
+    function viewReports(uint256 _postId) external view returns (DataTypes.Report[] memory) {
         return posts[_postId].reports;
     }
 

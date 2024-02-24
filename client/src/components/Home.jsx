@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 
 import PostContainer from './PostContainer';
 import Post from './Post';
 import axios from 'axios';
 import CryptoJS from 'crypto-js'
 import { Buffer, combine } from 'shamirs-secret-sharing'
+import web3Context from '../context/web3/web3Context';
 
 const Home = ({ state }) => {
 
     const { contract, address } = state;
+    
+    const context = useContext(web3Context);
+    const { showAlert, deletePost, getPost } = context;
 
     const [posts, setPosts] = useState([])
     const [isLoading, setIsLoading] = useState(true)
@@ -78,9 +82,6 @@ const Home = ({ state }) => {
                             // console.log(hasPaid);
 
                             return { ...post, postText, viewPrice, decryptedFiles, hasPaid, ipfsHashes:[] }
-
-
-
                         } else {
                             const { postText, viewPrice, ipfsHashes } = await fetchTextFromIPFS(post.postText);
                             // console.log(postText, viewPrice, ipfsHashes)
@@ -106,17 +107,21 @@ const Home = ({ state }) => {
             return response.data;
         } catch (error) {
             console.error('Error fetching text from IPFS:', error);
+            showAlert("danger", "Error fetching text from IPFS");
             return null;
         }
     }
 
-    const deletePost = key => async () => {
+    const deletePostHandler = key => async () => {
         try {
             const receipt = await contract.deletePost(key);
             await receipt.wait();
             setPosts(posts.filter(post => post[0] !== key));
+            deletePost(key);
         } catch (error) {
             console.log(error);
+            showAlert("danger", "Error deleting post");
+            return null;
         }
     }
 
@@ -139,7 +144,7 @@ const Home = ({ state }) => {
                             displayName={post[1]}
                             text={post.postText}
                             price={Number(post.viewPrice) / 100}
-                            onClick={deletePost(post[0])}
+                            deletePostHandler={deletePostHandler(post[0])}
                             isCreator={address === post[1]}
                             postId = {post[0]}
                             state = {state}

@@ -8,7 +8,7 @@ const Web3State = ({ children }) => {
 
     const [alert, setAlert] = useState(null);
 
-    function showAlert(type, message) {
+    const showAlert = (type, message) => {
         setAlert({
             type: type,
             msg: message
@@ -18,8 +18,46 @@ const Web3State = ({ children }) => {
         }, 1500);
     };
 
+    const getPost = async (id) => {
+        try {
+            const res = await axios.get(`${host}/api/posts/${id}`);
+            return res.data;
+        } catch (error) {
+            console.log(error);
+            showAlert("danger", "Error fetching posts")
+        }
+    }
+
+    const deletePost = async (id) => {
+        try {
+            const res = await axios.delete(`${host}/api/posts/${id}`);
+            return res.data;
+        } catch (error) {
+            console.log(error);
+            showAlert("danger", "Error deleting post")
+            return error;
+        }
+    }
+
+    const postPost = async (post) => {
+        try {
+            const res = await axios.post(`${host}/api/posts`, post, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            return res.data;
+        } catch (error) {
+            console.log(error);
+            showAlert("danger", "Error posting post")
+            return error;
+        }
+    }
+
+
+
     return (
-        <Web3Context.Provider value={{ alert, showAlert }}>
+        <Web3Context.Provider value={{ alert, showAlert, getPost, deletePost, postPost }}>
             {children}
         </Web3Context.Provider>
     )

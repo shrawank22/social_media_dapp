@@ -1,12 +1,13 @@
 import "./Post.css";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import PostHelper from "./PostHelper";
+import web3Context from '../context/web3/web3Context';
 
 const Post = ({
     displayName,
     text,
     price,
-    onClick,
+    deletePostHandler,
     isCreator,
     postId,
     state,
@@ -32,6 +33,9 @@ const Post = ({
     const commentRef = useRef(null);
     const [comments, setComments] = useState([]);
 
+    const context = useContext(web3Context);
+    const { showAlert, getPost } = context;
+
     const handleCommentPost = async () => {
         const comment = commentRef.current.value;
         if (!comment) {
@@ -50,6 +54,25 @@ const Post = ({
             console.error("Error posting comment:", error);
         }
     };
+
+    const updatePostHandler = async (key, post) => {
+        try {
+            // Getting Unique ID from the post which is saved in DB
+            const data = await getPost(key);
+            // const {uniqueID} = data[0];
+
+            // Smart Contract Call to update the post
+            // console.log(contract.interface.fragments);
+            const receipt = await contract.editPost(key, "sygudfhdsfghds", 100);
+            await receipt.wait();
+            
+            // getAllPosts();
+        } catch (error) {
+            console.log(error);
+            showAlert("danger", "Error updating post");
+            return null;
+        }
+    }
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -79,10 +102,10 @@ const Post = ({
                     <i className="bi bi-heart"></i>
                     <i className="bi bi-flag"></i>
                     {isCreator && (
-                        <i className="bi bi-pencil-square"></i>
+                        <i className="bi bi-pencil-square" onClick={() => updatePostHandler(postId, "dsjhfuid")}></i>
                     )}
                     {isCreator && (
-                        <i className="bi bi-trash-fill" onClick={onClick}></i>
+                        <i className="bi bi-trash-fill" onClick={deletePostHandler}></i>
                     )}
                 </div>
 
@@ -105,7 +128,7 @@ const Post = ({
                                         <i className="bi bi-pencil-square"></i>
                                     )}
                                     {isCreator && (
-                                        <i className="bi bi-trash-fill" onClick={onClick}></i>
+                                        <i className="bi bi-trash-fill" onClick={deletePostHandler}></i>
                                     )}
                                 </div>
                                 <hr />

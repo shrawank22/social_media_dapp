@@ -120,11 +120,6 @@ function PostContainer({ state }) {
                     console.log(res.data.IpfsHash);
                     const ipfsHash = res.data.IpfsHash;
 
-                    // -----------Retrieving content---------
-                    // const response = await axios.get(`https://brown-bright-emu-470.mypinata.cloud/ipfs/${ipfsHash}`);
-                    // const data = response.data;
-                    // console.log(data);
-
                     // Store hash onto blockchain
                     const receipt = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
                     await receipt.wait();
@@ -234,24 +229,6 @@ function PostContainer({ state }) {
                     <button disabled={isPosting} className="btn btn-primary rounded-pill" type="submit">Post</button>
                 </div>
             </div>
-
-            {/* {decryptedFiles.length > 0 && (
-                <div>
-                    <p>Decrypted Content:</p>
-                    {selectedFiles.map((file, index) => (
-                        <div key={index}>
-                            <p>{file.name}</p>
-                            {file.type.startsWith('image/') ? (
-                                <img src={decryptedFiles[index]} alt={`Decrypted ${file.name}`} />
-                            ) : (
-                                <a href={decryptedFiles[index]} download={`decrypted_${file.name}`}>
-                                    Download Decrypted {file.name}
-                                </a>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            )}  */}
 
         </form >
     );
