@@ -17,11 +17,13 @@ router.get('/posts/:id', async (req, res) => {
 
 router.post('/posts', async (req, res) => {
     try {
-        let { NFTID, uniqueID } = req.body;
+        let { NFTID, uniqueID, ipfsHashes, encryptedFiles } = req.body;
         NFTID = req.sanitize(NFTID);
         uniqueID = req.sanitize(uniqueID);
+        ipfsHashes = req.sanitize(ipfsHashes);
+        encryptedFiles = req.sanitize(encryptedFiles);
 
-        const post = await Post.create({NFTID, uniqueID});
+        const post = await Post.create({NFTID, uniqueID, ipfsHashes, encryptedFiles});
         res.send(post);
     } catch (error) {
         console.error(error.message);

@@ -1,7 +1,7 @@
 import "./Post.css";
 import { useState, useRef, useEffect, useContext } from "react";
 import PostHelper from "./PostHelper";
-import web3Context from '../context/web3/web3Context';
+import postContext from '../context/post/postContext';
 
 const Post = ({
     displayName,
@@ -33,7 +33,7 @@ const Post = ({
     const commentRef = useRef(null);
     const [comments, setComments] = useState([]);
 
-    const context = useContext(web3Context);
+    const context = useContext(postContext);
     const { showAlert, getPost } = context;
 
     const handleCommentPost = async () => {
@@ -84,7 +84,7 @@ const Post = ({
             }
         };
         fetchComments();
-    }, [postId, comments]);
+    }, [comments]);
 
     return (
         <div className="post">

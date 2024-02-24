@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import "./PostContainer.css";
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPicker from 'emoji-picker-react';
 import CryptoJS from 'crypto-js'
 import { Buffer, split } from 'shamirs-secret-sharing'
+import postContext from '../context/post/postContext';
 
 function PostContainer({ state }) {
     const { contract, address, signer, provider } = state;
@@ -15,6 +16,9 @@ function PostContainer({ state }) {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [isPosting, setIsPosting] = useState(false);
     const [fileURLs, setFileURLs] = useState([]);
+
+    const context = useContext(postContext);
+    const { postPost } = context;
 
 
     const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
@@ -121,8 +125,14 @@ function PostContainer({ state }) {
                     const ipfsHash = res.data.IpfsHash;
 
                     // Store hash onto blockchain
-                    const receipt = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
-                    await receipt.wait();
+                    const tx = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
+                    const receipt = await tx.wait();
+                    // console.log(receipt.logs);
+
+                    // Storing some info about post to DB
+                    const addPostEvent = receipt.logs.find(log => log.fragment.name === 'AddPost');
+                    const postId = addPostEvent.args[1].toString();
+                    postPost({ NFTID: postId, uniqueID: uniqueId, ipfsHashes: [], encryptedFiles });
                 } else {
                     const ipfsHashes = [];
                     for (const file of selectedFiles) {
@@ -162,8 +172,13 @@ function PostContainer({ state }) {
                     const ipfsHash = res.data.IpfsHash;
 
                     // Store hash onto blockchain
-                    const receipt = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
-                    await receipt.wait();
+                    const tx = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
+                    const receipt = await tx.wait();
+
+                    // Storing some info about post to DB
+                    const addPostEvent = receipt.logs.find(log => log.fragment.name === 'AddPost');
+                    const postId = addPostEvent.args[1].toString();
+                    postPost({ NFTID: postId, uniqueID: uniqueId, ipfsHashes: ipfsHashes, encryptedFiles: [] });
                 }
 
                 // Resetting inputs

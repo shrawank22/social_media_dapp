@@ -1,9 +1,9 @@
 import {useContext} from 'react'
-import web3Context from '../context/web3/web3Context';
+import postContext from '../context/post/postContext';
 
 
 export default function Alert() {
-    const context = useContext(web3Context);
+    const context = useContext(postContext);
     const { alert } = context;
 
 

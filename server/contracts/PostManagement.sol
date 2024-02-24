@@ -23,10 +23,7 @@ contract PostManagement is ERC721 {
     constructor() ERC721("PostNFT", "PNFT") {}
 
     // Functions
-    function addPost(string memory _postText, uint256 _viewPrice)
-        external
-        payable
-    {
+    function addPost(string memory _postText, uint256 _viewPrice) external payable {
         postCounter++;
         uint256 postId = postCounter;
 

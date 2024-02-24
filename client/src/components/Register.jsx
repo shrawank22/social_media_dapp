@@ -1,6 +1,10 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import web3Context from '../context/web3/web3Context';
 
-const Register = ({ state }) => {
+const Register = () => {
+    const context = useContext(web3Context);
+    const { state } = context;
+    
     const [address, setAddress] = useState("");
     const handleLogin = () => {
         setAddress(state.address)

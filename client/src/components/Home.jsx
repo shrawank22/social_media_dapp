@@ -5,14 +5,15 @@ import Post from './Post';
 import axios from 'axios';
 import CryptoJS from 'crypto-js'
 import { Buffer, combine } from 'shamirs-secret-sharing'
+import postContext from '../context/post/postContext';
 import web3Context from '../context/web3/web3Context';
 
-const Home = ({ state }) => {
-
+const Home = () => { 
+    const context1 = useContext(postContext);
+    const context2 = useContext(web3Context);
+    const { showAlert, deletePost, getPost } = context1;
+    const { state } = context2;
     const { contract, address } = state;
-    
-    const context = useContext(web3Context);
-    const { showAlert, deletePost, getPost } = context;
 
     const [posts, setPosts] = useState([])
     const [isLoading, setIsLoading] = useState(true)

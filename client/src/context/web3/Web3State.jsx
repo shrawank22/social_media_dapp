@@ -1,63 +1,46 @@
 import Web3Context from "./web3Context";
 import { useState } from "react";
-import axios from 'axios'
+import { ethers } from 'ethers'
+import {contractAddress, contractABI} from '../../constants/constants'
 
 const Web3State = ({ children }) => {
-    const host = "http://localhost:8080"
+    const [state, setState] = useState({
+        provider: null,
+        signer: null,
+        contract: null,
+        address: null
+    });
 
+    const connectWallet = async () => {
+        if (window.ethereum) {
+            try {
+                const provider = new ethers.BrowserProvider(window.ethereum);
 
-    const [alert, setAlert] = useState(null);
+                window.ethereum.on("chainChanged", () => {
+                    window.location.reload();
+                });
 
-    const showAlert = (type, message) => {
-        setAlert({
-            type: type,
-            msg: message
-        });
-        setTimeout(() => {
-            setAlert(null);
-        }, 1500);
+                window.ethereum.on("accountsChanged", () => {
+                    window.location.reload();
+                });
+
+                const signer = await provider.getSigner();
+                const address = await signer.getAddress();
+
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                setState({ provider, signer, contract, address })
+
+            } catch (err) {
+                console.error(err);
+            }
+
+        } else {
+            console.error("Metamask not Detected");
+        }
     };
 
-    const getPost = async (id) => {
-        try {
-            const res = await axios.get(`${host}/api/posts/${id}`);
-            return res.data;
-        } catch (error) {
-            console.log(error);
-            showAlert("danger", "Error fetching posts")
-        }
-    }
-
-    const deletePost = async (id) => {
-        try {
-            const res = await axios.delete(`${host}/api/posts/${id}`);
-            return res.data;
-        } catch (error) {
-            console.log(error);
-            showAlert("danger", "Error deleting post")
-            return error;
-        }
-    }
-
-    const postPost = async (post) => {
-        try {
-            const res = await axios.post(`${host}/api/posts`, post, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            return res.data;
-        } catch (error) {
-            console.log(error);
-            showAlert("danger", "Error posting post")
-            return error;
-        }
-    }
-
-
-
     return (
-        <Web3Context.Provider value={{ alert, showAlert, getPost, deletePost, postPost }}>
+        <Web3Context.Provider value={{ state, connectWallet }}>
             {children}
         </Web3Context.Provider>
     )
