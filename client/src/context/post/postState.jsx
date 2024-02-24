@@ -41,6 +41,7 @@ const PostState = ({ children }) => {
 
     const postPost = async (post) => {
         try {
+            // console.log(post);
             const res = await axios.post(`${host}/api/posts`, post, {
                 headers: {
                     'Content-Type': 'application/json'

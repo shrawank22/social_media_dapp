@@ -2,6 +2,9 @@ import "./Post.css";
 import { useState, useRef, useEffect, useContext } from "react";
 import PostHelper from "./PostHelper";
 import postContext from '../context/post/postContext';
+import axios from "axios";
+import { Buffer, combine } from 'shamirs-secret-sharing'
+import CryptoJS from 'crypto-js'
 
 const Post = ({
     displayName,
@@ -36,6 +39,9 @@ const Post = ({
     const context = useContext(postContext);
     const { showAlert, getPost } = context;
 
+    const [editedText, setEditedText] = useState(text);
+    const [editedPrice, setEditedPrice] = useState(price);
+
     const handleCommentPost = async () => {
         const comment = commentRef.current.value;
         if (!comment) {
@@ -55,18 +61,66 @@ const Post = ({
         }
     };
 
-    const updatePostHandler = async (key, post) => {
+    const updatePostHandler = async (event) => {
+        event.preventDefault();
         try {
-            // Getting Unique ID from the post which is saved in DB
-            const data = await getPost(key);
-            // const {uniqueID} = data[0];
+            let content = {
+                postText: editedText,
+                viewPrice: parseFloat(editedPrice) * 100
+            };
 
-            // Smart Contract Call to update the post
-            // console.log(contract.interface.fragments);
-            const receipt = await contract.editPost(key, "sygudfhdsfghds", 100);
-            await receipt.wait();
-            
-            // getAllPosts();
+            // Getting meta data of post which is saved in DB
+            const data = await getPost(postId);
+            const { uniqueID, ipfsHashes, encryptedFiles } = data[0];
+
+            if (editedPrice > 0) {
+                // Retrieving key from gatekeepers
+                const retrievedShares = [];
+                const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
+                for (let i = 0; i < gatekeepersCount; i++) {
+                    const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueID}`);
+                    retrievedShares.push(Buffer.from(response.data.share, 'hex'));
+
+                    if (retrievedShares.length === Math.ceil(2 * gatekeepersCount / 3)) break;
+                }
+
+                let retrievedKey = combine(retrievedShares).toString();
+                const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(content), retrievedKey).toString(); // Used AES to encrypt the content
+                
+                // Storing paid content to IPFS
+                const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId: uniqueID, encryptedFiles }, {
+                    headers: {
+                        pinata_api_key: import.meta.env.VITE_PINATA_KEY,
+                        pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
+                    },
+                });
+                const ipfsHash = res.data.IpfsHash;
+
+                // Store hash onto blockchain
+                const tx = await contract.editPost(postId, String(ipfsHash), parseInt(content.viewPrice));
+                await tx.wait();
+            } else {
+                content.ipfsHashes = ipfsHashes;
+                // console.log(content);
+
+                // Storing free content to IPFS
+                const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+                    pinataContent: content,
+                    pinataMetadata: {
+                        name: uniqueID
+                    }
+                }, {
+                    headers: {
+                        pinata_api_key: import.meta.env.VITE_PINATA_KEY,
+                        pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
+                    },
+                });
+                const ipfsHash = res.data.IpfsHash;
+
+                // Store hash onto blockchain
+                const tx = await contract.editPost(postId, String(ipfsHash), parseInt(content.viewPrice));
+                await tx.wait();
+            }
         } catch (error) {
             console.log(error);
             showAlert("danger", "Error updating post");
@@ -102,15 +156,46 @@ const Post = ({
                     <i className="bi bi-heart"></i>
                     <i className="bi bi-flag"></i>
                     {isCreator && (
-                        <i className="bi bi-pencil-square" onClick={() => updatePostHandler(postId, "dsjhfuid")}></i>
+                        <i className="bi bi-pencil-square" data-bs-toggle="modal" data-bs-target={`#editModal-${postId}`}></i>
                     )}
                     {isCreator && (
                         <i className="bi bi-trash-fill" onClick={deletePostHandler}></i>
                     )}
                 </div>
 
+                {/* Modal for editing */}
+                <div className="modal fade" id={`editModal-${postId}`} tabIndex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                    <div className="modal-dialog modal-xl">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h1 className="modal-title fs-5" id="editModalLabel">Edit Post</h1>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div className="modal-body">
+                                <form onSubmit={updatePostHandler}>
+                                    <div className="mb-3">
+                                        <label htmlFor="editedText" className="form-label">Text</label>
+                                        <textarea
+                                            id="editedText"
+                                            className="form-control"
+                                            value={editedText}
+                                            onChange={(e) => setEditedText(e.target.value)}
+                                            placeholder="What's happening?"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label htmlFor="editedPrice" className="form-label">View Price</label>
+                                        <input type="number" min={0} className="form-control" id="editedPrice" value={editedPrice} onChange={(e) => setEditedPrice(e.target.value)} />
+                                    </div>
+                                    <button type="submit" className="btn btn-success rounded-pill">Update Post</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                {/* Modal */}
+                {/* Modal for view and commenting*/}
                 <div className="modal fade" id={`commentModal-${postId}`} tabIndex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
                     <div className="modal-dialog modal-xl">
                         <div className="modal-content">

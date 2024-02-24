@@ -20,8 +20,6 @@ router.post('/posts', async (req, res) => {
         let { NFTID, uniqueID, ipfsHashes, encryptedFiles } = req.body;
         NFTID = req.sanitize(NFTID);
         uniqueID = req.sanitize(uniqueID);
-        ipfsHashes = req.sanitize(ipfsHashes);
-        encryptedFiles = req.sanitize(encryptedFiles);
 
         const post = await Post.create({NFTID, uniqueID, ipfsHashes, encryptedFiles});
         res.send(post);

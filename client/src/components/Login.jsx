@@ -2,7 +2,7 @@ import { useState, useContext } from "react"
 import { useNavigate } from 'react-router'
 import axios from 'axios'
 import postContext from '../context/post/postContext';
-const web3Context = require('../context/web3/web3Context');
+import web3Context from '../context/web3/web3Context';
 
 const Login = () => {
     const context1 = useContext(postContext);

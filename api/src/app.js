@@ -17,8 +17,8 @@ const options = {
 app.use(cors(options));
 
 app.use(express.static("public"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({limit: '1mb'}));
+app.use(express.urlencoded({ limit: '1mb', extended: true }));
 app.use(expressSanitizer());
 
 //DB Models exports

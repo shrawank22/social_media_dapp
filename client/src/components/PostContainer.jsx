@@ -132,7 +132,11 @@ function PostContainer({ state }) {
                     // Storing some info about post to DB
                     const addPostEvent = receipt.logs.find(log => log.fragment.name === 'AddPost');
                     const postId = addPostEvent.args[1].toString();
-                    postPost({ NFTID: postId, uniqueID: uniqueId, ipfsHashes: [], encryptedFiles });
+                    if (encryptedFiles.length === 0) {
+                        postPost({ NFTID: postId, uniqueID: uniqueId });
+                    } else {
+                        postPost({ NFTID: postId, uniqueID: uniqueId, encryptedFiles });
+                    }
                 } else {
                     const ipfsHashes = [];
                     for (const file of selectedFiles) {
@@ -154,7 +158,6 @@ function PostContainer({ state }) {
                     }
 
                     content.ipfsHashes = ipfsHashes;
-
 
                     // Storing free content to IPFS
                     const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
@@ -178,7 +181,11 @@ function PostContainer({ state }) {
                     // Storing some info about post to DB
                     const addPostEvent = receipt.logs.find(log => log.fragment.name === 'AddPost');
                     const postId = addPostEvent.args[1].toString();
-                    postPost({ NFTID: postId, uniqueID: uniqueId, ipfsHashes: ipfsHashes, encryptedFiles: [] });
+                    if (ipfsHashes.length === 0) {
+                        postPost({ NFTID: postId, uniqueID: uniqueId });
+                    } else {
+                        postPost({ NFTID: postId, uniqueID: uniqueId, ipfsHashes: ipfsHashes });
+                    }
                 }
 
                 // Resetting inputs
