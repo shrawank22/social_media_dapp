@@ -1,23 +1,36 @@
 import PostContext from "./postContext";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import axios from 'axios'
+import CryptoJS from 'crypto-js'
+import { v4 as uuidv4 } from 'uuid';
+import { Buffer, split, combine } from 'shamirs-secret-sharing'
+
+import web3Context from '../web3/web3Context';
 
 const PostState = ({ children }) => {
     const host = "http://localhost:8080"
 
+    //------------------------------ Web3 Context ------------------------------
+    const context = useContext(web3Context);
+    const { state } = context;
+    const { contract, address, signer, provider } = state;
 
+    //--------------------------------- States ---------------------------------
     const [alert, setAlert] = useState(null);
+    const [postText, setPostText] = useState('');
+    const [viewPrice, setViewPrice] = useState('');
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [fileURLs, setFileURLs] = useState([]);
+    const [isPosting, setIsPosting] = useState(false);
+    const [posts, setPosts] = useState([])
+    const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
 
-    const showAlert = (type, message) => {
-        setAlert({
-            type: type,
-            msg: message
-        });
-        setTimeout(() => {
-            setAlert(null);
-        }, 1500);
-    };
+    //------------------------------ useEffect hooks ------------------------------
+    useEffect(() => {
+        getAllPosts();
+    }, [state, posts]);
 
+    //--------------------------------- API Calls ---------------------------------
     const getPost = async (id) => {
         try {
             const res = await axios.get(`${host}/api/posts/${id}`);
@@ -55,10 +68,248 @@ const PostState = ({ children }) => {
         }
     }
 
+    //--------------------------------- Functions ---------------------------------
+    const showAlert = (type, message) => {
+        setAlert({
+            type: type,
+            msg: message
+        });
+        setTimeout(() => {
+            setAlert(null);
+        }, 1500);
+    };
 
+    const handleFileEncrypt = (key) => {
+        const encryptedFilesArray = [];
+
+        selectedFiles.forEach((file) => {
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                const fileContent = event.target.result;
+                const base64Content = btoa(fileContent);
+                const encryptedContent = CryptoJS.AES.encrypt(base64Content, key).toString();
+                encryptedFilesArray.push(encryptedContent);
+            };
+            reader.readAsBinaryString(file);
+        });
+        return encryptedFilesArray
+    };
+
+    const handleFileDecrypt = (key, encryptedFiles) => {
+        const decryptedFilesArray = [];
+
+        encryptedFiles.forEach((encryptedFile, index) => {
+            const decryptedContent = CryptoJS.AES.decrypt(encryptedFile, key).toString(CryptoJS.enc.Utf8);
+            const binaryContent = atob(decryptedContent);
+            const byteArray = new Uint8Array(binaryContent.length);
+
+            for (let i = 0; i < binaryContent.length; i++) {
+                byteArray[i] = binaryContent.charCodeAt(i);
+            }
+
+            const decryptedBlob = new Blob([byteArray], { type: "image/jpeg" });
+            decryptedFilesArray.push(URL.createObjectURL(decryptedBlob));
+        });
+
+        return decryptedFilesArray;
+    };
+
+    const fetchTextFromIPFS = async (ipfsHash) => {
+        try {
+            const response = await axios.get(`https://ipfs.io/ipfs/${ipfsHash}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching text from IPFS:', error);
+            showAlert("danger", "Error fetching text from IPFS");
+            return null;
+        }
+    }
+
+    const addPostHandler = async (event) => {
+        event.preventDefault();
+        setIsPosting(true);
+        try {
+            console.log("Trying to add a post");
+            if (postText === '' || viewPrice === '') {
+                console.log("Input fields can't be empty");
+            } else {
+                let content = {
+                    postText: postText,
+                    viewPrice: parseFloat(viewPrice) * 100
+                };
+
+                const uniqueId = uuidv4();
+
+                if (content.viewPrice > 0) {
+                    // Encrypt the content and split the key
+                    let key = CryptoJS.lib.WordArray.random(256 / 8).toString(); // Generate a random encryption key
+                    const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(content), key).toString();
+
+                    // Encrypt all the selected files
+                    let encryptedFiles = [];
+                    if (selectedFiles) {
+                        encryptedFiles = handleFileEncrypt(key);
+                    }
+
+                    // Split the key into parts
+                    const shares = split(Buffer.from(key), { shares: gatekeepersCount, threshold: Math.ceil(gatekeepersCount * 2 / 3) });
+
+                    const keyShares = shares.map(share => share.toString('hex'))
+
+                    // Send each share to a different gatekeeper
+                    for (let i = 0; i < gatekeepersCount; i++) {
+                        await axios.post(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`, { share: keyShares[i] }, {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                        });
+                    }
+
+                    // Storing paid content to IPFS
+                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId, encryptedFiles }, {
+                        headers: {
+                            pinata_api_key: import.meta.env.VITE_PINATA_KEY,
+                            pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
+                        },
+                    });
+                    console.log(res.data.IpfsHash);
+                    const ipfsHash = res.data.IpfsHash;
+
+                    // Store hash onto blockchain
+                    const tx = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
+                    const receipt = await tx.wait();
+                    // console.log(receipt.logs);
+
+                    // Storing some info about post to DB
+                    const addPostEvent = receipt.logs.find(log => log.fragment.name === 'AddPost');
+                    const postId = addPostEvent.args[1].toString();
+                    if (encryptedFiles.length === 0) {
+                        postPost({ NFTID: postId, uniqueID: uniqueId });
+                    } else {
+                        postPost({ NFTID: postId, uniqueID: uniqueId, encryptedFiles });
+                    }
+                } else {
+                    const ipfsHashes = [];
+                    for (const file of selectedFiles) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('pinataMetadata', JSON.stringify({ name: file.name }));
+
+                        const res = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", formData, {
+                            maxBodyLength: 'Infinity',
+                            headers: {
+                                'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
+                                pinata_api_key: import.meta.env.VITE_PINATA_KEY,
+                                pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
+                            },
+                        });
+                        const ipfsHash = res.data.IpfsHash;
+                        ipfsHashes.push(ipfsHash);
+                    }
+
+                    content.ipfsHashes = ipfsHashes;
+
+                    // Storing free content to IPFS
+                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+                        pinataContent: content,
+                        pinataMetadata: {
+                            name: uniqueId
+                        }
+                    }, {
+                        headers: {
+                            pinata_api_key: import.meta.env.VITE_PINATA_KEY,
+                            pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
+                        },
+                    });
+                    console.log(res.data.IpfsHash);
+                    const ipfsHash = res.data.IpfsHash;
+
+                    // Store hash onto blockchain
+                    const tx = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice));
+                    const receipt = await tx.wait();
+
+                    // Storing some info about post to DB
+                    const addPostEvent = receipt.logs.find(log => log.fragment.name === 'AddPost');
+                    const postId = addPostEvent.args[1].toString();
+                    if (ipfsHashes.length === 0) {
+                        postPost({ NFTID: postId, uniqueID: uniqueId });
+                    } else {
+                        postPost({ NFTID: postId, uniqueID: uniqueId, ipfsHashes: ipfsHashes });
+                    }
+                }
+
+                // Resetting inputs
+                setPostText('');
+                setViewPrice('');
+                setSelectedFiles([]);
+                setFileURLs([]);
+                setIsPosting(false);
+            }
+        } catch (err) {
+            console.log(err);
+            showAlert("danger", "Error adding post");
+        }
+    };
+
+    const getAllPosts = async () => {
+        try {
+            if (contract) {
+                let allPosts = await contract.getAllPosts();
+                // console.log(allPosts);
+
+                // Fetching text from IPFS for each post
+                const postsWithData = await Promise.all(
+                    allPosts.map(async (post) => {
+                        if (post.viewPrice > 0) {
+                            const { ciphertext, uniqueId, encryptedFiles } = await fetchTextFromIPFS(post.postText);
+
+                            // Retrieve the shares from the gatekeepers
+                            const retrievedShares = [];
+                            const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
+                            for (let i = 0; i < gatekeepersCount; i++) {
+                                const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`);
+                                retrievedShares.push(Buffer.from(response.data.share, 'hex'));
+
+                                if (retrievedShares.length === Math.ceil(2 * gatekeepersCount / 3)) break;
+                            }
+
+                            let retrievedKey = combine(retrievedShares).toString();
+                            // console.log(retrievedKey)
+
+                            // Retrieving content with retrieved key
+                            const bytes = CryptoJS.AES.decrypt(ciphertext, retrievedKey);
+                            const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+
+                            // Retrieving encrypted files
+                            const decryptedFiles = handleFileDecrypt(retrievedKey, encryptedFiles);
+                            const { postText, viewPrice } = JSON.parse(decrypted)
+
+                            let usersWhoPaid = await contract.getPaidUsersByPostId(post.id);
+                            const hasPaid = usersWhoPaid.includes(address);
+                            // console.log(hasPaid);
+
+                            return { ...post, postText, viewPrice, decryptedFiles, hasPaid, ipfsHashes: [] }
+                        } else {
+                            const { postText, viewPrice, ipfsHashes } = await fetchTextFromIPFS(post.postText);
+                            // console.log(postText, viewPrice, ipfsHashes)
+                            return { ...post, postText, viewPrice, ipfsHashes, hasPaid: true, decryptedFiles: [] };
+                        }
+                    })
+                );
+                setPosts(postsWithData);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
-        <PostContext.Provider value={{ alert, showAlert, getPost, deletePost, postPost }}>
+        <PostContext.Provider value={{ 
+            alert, showAlert, getPost, deletePost, postPost, addPostHandler, 
+            postText, viewPrice, fileURLs, isPosting, setFileURLs, setSelectedFiles, 
+            setPostText, setViewPrice, posts, setPosts 
+        }}>
             {children}
         </PostContext.Provider>
     )
