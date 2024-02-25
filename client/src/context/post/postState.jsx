@@ -297,7 +297,8 @@ const PostState = ({ children }) => {
                         }
                     })
                 );
-                setPosts(postsWithData);
+                const reversedPostsWithData = postsWithData.reverse();
+                setPosts(reversedPostsWithData);
             }
         } catch (error) {
             console.log(error);
