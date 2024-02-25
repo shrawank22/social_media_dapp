@@ -35,6 +35,7 @@ const Post = ({
 
     const commentRef = useRef(null);
     const [comments, setComments] = useState([]);
+    const [commentCount, setCommentCount] = useState(false);
 
     const context = useContext(postContext);
     const { showAlert, getPost } = context;
@@ -52,6 +53,7 @@ const Post = ({
             const receipt = await tx.wait();
             if (receipt.status === 1) {
                 console.log("Comment posted successfully");
+                setCommentCount(!commentCount); // Increase comment count when a new comment is added
             } else {
                 console.error("Comment posting failed");
             }
@@ -138,7 +140,7 @@ const Post = ({
             }
         };
         fetchComments();
-    }, [comments]);
+    }, [commentCount]);
 
     return (
         <div className="post">
