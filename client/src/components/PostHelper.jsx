@@ -1,4 +1,39 @@
+import web3Context from '../context/web3/web3Context';
+import postContext from '../context/post/postContext';
+import { useState, useEffect ,useContext } from 'react';
+
 const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBlurred }) => {
+    const context1 = useContext(postContext);
+    const context2 = useContext(web3Context);
+    const { showAlert } = context1;
+    const { state } = context2;
+    const { contract, address } = state;
+
+    const [isFollowing, setIsFollowing] = useState(false);
+
+    const handleFollowClick = async () => {
+        try {
+            if (!isFollowing) {
+                await contract.followUser(displayName);
+            } else {
+                await contract.unfollowUser(displayName);
+            }
+        } catch (err) {
+            showAlert('danger', err.reason);
+            console.error(err);
+        }
+        
+    };
+
+    useEffect(() => {
+        const checkFollowingStatus = async () => {
+            const followingStatus = await contract.followers(address, displayName);
+            console.log(followingStatus);
+            setIsFollowing(followingStatus);
+        };
+
+        checkFollowingStatus();
+    }, [contract, address, displayName]);
 
     return (
         <>
@@ -10,9 +45,9 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBl
                 <div>
                     <div className="m-2" style={{ fontSize: "15px" }}>
                         <span className="fw-bold">{displayName}</span>
-                        <span className="text-secondary"> @shrawank22 ·</span>
                         <span className="text-secondary"> 49m  ·</span>
-                        <span className="text-primary fw-bolder text-end"> viewPice: {price}</span>
+                        <a className="text-success fw-bold" onClick={handleFollowClick}>{isFollowing ? ' Unfollow' : ' Follow'}</a>
+                        {/* <span className="text-primary fw-bolder text-end"> viewPice: {price}</span> */}
                     </div>
 
 

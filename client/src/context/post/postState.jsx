@@ -28,7 +28,7 @@ const PostState = ({ children }) => {
     //------------------------------ useEffect hooks ------------------------------
     useEffect(() => {
         getAllPosts();
-    }, [state, posts]);
+    }, [state]);
 
     //--------------------------------- API Calls ---------------------------------
     const getPost = async (id) => {

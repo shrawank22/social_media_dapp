@@ -5,7 +5,6 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./DataTypes.sol";
 import "./PostManagement.sol";
 import "./NotificationsManagement.sol";
-import "./FollowManagement.sol";
 import "./ProfileManagement.sol";
 
 

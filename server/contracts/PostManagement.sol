@@ -11,6 +11,7 @@ contract PostManagement is ERC721 {
     mapping(uint256 => DataTypes.Post) public posts;
     mapping(uint256 => mapping(address => bool)) public postLikes;
     mapping(uint256 => mapping(address => bool)) public postDislikes;
+    mapping(address => mapping(address => bool)) public followers;
 
     // Events
     event AddPost(address indexed recipient, uint256 indexed postId);
@@ -78,25 +79,12 @@ contract PostManagement is ERC721 {
         return posts[postId].userWhoPaid; 
     }
 
-    function getpostDetails(uint256 postId) external view returns (uint256, address, string memory, uint256, bool, DataTypes.Comment[] memory, DataTypes.Report[] memory) {
-        DataTypes.Post storage post = posts[postId];
-        return (
-            post.id,
-            post.username,
-            post.postText,
-            post.viewPrice,
-            post.isDeleted,
-            post.comments,
-            post.reports
-        );
-    }
-
     function getAllPosts() external view returns (DataTypes.Post[] memory) {
-        return _getPostsByCriteria(address(0));
+        return _getPostsByCriteria(address(0), false);
     }
 
     function getMyPosts() external view returns (DataTypes.Post[] memory) {
-        return _getPostsByCriteria(msg.sender);
+        return _getPostsByCriteria(msg.sender, false);
     }
 
     function deletePost(uint postId) external {
@@ -105,59 +93,24 @@ contract PostManagement is ERC721 {
         emit DeletePost(postId, true);
     }
 
-    function tipPost(uint256 postId, uint256 tipAmnt) external payable {
-        require(!posts[postId].isDeleted, "post is deleted");
-        require(tipAmnt > 0, "Invalid tip amount");
-        require(
-            posts[postId].username != msg.sender,
-            "You cannot tip your own post"
-        );
-
-        posts[postId].username.transfer(tipAmnt);
-        emit TipPost(msg.sender, postId, tipAmnt);
+    function followUser(address _user) external {
+        require(_user != msg.sender, "You cannot follow yourself");
+        followers[msg.sender][_user] = true;
     }
 
-    function likePost(uint256 postId) external {
-        require(!posts[postId].isDeleted, "Post is deleted");
-        require(!postLikes[postId][msg.sender], "Already liked");
-
-        posts[postId].likes++;
-        postLikes[postId][msg.sender] = true;
-
-        emit LikePost(msg.sender, postId);
+    function unfollowUser(address _user) external {
+        require(_user != msg.sender, "You cannot unfollow yourself");
+        followers[msg.sender][_user] = false;
     }
 
-    function dislikePost(uint256 postId) external {
-        require(!posts[postId].isDeleted, "Post is deleted");
-        require(!postDislikes[postId][msg.sender], "Already disliked");
-
-        posts[postId].dislikes++;
-        postDislikes[postId][msg.sender] = true;
-
-        emit DislikePost(msg.sender, postId);
+    function getFollowedUsersPosts() external view returns (DataTypes.Post[] memory) {
+        return _getPostsByCriteria(address(0), true);
     }
 
-    function reportPost(uint256 _postId, string memory _reason) external {
-        require(!posts[_postId].isDeleted, "Post is deleted");
-
-        DataTypes.Report memory newReport;
-        newReport.id = posts[_postId].reports.length + 1;
-        newReport.reporter = msg.sender;
-        newReport.reason = _reason;
-
-        posts[_postId].reports.push(newReport);
-    }
-
-
-    function viewReports(uint256 _postId) external view returns (DataTypes.Report[] memory) {
-        return posts[_postId].reports;
-    }
-
-    // Helping Functions
-    function _getPostsByCriteria(address _user) private view  returns (DataTypes.Post[] memory) {
+    function _getPostsByCriteria(address _user, bool onlyFollowed) private view returns (DataTypes.Post[] memory) {
         uint256 counter = 0;
-        for (uint i = 1; i <= postCounter; i++) {
-            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
+        for (uint256 i = 1; i <= postCounter; i++) {
+            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted && (!onlyFollowed || (followers[msg.sender][posts[i].username] && !posts[i].isDeleted))) {
                 counter++;
             }
         }
@@ -166,26 +119,13 @@ contract PostManagement is ERC721 {
 
         uint resultIndex = 0;
         for (uint256 i = 1; i <= postCounter; i++) {
-            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted) {
-                DataTypes.Post storage post = posts[i];
-            
-                postDataArray[resultIndex] = DataTypes.Post({
-                    id: post.id,
-                    username: post.username,
-                    postText: post.postText,
-                    viewPrice: post.viewPrice,
-                    isDeleted: post.isDeleted,
-                    likes: post.likes,
-                    dislikes: post.dislikes,
-                    visibility: post.visibility,
-                    comments: post.comments,
-                    reports: post.reports,
-                    userWhoPaid: post.userWhoPaid
-                });
+            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted &&
+                (!onlyFollowed || (followers[msg.sender][posts[i].username] && !posts[i].isDeleted))) {
+                postDataArray[resultIndex] = posts[i];
                 resultIndex++;
             }
         }
-        
+
         return postDataArray;
     }
 }
