@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const { GetAuthRequests, handleVerification } = require('../helper/helper');
 
 const API_URL = process.env.API_URL || 'http://localhost:3002';
 const BASIC_AUTH = process.env.BASIC_AUTH;
 
 router.post('/register', async (req, res) => {
+    console.log('/register reached');
     const userDetails = req.body;
 
     req.body = {
@@ -39,18 +41,31 @@ router.post('/register', async (req, res) => {
 
         // send qr code to user
         const qrCodeLink = qrCodeRes.data.qrCodeLink.split('=')[1]+ '=' + qrCodeRes.data.qrCodeLink.split('=')[2];
-
         console.log('qrCodeLink: ', qrCodeLink);
 
         // get qr code link
         const qrCodeLinkRes = await axios.get(`${qrCodeLink}`);
-        
         console.log('qrCodeLinkRes: ', qrCodeLinkRes.data);
 
         res.status(200).send(qrCodeLinkRes.data);
     } catch (err) {
         console.log(err);
     }
+});
+
+router.get('/api/sign-in', (req, res) => {
+    console.log("get Auth reached");
+    GetAuthRequests(req, res);
+});
+
+router.post('/api/callback', (req, res) => {
+    console.log("post Auth reached");
+    handleVerification(req, res);
+
+});
+
+router.get('/', (req, res) => {
+    res.send('Hello from SSI');
 });
 
 module.exports = router;
