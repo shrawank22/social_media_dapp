@@ -22,13 +22,51 @@ const PostState = ({ children }) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [fileURLs, setFileURLs] = useState([]);
     const [isPosting, setIsPosting] = useState(false);
+    const [posted, setPosted] = useState(false); // Just to trigger useEffect when post is added
     const [posts, setPosts] = useState([])
     const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
 
     //------------------------------ useEffect hooks ------------------------------
     useEffect(() => {
-        getAllPosts();
-    }, [state]);
+        const fetchPosts = async () => {
+            try {
+                if (contract) {
+                    let allPosts = await contract.getAllPosts();
+                    // console.log(allPosts);
+    
+                    // Fetching text from IPFS for each post
+                    const postsWithData = await Promise.all(
+                        allPosts.map(async (post) => {
+                            if (post.viewPrice > 0) {
+                                const { ciphertext, uniqueId, encryptedFiles } = await fetchTextFromIPFS(post.postText);
+    
+                                let usersWhoPaid = await contract.getPaidUsersByPostId(post.id);
+                                const hasPaid = usersWhoPaid.includes(address);
+                                
+                                // If Paid Post is created by the user itself
+                                if (post[1] === address || hasPaid) { 
+                                    const {postText, viewPrice, decryptedFiles } = await retrieveDecryptedContent(uniqueId, ciphertext, encryptedFiles);     
+                                    return { ...post, postText, viewPrice, decryptedFiles, hasPaid }
+                                } else {
+                                    return { ...post, postText: "Paid Post", viewPrice: 0 }
+                                }
+                            } else {
+                                const { postText, viewPrice, ipfsHashes } = await fetchTextFromIPFS(post.postText);
+                                // console.log(postText, viewPrice, ipfsHashes)
+                                return { ...post, postText, viewPrice, ipfsHashes, hasPaid: true };
+                            }
+                        })
+                    );
+                    const reversedPostsWithData = postsWithData.reverse();
+                    setPosts(reversedPostsWithData);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        fetchPosts();
+    }, [state, posted]);
 
     //--------------------------------- API Calls ---------------------------------
     const getPost = async (id) => {
@@ -245,6 +283,7 @@ const PostState = ({ children }) => {
                 setSelectedFiles([]);
                 setFileURLs([]);
                 setIsPosting(false);
+                setPosted(!posted);
             }
         } catch (err) {
             console.log(err);
@@ -276,43 +315,6 @@ const PostState = ({ children }) => {
 
         return { postText, viewPrice, decryptedFiles } 
     }
-
-    const getAllPosts = async () => {
-        try {
-            if (contract) {
-                let allPosts = await contract.getFollowedUsersPosts();
-                // console.log(allPosts);
-
-                // Fetching text from IPFS for each post
-                const postsWithData = await Promise.all(
-                    allPosts.map(async (post) => {
-                        if (post.viewPrice > 0) {
-                            const { ciphertext, uniqueId, encryptedFiles } = await fetchTextFromIPFS(post.postText);
-
-                            let usersWhoPaid = await contract.getPaidUsersByPostId(post.id);
-                            const hasPaid = usersWhoPaid.includes(address);
-                            
-                            // If Paid Post is created by the user itself
-                            if (post[1] === address || hasPaid) { 
-                                const {postText, viewPrice, decryptedFiles } = await retrieveDecryptedContent(uniqueId, ciphertext, encryptedFiles);     
-                                return { ...post, postText, viewPrice, decryptedFiles, hasPaid }
-                            } else {
-                                return { ...post, postText: "Paid Post", viewPrice: 0 }
-                            }
-                        } else {
-                            const { postText, viewPrice, ipfsHashes } = await fetchTextFromIPFS(post.postText);
-                            // console.log(postText, viewPrice, ipfsHashes)
-                            return { ...post, postText, viewPrice, ipfsHashes, hasPaid: true };
-                        }
-                    })
-                );
-                const reversedPostsWithData = postsWithData.reverse();
-                setPosts(reversedPostsWithData);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
     return (
         <PostContext.Provider value={{ 

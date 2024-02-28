@@ -49,3 +49,13 @@
     background-size: cover;
     border-radius: 5px;
 }
+
+.post-helper-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-container {
+    align-self: flex-end;
+    margin-top: auto;
+}

@@ -53,7 +53,7 @@ const Post = ({
             const receipt = await tx.wait();
             if (receipt.status === 1) {
                 console.log("Comment posted successfully");
-                setCommentCount(!commentCount); // Increase comment count when a new comment is added
+                setCommentCount(!commentCount); // To trigger useEffect
             } else {
                 console.error("Comment posting failed");
             }

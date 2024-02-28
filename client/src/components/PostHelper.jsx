@@ -1,6 +1,6 @@
 import web3Context from '../context/web3/web3Context';
 import postContext from '../context/post/postContext';
-import { useState, useEffect ,useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 
 const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBlurred }) => {
     const context1 = useContext(postContext);
@@ -22,7 +22,7 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBl
             showAlert('danger', err.reason);
             console.error(err);
         }
-        
+
     };
 
     useEffect(() => {
@@ -35,7 +35,7 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBl
     }, [contract, address, displayName]);
 
     return (
-        <>
+        <div className="post-helper-container">
             <div className="d-flex justify-content-start">
                 <div style={{ marginRight: "5px" }}>
                     <img src="https://images.unsplash.com/photo-1707159432991-ac67eace0014?q=80&w=1925&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -45,10 +45,8 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBl
                     <div className="m-2" style={{ fontSize: "15px" }}>
                         <span className="fw-bold">{displayName}</span>
                         <span className="text-secondary"> 49m  ·</span>
-                        <a className="text-success fw-bold" onClick={handleFollowClick}>{isFollowing ? ' Unfollow' : ' Follow'}</a>
-                        {/* <span className="text-primary fw-bolder text-end"> viewPice: {price}</span> */}
+                        <a className={`${isFollowing ? 'text-danger' : 'text-success'} fw-bold`} onClick={handleFollowClick}>{isFollowing ? ' Unfollow' : ' Follow'}</a>
                     </div>
-
 
                     <div className="post_description">
                         <p>{text}</p>
@@ -69,7 +67,11 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBl
                     </div>
                 </div>
             </div>
-        </>
+
+            <div className="price-container">
+                <button className='btn btn-info btn-sm'>View Price <span className="badge text-bg-secondary">{price}</span></button>
+            </div>
+        </div>
     )
 };
 

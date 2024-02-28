@@ -130,9 +130,11 @@ contract PostManagement is ERC721 {
         DataTypes.Post[] memory postDataArray = new DataTypes.Post[](counter);
 
         uint resultIndex = 0;
-        for (uint256 i = 1; i <= counter; i++) {
-            postDataArray[resultIndex] = posts[i];
-            resultIndex++;
+        for (uint256 i = 1; i <= postCounter; i++) {
+            if (!posts[i].isDeleted && (_user == address(0) || posts[i].username == _user || (onlyFollowed && followers[msg.sender][posts[i].username]))) {
+                postDataArray[resultIndex] = posts[i];
+                resultIndex++;
+            }
         }
 
         return postDataArray;
