@@ -252,10 +252,35 @@ const PostState = ({ children }) => {
         }
     };
 
+    const retrieveDecryptedContent = async (uniqueId, ciphertext, encryptedFiles) => { 
+        // Retrieve the shares from the gatekeepers
+        const retrievedShares = [];
+        const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
+        for (let i = 0; i < gatekeepersCount; i++) {
+            const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`);
+            retrievedShares.push(Buffer.from(response.data.share, 'hex'));
+
+            if (retrievedShares.length === Math.ceil(2 * gatekeepersCount / 3)) break;
+        }
+
+        let retrievedKey = combine(retrievedShares).toString();
+        // console.log(retrievedKey)
+
+        // Retrieving content with retrieved key
+        const bytes = CryptoJS.AES.decrypt(ciphertext, retrievedKey);
+        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+
+        // Retrieving encrypted files
+        const decryptedFiles = handleFileDecrypt(retrievedKey, encryptedFiles);
+        const { postText, viewPrice } = JSON.parse(decrypted);
+
+        return { postText, viewPrice, decryptedFiles } 
+    }
+
     const getAllPosts = async () => {
         try {
             if (contract) {
-                let allPosts = await contract.getAllPosts();
+                let allPosts = await contract.getFollowedUsersPosts();
                 // console.log(allPosts);
 
                 // Fetching text from IPFS for each post
@@ -264,36 +289,20 @@ const PostState = ({ children }) => {
                         if (post.viewPrice > 0) {
                             const { ciphertext, uniqueId, encryptedFiles } = await fetchTextFromIPFS(post.postText);
 
-                            // Retrieve the shares from the gatekeepers
-                            const retrievedShares = [];
-                            const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
-                            for (let i = 0; i < gatekeepersCount; i++) {
-                                const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`);
-                                retrievedShares.push(Buffer.from(response.data.share, 'hex'));
-
-                                if (retrievedShares.length === Math.ceil(2 * gatekeepersCount / 3)) break;
-                            }
-
-                            let retrievedKey = combine(retrievedShares).toString();
-                            // console.log(retrievedKey)
-
-                            // Retrieving content with retrieved key
-                            const bytes = CryptoJS.AES.decrypt(ciphertext, retrievedKey);
-                            const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-
-                            // Retrieving encrypted files
-                            const decryptedFiles = handleFileDecrypt(retrievedKey, encryptedFiles);
-                            const { postText, viewPrice } = JSON.parse(decrypted)
-
                             let usersWhoPaid = await contract.getPaidUsersByPostId(post.id);
                             const hasPaid = usersWhoPaid.includes(address);
-                            // console.log(hasPaid);
-
-                            return { ...post, postText, viewPrice, decryptedFiles, hasPaid, ipfsHashes: [] }
+                            
+                            // If Paid Post is created by the user itself
+                            if (post[1] === address || hasPaid) { 
+                                const {postText, viewPrice, decryptedFiles } = await retrieveDecryptedContent(uniqueId, ciphertext, encryptedFiles);     
+                                return { ...post, postText, viewPrice, decryptedFiles, hasPaid }
+                            } else {
+                                return { ...post, postText: "Paid Post", viewPrice: 0 }
+                            }
                         } else {
                             const { postText, viewPrice, ipfsHashes } = await fetchTextFromIPFS(post.postText);
                             // console.log(postText, viewPrice, ipfsHashes)
-                            return { ...post, postText, viewPrice, ipfsHashes, hasPaid: true, decryptedFiles: [] };
+                            return { ...post, postText, viewPrice, ipfsHashes, hasPaid: true };
                         }
                     })
                 );

@@ -378,6 +378,13 @@ const contractABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "clearNotifications",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -1161,6 +1168,80 @@ const contractABI = [
 		"name": "unfollowUser",
 		"outputs": [],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "userNotifications",
+		"outputs": [
+			{
+				"internalType": "enum NotificationsManagement.NotificationType",
+				"name": "notificationType",
+				"type": "uint8"
+			},
+			{
+				"internalType": "address",
+				"name": "fromUser",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "associatedPostId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "additionalInfo",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "viewNotifications",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "enum NotificationsManagement.NotificationType",
+						"name": "notificationType",
+						"type": "uint8"
+					},
+					{
+						"internalType": "address",
+						"name": "fromUser",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "associatedPostId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "additionalInfo",
+						"type": "string"
+					}
+				],
+				"internalType": "struct NotificationsManagement.Notification[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{

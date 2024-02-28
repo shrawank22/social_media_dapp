@@ -28,7 +28,6 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBl
     useEffect(() => {
         const checkFollowingStatus = async () => {
             const followingStatus = await contract.followers(address, displayName);
-            console.log(followingStatus);
             setIsFollowing(followingStatus);
         };
 
