@@ -24,6 +24,7 @@ contract PostManagement is ERC721 {
     constructor() ERC721("PostNFT", "PNFT") {}
 
     // Functions
+    // Add a new post
     function addPost(string memory _postText, uint256 _viewPrice) external payable {
         postCounter++;
         uint256 postId = postCounter;
@@ -40,6 +41,7 @@ contract PostManagement is ERC721 {
         emit AddPost(msg.sender, postId);
     }
 
+    // Edit a post
     function editPost(uint256 _postId, string memory _newPostText, uint256 _newPrice) external {
         require(
             posts[_postId].username == msg.sender,
@@ -51,6 +53,29 @@ contract PostManagement is ERC721 {
         posts[_postId].viewPrice = _newPrice;
     }
 
+    // Delete a post
+    function deletePost(uint postId) external {
+        require(posts[postId].username == msg.sender, "You are not the owner of the post");
+        posts[postId].isDeleted = true;
+        emit DeletePost(postId, true);
+    }
+
+    // Get all posts
+    function getAllPosts() external view returns (DataTypes.Post[] memory) {
+        return _getPostsByCriteria(address(0), false);
+    }
+
+    // Get all posts by a user
+    function getMyPosts() external view returns (DataTypes.Post[] memory) {
+        return _getPostsByCriteria(msg.sender, false);
+    }
+
+    // get all posts created by other users that the current user follows
+    function getFollowedUsersPosts() external view returns (DataTypes.Post[] memory) {
+        return _getPostsByCriteria(msg.sender, true);
+    }
+
+    // Add comment to a post
     function addComment(uint256 _postId, string memory _commentText) external {
         require(!posts[_postId].isDeleted, "Post is deleted");
 
@@ -62,10 +87,12 @@ contract PostManagement is ERC721 {
         posts[_postId].comments.push(newComment);
     }
 
+    // Get all comments for a post
     function getPostComments(uint256 _postId) external view returns (DataTypes.Comment[] memory) {
         return posts[_postId].comments;
     }
 
+    // View Paid Post
     function viewPaidPost(uint postId) external payable {
         require(!posts[postId].isDeleted, "post is deleted");
         require(posts[postId].username != msg.sender, "You cannot pay to view your own post");
@@ -79,38 +106,23 @@ contract PostManagement is ERC721 {
         return posts[postId].userWhoPaid; 
     }
 
-    function getAllPosts() external view returns (DataTypes.Post[] memory) {
-        return _getPostsByCriteria(address(0), false);
-    }
-
-    function getMyPosts() external view returns (DataTypes.Post[] memory) {
-        return _getPostsByCriteria(msg.sender, false);
-    }
-
-    function deletePost(uint postId) external {
-        require(posts[postId].username == msg.sender, "You are not the owner of the post");
-        posts[postId].isDeleted = true;
-        emit DeletePost(postId, true);
-    }
-
+    // Follow a user
     function followUser(address _user) external {
         require(_user != msg.sender, "You cannot follow yourself");
         followers[msg.sender][_user] = true;
     }
 
+    // Unfollow a user
     function unfollowUser(address _user) external {
         require(_user != msg.sender, "You cannot unfollow yourself");
         followers[msg.sender][_user] = false;
     }
 
-    function getFollowedUsersPosts() external view returns (DataTypes.Post[] memory) {
-        return _getPostsByCriteria(address(0), true);
-    }
-
+    // Helper functions
     function _getPostsByCriteria(address _user, bool onlyFollowed) private view returns (DataTypes.Post[] memory) {
         uint256 counter = 0;
         for (uint256 i = 1; i <= postCounter; i++) {
-            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted && (!onlyFollowed || (followers[msg.sender][posts[i].username] && !posts[i].isDeleted))) {
+            if (!posts[i].isDeleted && (_user == address(0) || posts[i].username == _user || (onlyFollowed && followers[msg.sender][posts[i].username]))) {
                 counter++;
             }
         }
@@ -118,12 +130,9 @@ contract PostManagement is ERC721 {
         DataTypes.Post[] memory postDataArray = new DataTypes.Post[](counter);
 
         uint resultIndex = 0;
-        for (uint256 i = 1; i <= postCounter; i++) {
-            if ((_user == address(0) || posts[i].username == _user) && !posts[i].isDeleted &&
-                (!onlyFollowed || (followers[msg.sender][posts[i].username] && !posts[i].isDeleted))) {
-                postDataArray[resultIndex] = posts[i];
-                resultIndex++;
-            }
+        for (uint256 i = 1; i <= counter; i++) {
+            postDataArray[resultIndex] = posts[i];
+            resultIndex++;
         }
 
         return postDataArray;
