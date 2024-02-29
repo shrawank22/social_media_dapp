@@ -145,12 +145,11 @@ const Post = ({
     return (
         <div className="post">
             <div className={`viewButton ${!isCreator && isBlurred ? "visible" : "hidden"}`}>
-                <i
-                    className="bi bi-eye-slash fs-1 text-primary fw-bold"
-                    onClick={() => handleViewClick()}
-                ></i>
-                <div className="price-container">
-                    <button className='btn btn-info btn-sm'>View Price <span className="badge text-bg-secondary">{price}</span></button>
+                <div onClick={() => handleViewClick()}>
+                    <i className="bi bi-eye-slash fs-1 text-primary fw-bold ms-4" style={{ cursor: 'pointer' }}></i>
+                    <div>
+                        <a className='btn btn-info btn-sm'>View Price <span className="badge text-bg-secondary">{price}</span></a>
+                    </div>
                 </div>
             </div>
 
