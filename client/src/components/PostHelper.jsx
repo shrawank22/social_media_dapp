@@ -53,7 +53,7 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBl
                     </div>
 
                     <div className="media-container">
-                        {!isBlurred && decryptedFiles && decryptedFiles.map((src) => (
+                        {decryptedFiles && decryptedFiles.map((src) => (
                             <div key={src} className="media-item">
                                 <img src={src} alt="media" className="img-fluid" />
                             </div>

@@ -38,7 +38,7 @@ const PostState = ({ children }) => {
                     const postsWithData = await Promise.all(
                         allPosts.map(async (post) => {
                             if (post.viewPrice > 0) {
-                                const { ciphertext, uniqueId, encryptedFiles } = await fetchTextFromIPFS(post.postText);
+                                const { ciphertext, uniqueId, encryptedFiles, price } = await fetchTextFromIPFS(post.postText);
     
                                 let usersWhoPaid = await contract.getPaidUsersByPostId(post.id);
                                 const hasPaid = usersWhoPaid.includes(address);
@@ -48,7 +48,7 @@ const PostState = ({ children }) => {
                                     const {postText, viewPrice, decryptedFiles } = await retrieveDecryptedContent(uniqueId, ciphertext, encryptedFiles);     
                                     return { ...post, postText, viewPrice, decryptedFiles, hasPaid }
                                 } else {
-                                    return { ...post, postText: "Paid Post", viewPrice: 0 }
+                                    return { ...post, postText: "Paid Post", viewPrice: price, hasPaid: false }
                                 }
                             } else {
                                 const { postText, viewPrice, ipfsHashes } = await fetchTextFromIPFS(post.postText);
@@ -205,7 +205,8 @@ const PostState = ({ children }) => {
                     }
 
                     // Storing paid content to IPFS
-                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId, encryptedFiles }, {
+                    let price = content.viewPrice
+                    const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, price, uniqueId, encryptedFiles }, {
                         headers: {
                             pinata_api_key: import.meta.env.VITE_PINATA_KEY,
                             pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,

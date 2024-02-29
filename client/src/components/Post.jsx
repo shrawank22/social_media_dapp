@@ -88,7 +88,7 @@ const Post = ({
 
                 let retrievedKey = combine(retrievedShares).toString();
                 const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(content), retrievedKey).toString(); // Used AES to encrypt the content
-                
+
                 // Storing paid content to IPFS
                 const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId: uniqueID, encryptedFiles }, {
                     headers: {
@@ -149,6 +149,9 @@ const Post = ({
                     className="bi bi-eye-slash fs-1 text-primary fw-bold"
                     onClick={() => handleViewClick()}
                 ></i>
+                <div className="price-container">
+                    <button className='btn btn-info btn-sm'>View Price <span className="badge text-bg-secondary">{price}</span></button>
+                </div>
             </div>
 
             <div className={`post_content ${isBlurred ? "blurred" : ""}`}>

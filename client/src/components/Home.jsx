@@ -15,6 +15,12 @@ const Home = () => {
     
     const deletePostHandler = key => async () => {
         try {
+            const usersWhoPaid = await contract.getPaidUsersByPostId(key);
+            if (usersWhoPaid.length > 0) {
+                showAlert("danger", "You cannot delete a post that has been paid for");
+                return null;
+            }
+
             const receipt = await contract.deletePost(key);
             await receipt.wait();
             setPosts(posts.filter(post => post[0] !== key));
