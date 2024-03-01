@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs').promises;
+const { ethers } = require('ethers');
 
 const router = express.Router();
 
@@ -9,6 +10,41 @@ fs.mkdir('./shares', { recursive: true })
     .then(() => console.log(`Directory shares created successfully.`))
     .catch((error) => console.error('Error creating directory:', error));
 
+// Initialize ethers.js
+const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
+let contractAddress = '0xE1411E5c7e31b3FEb1a22e560f0551CBB46BFA31';
+let contractABI;
+fs.readFile('./abi.json', 'utf8').then(json => {
+    const obj = JSON.parse(json);
+    contractABI = obj.abi;
+
+    const contract = new ethers.Contract(contractAddress, contractABI, provider);
+
+    router.get('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
+        const id = req.params.id;
+        const uniqueId = req.params.uniqueId;
+
+        // Check if the user has paid for the post
+        try {
+            const hasPaid = await contract.hasUserPaidForPost(1, "0xec38702f99F326C5587E9fB94E110Eb65d0Ca7Bd");
+            console.log('hasPaid:', hasPaid);
+
+            if (!hasPaid) {
+                res.status(403).send({ message: 'Payment required' });
+                return;
+            }
+
+            // Retrieve the share from the file
+            const shareFileName = `${uniqueId}_share_${id}.txt`;
+            const share = await fs.readFile(`${SHARES_DIR}/${shareFileName}`, 'utf8');
+            res.status(200).send({ share });
+        } catch (error) {
+            res.status(404).send({ message: 'Share not found' });
+        }
+    });
+
+
+}).catch(error => console.error('Error reading file:', error));
 
 router.post('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
     const id = req.params.id;
@@ -26,38 +62,5 @@ router.post('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
     }
 });
 
-router.get('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
-    const id = req.params.id;
-    const uniqueId = req.params.uniqueId;
 
-    // Retrieve the share from the file
-    const shareFileName = `${uniqueId}_share_${id}.txt`;
-
-    try {
-        const share = await fs.readFile(`${SHARES_DIR}/${shareFileName}`, 'utf8');
-
-        // Send the share as the response
-        res.status(200).send({ share });
-    } catch (error) {
-        res.status(404).send({ message: 'Share not found' });
-    }
-});
-
-// router.post('/content/decrypt/:uniqueId', (req, res) => {
-//     const shares = req.body.shares;
-//     const ciphertext = req.body.ciphertext;
-//     const uniqueId = req.params.uniqueId;
-
-//     // Combine the shares to reconstruct the encryption key
-//     const key = sss.combine(shares).toString();
-
-//     // Use the key to decrypt the content
-//     const bytes = CryptoJS.AES.decrypt(ciphertext, key);
-//     const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-
-//     console.log(decrypted)
-
-//     res.status(200).send({ content: decrypted });
-
-// });
 module.exports = router;

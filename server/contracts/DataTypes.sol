@@ -31,4 +31,8 @@ library DataTypes {
         string reason;
     }
 
+    struct Gatekeeper {
+        string ip;
+        uint16 port;
+    }
 }

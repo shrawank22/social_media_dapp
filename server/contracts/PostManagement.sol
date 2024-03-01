@@ -12,6 +12,7 @@ contract PostManagement is ERC721 {
     mapping(uint256 => mapping(address => bool)) public postLikes;
     mapping(uint256 => mapping(address => bool)) public postDislikes;
     mapping(address => mapping(address => bool)) public followers;
+    DataTypes.Gatekeeper[] public gatekeepers;
 
     // Events
     event AddPost(address indexed recipient, uint256 indexed postId);
@@ -106,6 +107,16 @@ contract PostManagement is ERC721 {
         return posts[postId].userWhoPaid; 
     }
 
+    // Check if a user has paid for a post
+    function hasUserPaidForPost(uint256 postId, address user) public view returns (bool) {
+        for (uint i = 0; i < posts[postId].userWhoPaid.length; i++) {
+            if (posts[postId].userWhoPaid[i] == user) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Follow a user
     function followUser(address _user) external {
         require(_user != msg.sender, "You cannot follow yourself");
@@ -116,6 +127,20 @@ contract PostManagement is ERC721 {
     function unfollowUser(address _user) external {
         require(_user != msg.sender, "You cannot unfollow yourself");
         followers[msg.sender][_user] = false;
+    }
+
+    // Add a gatekeeper
+    function addGatekeeper(string memory ip, uint16 port) public {
+        gatekeepers.push(DataTypes.Gatekeeper(ip, port));
+    }
+
+    // Fetch gatekeepers
+    function getGatekeepersCount() public view returns (uint) {
+        return gatekeepers.length;
+    }
+    function getGatekeeper(uint index) public view returns (string memory ip, uint16 port) {
+        DataTypes.Gatekeeper memory gatekeeper = gatekeepers[index];
+        return (gatekeeper.ip, gatekeeper.port);
     }
 
     // Helper functions
