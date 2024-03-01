@@ -109,6 +109,10 @@ contract PostManagement is ERC721 {
 
     // Check if a user has paid for a post
     function hasUserPaidForPost(uint256 postId, address user) public view returns (bool) {
+        if (posts[postId].username == user) {
+            return true;
+        }
+        
         for (uint i = 0; i < posts[postId].userWhoPaid.length; i++) {
             if (posts[postId].userWhoPaid[i] == user) {
                 return true;

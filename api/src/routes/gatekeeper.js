@@ -13,7 +13,7 @@ fs.mkdir('./shares', { recursive: true })
 
 // Initialize ethers.js
 const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
-let contractAddress = '0xa00410e801B6865125331a28A4dBD3F230121052';
+let contractAddress = process.env.CONTRACT_ADDRESS;
 let contractABI;
 fs.readFile('./abi.json', 'utf8').then(json => {
     const obj = JSON.parse(json);
@@ -26,19 +26,17 @@ fs.readFile('./abi.json', 'utf8').then(json => {
         const uniqueId = req.params.uniqueId;
         const address = req.query.address;
 
-        console.log(uniqueId);
-
         try {
             // Call get post route to get NFTID from uniqueID
-            const postResponse = await axios.get(`http://localhost:8080/posts/${uniqueId}`);
-            console.log('postResponse:', postResponse.data);
+            const postResponse = await axios.get(`http://localhost:8080/api/posts/${uniqueId}`);
+
+            const NFTID = parseInt(postResponse.data[0].NFTID);
 
             // Check if the user has paid for the post
-            const hasPaid = await contract.hasUserPaidForPost(1, address);
-            console.log('hasPaid:', hasPaid);
+            const hasPaid = await contract.hasUserPaidForPost(NFTID, address);
 
             if (!hasPaid) {
-                res.status(403).send({ message: 'Payment required' });
+                res.status(403).send({ message: 'You have not view rights of this post.' });
                 return;
             }
 
@@ -58,8 +56,6 @@ router.post('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
     const id = req.params.id;
     const uniqueId = req.params.uniqueId;
     const share = req.body.share;
-
-    console.log(uniqueId);
 
     // Store the share in a file
     const shareFileName = `${uniqueId}_share_${id}.txt`;

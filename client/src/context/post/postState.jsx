@@ -31,8 +31,8 @@ const PostState = ({ children }) => {
         const fetchPosts = async () => {
             try {
                 if (contract) {
-                    // let allPosts = await contract.getAllPosts();
-                    let allPosts = await contract.getFollowedUsersPosts();
+                    let allPosts = await contract.getAllPosts();
+                    // let allPosts = await contract.getFollowedUsersPosts();
                     // console.log(allPosts);
     
                     // Fetching text from IPFS for each post

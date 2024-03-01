@@ -5,14 +5,13 @@ const Post = require('../models/Post');
 
 router.get('/posts/:id', async (req, res) => { 
     try {
-        console.log(req.params.id);
         const posts = await Post.find({
             $or: [
                 { NFTID: req.params.id },
                 { uniqueID: req.params.id }
             ]
         });
-        console.log(posts);
+        
         if (!posts.length) return res.status(404).send("No Post Found")
         res.json(posts)
     } catch (error) {
