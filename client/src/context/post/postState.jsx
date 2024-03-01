@@ -298,7 +298,11 @@ const PostState = ({ children }) => {
         const retrievedShares = [];
         const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
         for (let i = 0; i < gatekeepersCount; i++) {
-            const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`);
+            const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`, {
+                params: {
+                    address: address
+                }
+            });
             retrievedShares.push(Buffer.from(response.data.share, 'hex'));
 
             if (retrievedShares.length === Math.ceil(2 * gatekeepersCount / 3)) break;

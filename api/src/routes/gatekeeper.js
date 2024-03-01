@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs').promises;
 const { ethers } = require('ethers');
+const axios = require('axios');
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ fs.mkdir('./shares', { recursive: true })
 
 // Initialize ethers.js
 const provider = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
-let contractAddress = '0xE1411E5c7e31b3FEb1a22e560f0551CBB46BFA31';
+let contractAddress = '0xa00410e801B6865125331a28A4dBD3F230121052';
 let contractABI;
 fs.readFile('./abi.json', 'utf8').then(json => {
     const obj = JSON.parse(json);
@@ -23,10 +24,17 @@ fs.readFile('./abi.json', 'utf8').then(json => {
     router.get('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
         const id = req.params.id;
         const uniqueId = req.params.uniqueId;
+        const address = req.query.address;
 
-        // Check if the user has paid for the post
+        console.log(uniqueId);
+
         try {
-            const hasPaid = await contract.hasUserPaidForPost(1, "0xec38702f99F326C5587E9fB94E110Eb65d0Ca7Bd");
+            // Call get post route to get NFTID from uniqueID
+            const postResponse = await axios.get(`http://localhost:8080/posts/${uniqueId}`);
+            console.log('postResponse:', postResponse.data);
+
+            // Check if the user has paid for the post
+            const hasPaid = await contract.hasUserPaidForPost(1, address);
             console.log('hasPaid:', hasPaid);
 
             if (!hasPaid) {
@@ -50,6 +58,8 @@ router.post('/gatekeepers/:id/share/:uniqueId', async (req, res) => {
     const id = req.params.id;
     const uniqueId = req.params.uniqueId;
     const share = req.body.share;
+
+    console.log(uniqueId);
 
     // Store the share in a file
     const shareFileName = `${uniqueId}_share_${id}.txt`;
