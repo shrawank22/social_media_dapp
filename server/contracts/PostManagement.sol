@@ -13,6 +13,7 @@ contract PostManagement is ERC721 {
     mapping(uint256 => mapping(address => bool)) public postDislikes;
     mapping(address => mapping(address => bool)) public followers;
     DataTypes.Gatekeeper[] public gatekeepers;
+    mapping(address => bool) public hasAddedGatekeeper;
 
     // Events
     event AddPost(address indexed recipient, uint256 indexed postId);
@@ -135,7 +136,9 @@ contract PostManagement is ERC721 {
 
     // Add a gatekeeper
     function addGatekeeper(string memory ip, uint16 port) public {
+        require(!hasAddedGatekeeper[msg.sender], "This address has already added a gatekeeper");
         gatekeepers.push(DataTypes.Gatekeeper(ip, port));
+        hasAddedGatekeeper[msg.sender] = true;
     }
 
     // Fetch gatekeepers
