@@ -34,19 +34,19 @@ const PostState = ({ children }) => {
                     let allPosts = await contract.getAllPosts();
                     // let allPosts = await contract.getFollowedUsersPosts();
                     // console.log(allPosts);
-    
+
                     // Fetching text from IPFS for each post
                     const postsWithData = await Promise.all(
                         allPosts.map(async (post) => {
                             if (post.viewPrice > 0) {
                                 const { ciphertext, uniqueId, encryptedFiles, price } = await fetchTextFromIPFS(post.postText);
-    
+
                                 let usersWhoPaid = await contract.getPaidUsersByPostId(post.id);
                                 const hasPaid = usersWhoPaid.includes(address);
-                                
+
                                 // If Paid Post is created by the user itself
-                                if (post[1] === address || hasPaid) { 
-                                    const {postText, viewPrice, decryptedFiles } = await retrieveDecryptedContent(uniqueId, ciphertext, encryptedFiles);     
+                                if (post[1] === address || hasPaid) {
+                                    const { postText, viewPrice, decryptedFiles } = await retrieveDecryptedContent(uniqueId, ciphertext, encryptedFiles);
                                     return { ...post, postText, viewPrice, decryptedFiles, hasPaid }
                                 } else {
                                     return { ...post, postText: "Paid Post", viewPrice: price, hasPaid: false }
@@ -192,13 +192,14 @@ const PostState = ({ children }) => {
                     }
 
                     // Split the key into parts
-                    const shares = split(Buffer.from(key), { shares: gatekeepersCount, threshold: Math.ceil(gatekeepersCount * 2 / 3) });
+                    const { gatekeepers, gatekeepersCount } = await fetchGatekeepers();
+                    const shares = split(Buffer.from(key), { shares: parseInt(gatekeepersCount), threshold: Math.ceil(parseInt(gatekeepersCount) * 2 / 3) });
 
                     const keyShares = shares.map(share => share.toString('hex'))
 
                     // Send each share to a different gatekeeper
                     for (let i = 0; i < gatekeepersCount; i++) {
-                        await axios.post(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`, { share: keyShares[i] }, {
+                        await axios.post(`http://${gatekeepers[i].ip}:${gatekeepers[i].port}/api/gatekeepers/${i}/share/${uniqueId}`, { share: keyShares[i] }, {
                             headers: {
                                 'Content-Type': 'application/json'
                             },
@@ -293,20 +294,31 @@ const PostState = ({ children }) => {
         }
     };
 
-    const retrieveDecryptedContent = async (uniqueId, ciphertext, encryptedFiles) => { 
+    const retrieveDecryptedContent = async (uniqueId, ciphertext, encryptedFiles) => {
         // Retrieve the shares from the gatekeepers
         const retrievedShares = [];
-        const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
+
+        const { gatekeepers, gatekeepersCount } = await fetchGatekeepers();
+        
         for (let i = 0; i < gatekeepersCount; i++) {
-            const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`, {
+            const response = await axios.get(`http://${gatekeepers[i].ip}:${gatekeepers[i].port}/api/gatekeepers/${i}/share/${uniqueId}`, {
                 params: {
                     address: address
                 }
             });
             retrievedShares.push(Buffer.from(response.data.share, 'hex'));
-
-            if (retrievedShares.length === Math.ceil(2 * gatekeepersCount / 3)) break;
+            if (retrievedShares.length === Math.ceil(2 * parseInt(gatekeepersCount) / 3)) break;
         }
+
+        // for (let i = 0; i < gatekeepersCount; i++) {
+        //     const response = await axios.get(`http://localhost:8080/api/gatekeepers/${i}/share/${uniqueId}`, {
+        //         params: {
+        //             address: address
+        //         }
+        //     });
+        //     retrievedShares.push(Buffer.from(response.data.share, 'hex'));
+        //     if (retrievedShares.length === Math.ceil(2 * gatekeepersCount / 3)) break;
+        // }
 
         let retrievedKey = combine(retrievedShares).toString();
         // console.log(retrievedKey)
@@ -319,14 +331,29 @@ const PostState = ({ children }) => {
         const decryptedFiles = handleFileDecrypt(retrievedKey, encryptedFiles);
         const { postText, viewPrice } = JSON.parse(decrypted);
 
-        return { postText, viewPrice, decryptedFiles } 
+        return { postText, viewPrice, decryptedFiles }
+    }
+
+    const fetchGatekeepers = async () => {
+        try {
+            const gatekeepersCount = await contract.getGatekeepersCount();
+            let gatekeepers = [];
+            for (let i = 0; i < gatekeepersCount; i++) {
+                let { ip, port } = await contract.getGatekeeper(i);
+                gatekeepers.push({ ip, port });
+            }
+            return { gatekeepers, gatekeepersCount };
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
     }
 
     return (
-        <PostContext.Provider value={{ 
-            alert, showAlert, getPost, deletePost, postPost, addPostHandler, 
-            postText, viewPrice, fileURLs, isPosting, setFileURLs, setSelectedFiles, 
-            setPostText, setViewPrice, posts, setPosts 
+        <PostContext.Provider value={{
+            alert, showAlert, getPost, deletePost, postPost, addPostHandler,
+            postText, viewPrice, fileURLs, isPosting, setFileURLs, setSelectedFiles,
+            setPostText, setViewPrice, posts, setPosts
         }}>
             {children}
         </PostContext.Provider>
