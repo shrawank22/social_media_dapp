@@ -24,7 +24,8 @@ router.post('/register', async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept' : 'application/json',
-                'Authorization': BASIC_AUTH
+                'Authorization': BASIC_AUTH,
+                'X-Pinggy-No-Screen' : 1
             }
         });
 
@@ -33,7 +34,8 @@ router.post('/register', async (req, res) => {
         // create VC qr code
         const qrCodeRes = await axios.get(`${API_URL}/v1/credentials/${issuerRes.data.id}/qrcode`, {
             headers: {
-                'Accept' : 'application/json'
+                'Accept' : 'application/json',
+                'X-Pinggy-No-Screen' : 1
             }
         });
 
@@ -44,7 +46,12 @@ router.post('/register', async (req, res) => {
         console.log('qrCodeLink: ', qrCodeLink);
 
         // get qr code link
-        const qrCodeLinkRes = await axios.get(`${qrCodeLink}`);
+        const qrCodeLinkRes = await axios.get(`${qrCodeLink}`, {
+            headers: {
+                'Accept' : 'application/json',
+                'X-Pinggy-No-Screen' : 1
+            }
+        });
         console.log('qrCodeLinkRes: ', qrCodeLinkRes.data);
 
         res.status(200).send(qrCodeLinkRes.data);
@@ -56,6 +63,11 @@ router.post('/register', async (req, res) => {
 router.get('/api/sign-in', (req, res) => {
     console.log("get Auth reached");
     GetAuthRequests(req, res);
+});
+
+router.get('/api/callback', (req, res) => {
+    console.log("get Auth reached");
+    // handleVerification(req, res);
 });
 
 router.post('/api/callback', (req, res) => {

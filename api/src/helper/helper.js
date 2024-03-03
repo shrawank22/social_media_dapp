@@ -31,8 +31,10 @@ async function GetAuthRequests(req, res) {
         uri,
     );
 
-    request.id = sessionId;
-    request.thid = sessionId;
+    // console.log("Request: ", request);
+
+    // request.id = sessionId;
+    // request.thid = sessionId;
     const proofRequest = {
         id: 1,
         circuitId: 'credentialAtomicQuerySigV2',
@@ -44,7 +46,8 @@ async function GetAuthRequests(req, res) {
                 address: {
                     $eq: "Kanpur",
                 }
-            }
+            },
+            skipClaimRevocationCheck: true,
         }
     }
 
@@ -58,12 +61,15 @@ async function GetAuthRequests(req, res) {
 
     console.log("Request: ", request);
 
-    return res.status(200).set('Content-Type', 'application/json').send(request);
+    return res.status(200).set('Content-Type', 'application/json').set('bypass-tunnel-reminder', 1).send(request);
 }
 
 
 async function handleVerification(req, res) {
-    const sessionId = req.sessionID;
+    const sessionId = req.query.sessionID;
+
+    console.log("Session ID handleVerification: ", sessionId);
+
     const authRequest = requestMap.get(sessionId);
 
     console.log("Auth request for session : ", sessionId, " is: ", authRequest);
