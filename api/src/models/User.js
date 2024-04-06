@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
-const passportLocalMongoose = require("passport-local-mongoose");
 
-const {Schema, model} = mongoose;
+const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
-    username: {type: String, unique: true, required: true},
+    username: { type: String, unique: true, required: true },
     name: {
         type: String,
         required: true
@@ -16,12 +15,13 @@ const userSchema = new Schema({
     },
     password: String,
     date: {
-        type: Date, 
+        type: Date,
         default: Date.now
-    }
-
+    },
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
-
-userSchema.plugin(passportLocalMongoose)
 
 module.exports = model("User", userSchema)

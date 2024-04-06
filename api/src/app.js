@@ -2,13 +2,11 @@ require('dotenv').config();
 
 const express = require("express");
 const expressSanitizer = require('express-sanitizer');
-const cors = require('cors')
-const passport = require('passport');
-const localStrategy = require('passport-local');
+const cors = require('cors');
 
 const app = express();
 
-//App config
+// App config
 const options = {
     credentials: true,
     origin: "http://localhost:5173",
@@ -21,15 +19,15 @@ app.use(express.json({limit: '1mb'}));
 app.use(express.urlencoded({ limit: '1mb', extended: true }));
 app.use(expressSanitizer());
 
-//DB Models exports
+// DB Models exports
 const User = require('./models/User');
 
-//routes imported
+// routes imported
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
 const gatekeeperRoutes = require('./routes/gatekeeper')
 
-//DB Connection
+// DB Connection
 const connectMongo = require('./connect');
 connectMongo();
 
@@ -67,40 +65,15 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 
-// app.use(require("express-session")({
-// 	secret: "Why should I tell you?",
-// 	resave: false,
-// 	saveUninitialized: false,
-// 	cookie: {
-//         httpOnly: true,
-//         // secure: true,
-//         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-//         maxAge: 1000 * 60 * 60 * 24 * 7
-//     }  
-// }));
-
-
-// Passport config----------
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.use(new localStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-app.use((req, res, next) => {
-    // console.log(req.session)
-    res.locals.user = req.user;
-    next();
-});
-
-//imported routes use
+// imported routes use
 app.use("/api", authRoutes);
 app.use("/api", postRoutes);
 app.use("/api", gatekeeperRoutes)
 
-//app listen config
+// app listen config
 const PORT = process.env.PORT || 8080;
 const IP = process.env.IP || "0.0.0.0";
 app.listen(PORT, IP, () =>
     console.log(`Server started on http://localhost:${PORT}`)
 );
+

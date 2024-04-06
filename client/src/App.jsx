@@ -5,6 +5,7 @@ import Home from './components/Home'
 import Profile from './components/Profile'
 import Login from './components/Login'
 import Register from './components/Register'
+import Notification from './components/Notification'
 import Widgets from './components/Widgets'
 import Navbar from './components/Navbar'
 import Alert from './components/Alert'
@@ -33,6 +34,7 @@ function App() {
                 <Route exact path='/profile' element={<Profile />} />
                 <Route exact path='/login' element={<Login />} />
                 <Route exact path='/register' element={<Register />} />
+                <Route exact path='/notification' element={<Notification />} />
               </Routes>
             </div>
             <div className='col-md-3 col-sm-12 scrollable-sidebar'>
