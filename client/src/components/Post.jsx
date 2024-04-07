@@ -154,7 +154,7 @@ const Post = ({
             </div>
 
             <div className={`post_content ${isBlurred ? "blurred" : ""}`}>
-                <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} isBlurred={isBlurred} />
+                <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} />
                 <div className="d-flex bg-body-tertiary rounded p-1 justify-content-around">
                     <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target={`#commentModal-${postId}`}></i>
                     <i className="bi bi-heart"></i>
@@ -208,7 +208,7 @@ const Post = ({
                                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div className="modal-body">
-                                <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} isBlurred={false} />
+                                <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} />
                                 <div className="d-flex bg-body-tertiary rounded p-1 justify-content-around">
                                     <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target={`#commentModal-${postId}`}></i>
                                     <i className="bi bi-heart"></i>

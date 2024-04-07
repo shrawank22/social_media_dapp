@@ -72,20 +72,41 @@ router.post('/follow/:username', middleware.isLoggedIn, async (req, res) => {
     try {
 		const { username } = req.params;
         const followerId = req.user.id;
+        const follower = await User.findById(followerId);
 
 		const user = await User.findOneAndUpdate({ username: username }, { $addToSet: { followers: followerId } });
 
-		console.log( user._id, followerId);
-
         // Create a notification for the user being followed
 		await Notification.create({
-            // recipient: user._id,
+            recipient: user._id,
             sender: followerId,
             type: 'follow',
-            message: `${req.user.username} started following you.`
+            message: `${follower.username} started following you.`
         });
 
         res.status(200).send({ message: 'Followed successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Internal server error.' });
+    }
+});
+
+// Unfollow Route
+router.post('/unfollow/:username', middleware.isLoggedIn, async (req, res) => {
+    try {
+        const { username } = req.params;
+        const followerId = req.user.id;
+
+        const user = await User.findOneAndUpdate({ username: username }, { $pull: { followers: followerId } });
+
+        // Delete the 'follow' notification
+        await Notification.findOneAndDelete({
+            recipient: user._id,
+            sender: followerId,
+            type: 'follow'
+        });
+
+        res.status(200).send({ message: 'Unfollowed successfully.' });
     } catch (error) {
         console.error(error);
         res.status(500).send({ error: 'Internal server error.' });

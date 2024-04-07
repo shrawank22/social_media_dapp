@@ -40,9 +40,8 @@ const Register = () => {
 
 
         } catch (err) {
-            showAlert("danger", err.message)
-            console.log(err);
-           
+            showAlert("danger", err.response.data)
+            // console.log(err.response.data); 
         }
     }
 
@@ -81,7 +80,7 @@ const Register = () => {
                     <label htmlFor="password" className="form-label">Password</label>
                     <input type="password" className="form-control" id="password" name='password'  value={password} onChange={onChange1} />
                 </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary">Register</button>
             </form>
 
         </>

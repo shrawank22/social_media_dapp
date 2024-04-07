@@ -38,8 +38,8 @@ const Login = () => {
 
 
         } catch (err) {
-            showAlert("danger", err.message)
-            console.log(err);
+            showAlert("danger", err.response.data.error)
+            console.log(err.response.data.error);
            
         }
     }

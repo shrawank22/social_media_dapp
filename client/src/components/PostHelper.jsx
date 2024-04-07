@@ -1,8 +1,9 @@
 import web3Context from '../context/web3/web3Context';
 import postContext from '../context/post/postContext';
 import { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 
-const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBlurred }) => {
+const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) => {
     const context1 = useContext(postContext);
     const context2 = useContext(web3Context);
     const { showAlert } = context1;
@@ -13,10 +14,28 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes, isBl
 
     const handleFollowClick = async () => {
         try {
+            const token = localStorage.getItem('token'); 
+            // console.log(token)
             if (!isFollowing) {
                 await contract.followUser(displayName);
+
+                const response = await axios.post(`http://localhost:8080/api/follow/${displayName}`, {}, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                });
+                console.log(response.data)
+        
             } else {
                 await contract.unfollowUser(displayName);
+                const response = await axios.post(`http://localhost:8080/api/unfollow/${displayName}`, {}, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                });
+                console.log(response.data)
             }
         } catch (err) {
             showAlert('danger', err.reason);
