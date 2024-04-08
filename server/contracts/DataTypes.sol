@@ -11,12 +11,10 @@ library DataTypes {
         uint256 viewPrice;
         bool isDeleted;
         uint256 likes;
-        uint256 dislikes;
         Visibility visibility;
         Comment[] comments;
         Report[] reports; 
         address[] userWhoPaid; 
-
     }
 
     struct Comment {

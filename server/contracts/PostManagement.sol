@@ -9,11 +9,11 @@ contract PostManagement is ERC721 {
 
     // Mappings
     mapping(uint256 => DataTypes.Post) public posts;
-    mapping(uint256 => mapping(address => bool)) public postLikes;
-    mapping(uint256 => mapping(address => bool)) public postDislikes;
+    mapping(uint256 => mapping(address => bool)) public postReports;
     mapping(address => mapping(address => bool)) public followers;
     DataTypes.Gatekeeper[] public gatekeepers;
     mapping(address => bool) public hasAddedGatekeeper;
+    mapping(uint256 => mapping(address => bool)) private reportedByUser;
 
     // Events
     event AddPost(address indexed recipient, uint256 indexed postId);
@@ -22,6 +22,10 @@ contract PostManagement is ERC721 {
     event LikePost(address indexed sender, uint256 indexed postId);
     event DislikePost(address indexed sender, uint256 indexed postId);
     event ViewPost(address indexed sender, uint indexed postId);
+    event PostLiked(uint256 indexed postId, address indexed liker);
+    event PostUnliked(uint256 indexed postId, address indexed unliker);
+    event PostReported(uint256 indexed postId, address indexed reporter, string reason);
+
 
     constructor() ERC721("PostNFT", "PNFT") {}
 
@@ -132,6 +136,40 @@ contract PostManagement is ERC721 {
     function unfollowUser(address _user) external {
         require(_user != msg.sender, "You cannot unfollow yourself");
         followers[msg.sender][_user] = false;
+    }
+
+    // Like a Post
+    function likePost(uint256 postId) external {
+        posts[postId].likes++;
+        emit PostLiked(postId, msg.sender);
+    }
+
+    // Unlike a Post
+    function unlikePost(uint256 postId) external {
+        require(posts[postId].likes > 0, "Post has no likes");
+        posts[postId].likes--;
+        emit PostUnliked(postId, msg.sender);
+    }
+
+    // Get likes for a post
+    function getLikesForPost(uint256 postId) external view returns (uint256) {
+        return posts[postId].likes;
+    }
+
+    // Report a post
+    function reportPost(uint256 postId, string memory reason) external {
+        require(posts[postId].username != msg.sender, "You cannot report your own post.");
+        require(!reportedByUser[postId][msg.sender], "You have already reported this post.");
+
+        DataTypes.Report memory report = DataTypes.Report(posts[postId].reports.length, msg.sender, reason);
+        posts[postId].reports.push(report);
+        reportedByUser[postId][msg.sender] = true;
+
+        emit PostReported(postId, msg.sender, reason);
+    }
+
+    function getReportsForPost(uint256 postId) external view returns (DataTypes.Report[] memory) {
+        return posts[postId].reports;
     }
 
     // Add a gatekeeper

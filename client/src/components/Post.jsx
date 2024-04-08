@@ -43,6 +43,14 @@ const Post = ({
     const [editedText, setEditedText] = useState(text);
     const [editedPrice, setEditedPrice] = useState(price);
 
+    const [likes, setLikes] = useState(0);
+    const [isLiked, setIsLiked] = useState(false);
+
+    const handleLikeClick = () => {
+        setIsLiked(!isLiked);
+        setLikes(isLiked ? likes - 1 : likes + 1);
+    };
+
     const handleCommentPost = async () => {
         const comment = commentRef.current.value;
         if (!comment) {
@@ -140,6 +148,15 @@ const Post = ({
             }
         };
         fetchComments();
+        const fetchLikes = async () => {
+            try {
+                const likes = await contract.getLikesForPost(postId);
+                setLikes(likes);
+            } catch (error) {
+                console.error("Error fetching likes:", error);
+            }
+        }
+        fetchLikes();
     }, [commentCount]);
 
     return (
@@ -157,7 +174,14 @@ const Post = ({
                 <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} />
                 <div className="d-flex bg-body-tertiary rounded p-1 justify-content-around">
                     <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target={`#commentModal-${postId}`}></i>
-                    <i className="bi bi-heart"></i>
+                    {/* <i className="bi bi-heart"></i> */}
+                    <i
+                        className={`bi bi-heart${isLiked ? '-fill' : ''}`}
+                        style={{ color: isLiked ? 'red' : 'inherit' }}
+                        onClick={handleLikeClick}
+                    >
+                        {likes > 0 && <span>{likes}</span>}
+                    </i>
                     <i className="bi bi-flag"></i>
                     {isCreator && (
                         <i className="bi bi-pencil-square" data-bs-toggle="modal" data-bs-target={`#editModal-${postId}`}></i>
