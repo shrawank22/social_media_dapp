@@ -21,7 +21,7 @@ const Post = ({ displayName, text, price, deletePostHandler, isCreator, postId, 
     const [editedPrice, setEditedPrice] = useState(price);
 
     const [likes, setLikes] = useState(0);
-    // const [isLiked, setIsLiked] = useState(false);
+    const isLiked = localStorage.getItem(`liked-${address}-${postId}`) === 'true';
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -80,38 +80,38 @@ const Post = ({ displayName, text, price, deletePostHandler, isCreator, postId, 
         }
     };
 
-    // const handleLikeClick = async (postId) => {
-    //     if (isLiked) {
-    //         try {
-    //             const tx = await contract.unlikePost(postId);
-    //             const receipt = await tx.wait();
-    //             if (receipt.status === 1) {
-    //                 console.log("Post Unliked successfully");
-    //                 setLikes(prevLikes => BigInt(prevLikes) - 1n);
-    //                 setIsLiked(!isLiked);
-    //             } else {
-    //                 console.error("Post Unliking failed");
-    //             }
-    //         } catch (error) {
-    //             console.error("Error liking post:", error);
-    //         }
+    const handleLikeClick = async (postId) => {
+        if (isLiked) {
+            try {
+                const tx = await contract.unlikePost(postId);
+                const receipt = await tx.wait();
+                if (receipt.status === 1) {
+                    console.log("Post Unliked successfully");
+                    setLikes(prevLikes => BigInt(prevLikes) - 1n);
+                    localStorage.setItem(`liked-${address}-${postId}`, 'false');
+                } else {
+                    console.error("Post Unliking failed");
+                }
+            } catch (error) {
+                console.error("Error liking post:", error);
+            }
 
-    //     } else {
-    //         try {
-    //             const tx = await contract.likePost(postId);
-    //             const receipt = await tx.wait();
-    //             if (receipt.status === 1) {
-    //                 setIsLiked(!isLiked);
-    //                 setLikes(prevLikes => BigInt(prevLikes) + 1n);
-    //             } else {
-    //                 console.error("Post liking failed");
-    //             }
-    //         } catch (error) {
-    //             console.error("Error liking post:", error);
-    //         }
+        } else {
+            try {
+                const tx = await contract.likePost(postId);
+                const receipt = await tx.wait();
+                if (receipt.status === 1) {
+                    localStorage.setItem(`liked-${address}-${postId}`, 'true');
+                    setLikes(prevLikes => BigInt(prevLikes) + 1n);
+                } else {
+                    console.error("Post liking failed");
+                }
+            } catch (error) {
+                console.error("Error liking post:", error);
+            }
 
-    //     }
-    // };
+        }
+    };
 
     const updatePostHandler = async (event) => {
         event.preventDefault();
@@ -195,15 +195,11 @@ const Post = ({ displayName, text, price, deletePostHandler, isCreator, postId, 
                 <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} />
                 <div className="d-flex bg-body-tertiary rounded p-1 justify-content-around">
                     <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target={`#commentModal-${postId}`}></i>
-                    <i className="bi bi-heart">{likes > 0 && <span>{String(likes)}</span>}</i>
-                    {/* <i
-                        className={`bi bi-heart${isLiked ? '-fill' : ''}`}
-                        style={{ color: isLiked ? 'red' : 'inherit' }}
-                        onClick={() => handleLikeClick(postId)}
-                    >
-                        {console.log(likes)}
-                        {likes > 0 && <span>{likes}</span>}
-                    </i> */}
+                    
+                    {/* <i className="bi bi-heart">{likes > 0 && <span>{String(likes)}</span>}</i> */}
+                    <i className={`bi bi-heart${isLiked ? '-fill' : ''}`} style={{ color: isLiked ? 'red' : 'inherit' }} onClick={() => handleLikeClick(postId)}>
+                        {likes > 0 && <span>{String(likes)}</span>}
+                    </i>
 
                     <i className="bi bi-flag"></i>
                     {isCreator && (

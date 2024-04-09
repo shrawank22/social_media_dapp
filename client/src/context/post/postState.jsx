@@ -33,7 +33,7 @@ const PostState = ({ children }) => {
                 if (contract) {
                     let allPosts = await contract.getAllPosts();
                     // let allPosts = await contract.getFollowedUsersPosts();
-                    console.log(allPosts);
+                    // console.log(allPosts);
 
                     // Fetching text from IPFS for each post
                     const postsWithData = await Promise.all(
@@ -156,7 +156,8 @@ const PostState = ({ children }) => {
 
     const fetchTextFromIPFS = async (ipfsHash) => {
         try {
-            const response = await axios.get(`https://ipfs.io/ipfs/${ipfsHash}`);
+            // const response = await axios.get(`https://ipfs.io/ipfs/${ipfsHash}`);
+            const response = await axios.get(`https://brown-bright-emu-470.mypinata.cloud/ipfs/${ipfsHash}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching text from IPFS:', error);
