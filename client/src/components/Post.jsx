@@ -6,32 +6,9 @@ import axios from "axios";
 import { Buffer, combine } from 'shamirs-secret-sharing'
 import CryptoJS from 'crypto-js'
 
-const Post = ({
-    displayName,
-    text,
-    price,
-    deletePostHandler,
-    isCreator,
-    postId,
-    state,
-    hasPaid,
-    decryptedFiles,
-    ipfsHashes
-}) => {
+const Post = ({ displayName, text, price, deletePostHandler, isCreator, postId, state, hasPaid, decryptedFiles, ipfsHashes }) => {
     const [isBlurred, setIsBlurred] = useState(!isCreator && !hasPaid);
     const { contract, address } = state;
-    const handleViewClick = async () => {
-        if (!isCreator) {
-            const tx = await contract.viewPaidPost(postId, { value: price });
-            const receipt = await tx.wait(); // Wait for the transaction to be mined
-            if (receipt.status === 1) {
-                console.log("Transaction successful");
-                setIsBlurred(false);
-            } else {
-                console.error("Transaction failed");
-            }
-        }
-    };
 
     const commentRef = useRef(null);
     const [comments, setComments] = useState([]);
@@ -44,11 +21,43 @@ const Post = ({
     const [editedPrice, setEditedPrice] = useState(price);
 
     const [likes, setLikes] = useState(0);
-    const [isLiked, setIsLiked] = useState(false);
+    // const [isLiked, setIsLiked] = useState(false);
 
-    const handleLikeClick = () => {
-        setIsLiked(!isLiked);
-        setLikes(isLiked ? likes - 1 : likes + 1);
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                const comments = await contract.getPostComments(postId);
+                setComments(comments);
+            } catch (error) {
+                console.error("Error fetching comments:", error);
+            }
+        };
+        fetchComments();
+    }, [commentCount]);
+
+    useEffect(() => {
+        const fetchLikes = async () => {
+            try {
+                const likes = await contract.getLikesForPost(postId);
+                setLikes(likes);
+            } catch (error) {
+                console.error("Error fetching likes:", error);
+            }
+        };
+        fetchLikes();
+    }, [postId]);
+
+    const handleViewClick = async () => {
+        if (!isCreator) {
+            const tx = await contract.viewPaidPost(postId, { value: price });
+            const receipt = await tx.wait(); // Wait for the transaction to be mined
+            if (receipt.status === 1) {
+                console.log("Transaction successful");
+                setIsBlurred(false);
+            } else {
+                console.error("Transaction failed");
+            }
+        }
     };
 
     const handleCommentPost = async () => {
@@ -70,6 +79,39 @@ const Post = ({
             console.error("Error posting comment:", error);
         }
     };
+
+    // const handleLikeClick = async (postId) => {
+    //     if (isLiked) {
+    //         try {
+    //             const tx = await contract.unlikePost(postId);
+    //             const receipt = await tx.wait();
+    //             if (receipt.status === 1) {
+    //                 console.log("Post Unliked successfully");
+    //                 setLikes(prevLikes => BigInt(prevLikes) - 1n);
+    //                 setIsLiked(!isLiked);
+    //             } else {
+    //                 console.error("Post Unliking failed");
+    //             }
+    //         } catch (error) {
+    //             console.error("Error liking post:", error);
+    //         }
+
+    //     } else {
+    //         try {
+    //             const tx = await contract.likePost(postId);
+    //             const receipt = await tx.wait();
+    //             if (receipt.status === 1) {
+    //                 setIsLiked(!isLiked);
+    //                 setLikes(prevLikes => BigInt(prevLikes) + 1n);
+    //             } else {
+    //                 console.error("Post liking failed");
+    //             }
+    //         } catch (error) {
+    //             console.error("Error liking post:", error);
+    //         }
+
+    //     }
+    // };
 
     const updatePostHandler = async (event) => {
         event.preventDefault();
@@ -138,27 +180,6 @@ const Post = ({
         }
     }
 
-    useEffect(() => {
-        const fetchComments = async () => {
-            try {
-                const comments = await contract.getPostComments(postId);
-                setComments(comments);
-            } catch (error) {
-                console.error("Error fetching comments:", error);
-            }
-        };
-        fetchComments();
-        const fetchLikes = async () => {
-            try {
-                const likes = await contract.getLikesForPost(postId);
-                setLikes(likes);
-            } catch (error) {
-                console.error("Error fetching likes:", error);
-            }
-        }
-        fetchLikes();
-    }, [commentCount]);
-
     return (
         <div className="post">
             <div className={`viewButton ${!isCreator && isBlurred ? "visible" : "hidden"}`}>
@@ -174,14 +195,16 @@ const Post = ({
                 <PostHelper displayName={displayName} text={text} price={price} decryptedFiles={decryptedFiles} ipfsHashes={ipfsHashes} />
                 <div className="d-flex bg-body-tertiary rounded p-1 justify-content-around">
                     <i className="bi bi-chat-left" data-bs-toggle="modal" data-bs-target={`#commentModal-${postId}`}></i>
-                    {/* <i className="bi bi-heart"></i> */}
-                    <i
+                    <i className="bi bi-heart">{likes > 0 && <span>{String(likes)}</span>}</i>
+                    {/* <i
                         className={`bi bi-heart${isLiked ? '-fill' : ''}`}
                         style={{ color: isLiked ? 'red' : 'inherit' }}
-                        onClick={handleLikeClick}
+                        onClick={() => handleLikeClick(postId)}
                     >
+                        {console.log(likes)}
                         {likes > 0 && <span>{likes}</span>}
-                    </i>
+                    </i> */}
+
                     <i className="bi bi-flag"></i>
                     {isCreator && (
                         <i className="bi bi-pencil-square" data-bs-toggle="modal" data-bs-target={`#editModal-${postId}`}></i>
