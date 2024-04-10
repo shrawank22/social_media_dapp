@@ -2,6 +2,8 @@
 
 require("@nomiclabs/hardhat-ethers")
 require("@nomiclabs/hardhat-waffle")
+require('dotenv').config();
+const { PRIVATE_KEY, API_KEY } = process.env;
 
 module.exports = {
   solidity: {
@@ -15,9 +17,9 @@ module.exports = {
   },
   networks: {
     polygon: {
-      url: 'https://polygon-mumbai.g.alchemy.com/v2/MYPwc49ru8kphdLXanN10Z8ye9VWcH_W',
+      url:  `https://polygon-mumbai.g.alchemy.com/v2/${API_KEY}`,
       accounts: [
-        '0xc9891405696022967f401859c6947d9903e1a952447ce6609d4675dc90ec0c8d',
+        PRIVATE_KEY,
       ],
     },
     localhost: {
