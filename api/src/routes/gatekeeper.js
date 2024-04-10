@@ -12,9 +12,11 @@ fs.mkdir('./shares', { recursive: true })
     .catch((error) => console.error('Error creating directory:', error));
 
 // Initialize ethers.js
-const provider = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/MYPwc49ru8kphdLXanN10Z8ye9VWcH_W');
 let contractAddress = process.env.CONTRACT_ADDRESS;
 let contractABI;
+let API_KEY = process.env.API_KEY;
+const provider = new ethers.providers.JsonRpcProvider(`https://polygon-mumbai.g.alchemy.com/v2/${API_KEY}`);
+
 fs.readFile('./abi.json', 'utf8').then(json => {
     const obj = JSON.parse(json);
     contractABI = obj.abi;
