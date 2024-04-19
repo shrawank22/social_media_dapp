@@ -15,7 +15,7 @@ fs.mkdir('./shares', { recursive: true })
 let contractAddress = process.env.CONTRACT_ADDRESS;
 let contractABI;
 let API_KEY = process.env.API_KEY;
-const provider = new ethers.providers.JsonRpcProvider(`https://polygon-mumbai.g.alchemy.com/v2/${API_KEY}`);
+const provider = new ethers.providers.JsonRpcProvider(`https://polygon-amoy.g.alchemy.com/v2/${API_KEY}`);
 
 fs.readFile('./abi.json', 'utf8').then(json => {
     const obj = JSON.parse(json);
