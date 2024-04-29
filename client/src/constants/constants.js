@@ -137,6 +137,56 @@ const contractABI = [
     "inputs": [
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "follower",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "postId",
+        "type": "uint256"
+      }
+    ],
+    "name": "ListPostEvent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "follower",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "postId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NewPostForFollower",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
         "internalType": "uint256",
         "name": "postId",
         "type": "uint256"
@@ -356,6 +406,32 @@ const contractABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "postId",
+        "type": "uint256"
+      }
+    ],
+    "name": "buyPost",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "postId",
+        "type": "uint256"
+      }
+    ],
+    "name": "cancelListing",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "clearNotifications",
     "outputs": [],
@@ -553,6 +629,16 @@ const contractABI = [
             "internalType": "address[]",
             "name": "userWhoPaid",
             "type": "address[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasListed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "listPrice",
+            "type": "uint256"
           }
         ],
         "internalType": "struct DataTypes.Post[]",
@@ -676,11 +762,40 @@ const contractABI = [
             "internalType": "address[]",
             "name": "userWhoPaid",
             "type": "address[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasListed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "listPrice",
+            "type": "uint256"
           }
         ],
         "internalType": "struct DataTypes.Post[]",
         "name": "",
         "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getFollowers",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -732,6 +847,25 @@ const contractABI = [
       }
     ],
     "name": "getLikesForPost",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "postId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getListPrice",
     "outputs": [
       {
         "internalType": "uint256",
@@ -836,6 +970,16 @@ const contractABI = [
             "internalType": "address[]",
             "name": "userWhoPaid",
             "type": "address[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasListed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "listPrice",
+            "type": "uint256"
           }
         ],
         "internalType": "struct DataTypes.Post[]",
@@ -1018,6 +1162,24 @@ const contractABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "postId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_listPrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "listPost",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "name",
     "outputs": [
@@ -1135,6 +1297,16 @@ const contractABI = [
         "internalType": "enum DataTypes.Visibility",
         "name": "visibility",
         "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "hasListed",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "listPrice",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

@@ -6,8 +6,9 @@ import axios from "axios";
 import { Buffer, combine } from 'shamirs-secret-sharing'
 import CryptoJS from 'crypto-js'
 
-const Post = ({ displayName, text, price, deletePostHandler, isCreator, postId, state, hasPaid, decryptedFiles, ipfsHashes }) => {
-    const [isBlurred, setIsBlurred] = useState(!isCreator && !hasPaid);
+const Post = ({ displayName, text, price, deletePostHandler, isCreator, postId, state, hasPaid, hasListed, decryptedFiles, ipfsHashes }) => {
+    const [isBlurred, setIsBlurred] = useState(!isCreator && !hasPaid); 
+    const [listPrice, setListPrice] = useState(0); // Initialize listPrice state 
     const { contract, address } = state;
 
     const commentRef = useRef(null);
@@ -22,6 +23,66 @@ const Post = ({ displayName, text, price, deletePostHandler, isCreator, postId, 
 
     const [likes, setLikes] = useState(0);
     const isLiked = localStorage.getItem(`liked-${address}-${postId}`) === 'true';
+
+
+    const handleListClick = async (price) => {
+        console.log("Listing post with price:", price);
+        try{
+            
+            const tx = await contract.listPost(postId, price); 
+            const receipt = await tx.wait(); // Wait for the transaction to be mined
+            if (receipt.status === 1) {
+                console.log("Transaction successful");
+                setIsBlurred(false);
+            } else {
+                console.error("Transaction failed");
+            }
+        }
+        catch (error) {
+            console.error("Error cancelling listing:", error);
+        }
+    };
+    
+
+    const handleBuyClick = async () => {
+        // Implement your logic for buying the post
+        console.log("Buy post logic goes here");
+        try{
+            if(!isCreator)
+            {
+                const listPrice = await contract.getListPrice(postId); 
+                const tx = await contract.buyPost(postId, {value: listPrice}); 
+                const receipt = await tx.wait(); // Wait for the transaction to be mined
+                if (receipt.status === 1) {
+                    console.log("Post Purchase successful");
+                } else {
+                    console.error("Post Purchase failed");
+                }
+            }
+        }
+        catch (error) {
+            console.error("Error buying the post:", error);
+        }
+
+    };
+
+    const cancelList = async () => {
+        console.log("Cancelling post listing");
+        try {
+            // Assuming your contract has a cancelListing method
+            const tx = await contract.cancelListing(postId);
+            const receipt = await tx.wait();
+            if (receipt.status === 1) {
+                console.log("Listing cancelled successfully");
+                // Handle post-cancellation logic, e.g., updating state
+            } else {
+                console.error("Failed to cancel listing");
+            }
+        } catch (error) {
+            console.error("Error cancelling listing:", error);
+        }
+    };
+
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -208,6 +269,37 @@ const Post = ({ displayName, text, price, deletePostHandler, isCreator, postId, 
                     {isCreator && (
                         <i className="bi bi-trash-fill" onClick={deletePostHandler}></i>
                     )}
+                    {/* List Button and Price Input - shown only if user is the creator and post is not yet listed */}
+                    {isCreator && !hasListed && price!='0' && (
+                        <div className="listButton visible d-flex align-items-center gap-2">
+                            <input
+                                type="number"
+                                className="form-control"
+                                placeholder="Set Price"
+                                value={listPrice}
+                                onChange={(e) => setListPrice(e.target.value)}
+                                style={{ width: "100px" }} // Adjust width as needed
+                            />
+                            <button className="btn btn-primary" onClick={() => handleListClick(listPrice)}>List Post</button> 
+                        </div>
+                    )}
+
+                    {/* Cancel Listing Button - shown only if user is the creator and the post is listed */}
+                    {isCreator && hasListed && (
+                        <div className="cancelListingButton visible">
+                            <button className="btn btn-warning" onClick={cancelList}>Cancel Listing</button>
+                        </div>
+                    )}
+
+
+
+                    {/* Buy Button - shown only if user is not the creator and post is listed */}
+                    {!isCreator && hasPaid && hasListed && (
+                            <div className="buyButton visible">
+                                <button className="btn btn-success" onClick={handleBuyClick}>Buy Post</button>
+                            </div>
+                    )}
+
                 </div>
 
                 {/* Modal for editing */}

@@ -52,6 +52,7 @@ const Home = () => {
                     postId={post[0]}
                     state={state}
                     hasPaid={post.hasPaid}
+                    hasListed = {post[11]}
                     decryptedFiles={post.decryptedFiles}
                     ipfsHashes={post.ipfsHashes}
                 />

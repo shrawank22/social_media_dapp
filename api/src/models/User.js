@@ -2,6 +2,19 @@ const mongoose = require('mongoose');
 
 const { Schema, model } = mongoose;
 
+const postSchema = new Schema({
+    NFTID: String,
+    username: String,
+    postText: String, 
+    viewPrice: String, 
+    isDeleted: Boolean, 
+    userWhoPaid: [{ type: String }], 
+    hasListed: Boolean, 
+    listPrice: String, 
+    timestampp: {type: Date, default: Date.now}, 
+  });
+
+
 const userSchema = new Schema({
     username: { type: String, unique: true, required: true },
     name: {
@@ -21,7 +34,8 @@ const userSchema = new Schema({
     followers: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    followingPosts: [postSchema]
 });
 
 module.exports = model("User", userSchema)

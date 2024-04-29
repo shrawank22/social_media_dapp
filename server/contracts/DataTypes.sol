@@ -16,7 +16,8 @@ library DataTypes {
         Comment[] comments;
         Report[] reports; 
         address[] userWhoPaid; 
-
+        bool hasListed; //new added
+        uint256 listPrice; //new added  
     }
 
     struct Comment {

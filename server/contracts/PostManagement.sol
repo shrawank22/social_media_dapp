@@ -14,6 +14,7 @@ contract PostManagement is ERC721 {
     DataTypes.Gatekeeper[] public gatekeepers;
     mapping(address => bool) public hasAddedGatekeeper;
     mapping(uint256 => mapping(address => bool)) private reportedByUser;
+    mapping(address => address[]) arrayList;
 
     // Events
     event AddPost(address indexed recipient, uint256 indexed postId);
@@ -25,6 +26,8 @@ contract PostManagement is ERC721 {
     event PostLiked(uint256 indexed postId, address indexed liker);
     event PostUnliked(uint256 indexed postId, address indexed unliker);
     event PostReported(uint256 indexed postId, address indexed reporter, string reason);
+    event NewPostForFollower(address indexed follower, address indexed sender, uint256 indexed postId);
+    event ListPostEvent(address indexed follower, address indexed sender, uint256 indexed postId); 
 
 
     constructor() ERC721("PostNFT", "PNFT") {}
@@ -41,10 +44,18 @@ contract PostManagement is ERC721 {
         newPost.postText = _postText;
         newPost.viewPrice = _viewPrice;
         newPost.isDeleted = false;
-
+        newPost.hasListed  = false; 
+        newPost.listPrice = 0 ether;
         _mint(msg.sender, postId); // Mint a new NFT for the post
 
         emit AddPost(msg.sender, postId);
+
+        address[] memory followerList = getFollowers(msg.sender);
+        for (uint256 i = 0; i < followerList.length; i++) {
+            address follower = followerList[i];
+            emit NewPostForFollower(follower, msg.sender, postId);
+        }
+
     }
 
     // Edit a post
@@ -209,4 +220,93 @@ contract PostManagement is ERC721 {
 
         return postDataArray;
     }
+
+    //add the list price
+    function listPost(uint256 postId, uint256 _listPrice) external {
+        require(
+            msg.sender == posts[postId].username,
+            "You are not the owner so u can't list"
+        );
+        require(posts[postId].hasListed == false, "Already listed so u can't");
+
+        posts[postId].hasListed = true;
+        posts[postId].listPrice = _listPrice;
+        address[] memory followerList = getFollowers(msg.sender);
+        for (uint256 i = 0; i < followerList.length; i++) {
+            address follower = followerList[i];
+            emit ListPostEvent(follower, msg.sender, postId);
+        }
+    }
+
+    //cancel a listing
+    function cancelListing(uint256 postId) external {
+        require(
+            msg.sender == posts[postId].username,
+            "You are not the owner so u can't list"
+        );
+        require(posts[postId].hasListed == true, "Not listed so u can't");
+
+        posts[postId].hasListed = false;
+        posts[postId].listPrice = 0 ether;
+    }
+
+    //buy the post
+    function buyPost(uint256 postId) external payable {
+        require(posts[postId].hasListed, "This post is not listed for sale.");
+
+        require(
+            posts[postId].username != msg.sender,
+            "You cannot buy your own post."
+        );
+
+        address payable postOwner = posts[postId].username;
+        address buyer = msg.sender;
+
+        // Transfer the list price to the original owner
+        postOwner.transfer(msg.value);
+
+        // Transfer the NFT to the buyer
+        _transfer(postOwner, buyer, postId);
+
+        // Update the post's ownership in the posts mapping
+        posts[postId].username = payable(buyer);
+
+        posts[postId].userWhoPaid.push(postOwner);
+        // Optionally, reset the listing state if the post should no longer be considered listed after the sale
+        posts[postId].hasListed = false;
+        posts[postId].listPrice = 0;
+    }
+
+    //get ListPrice
+    function getListPrice(uint256 postId) public view returns (uint256) {
+        return posts[postId].listPrice;
+    }
+
+    //get the followers lists
+    function getFollowers(address user) public view returns (address[] memory) {
+        uint256 followerCount = 0;
+
+        // Count the number of followers for the user
+        for (uint256 i = 0; i < arrayList[user].length; i++) {
+            address followerAddress = arrayList[user][i];
+            if (followers[user][followerAddress]) {
+                followerCount++;
+            }
+        }
+
+        address[] memory followerList = new address[](followerCount);
+        uint256 index = 0;
+
+        // Populate the followerList array with the follower addresses
+        for (uint256 i = 0; i < arrayList[user].length; i++) {
+            address followerAddress = arrayList[user][i];
+            if (followers[user][followerAddress]) {
+                followerList[index] = followerAddress;
+                index++;
+            }
+        }
+
+        return followerList;
+    }
+
 }
