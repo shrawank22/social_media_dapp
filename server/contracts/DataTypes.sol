@@ -8,7 +8,7 @@ library DataTypes {
         uint256 id;
         address payable username;
         string postText;
-        uint256 viewPrice;
+        uint256 viewPrice; //index 3 
         bool isDeleted;
         uint256 likes;
         uint256 dislikes;

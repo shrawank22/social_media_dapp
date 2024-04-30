@@ -42,17 +42,32 @@ const Home = () => {
 
             {posts.map((post) => (
                 // console.log(post)
+                // <Post
+                //     key={post[0]}
+                //     displayName={post[1]}
+                //     text={post.postText}
+                //     price={Number(post.viewPrice) / 100}
+                //     deletePostHandler={deletePostHandler(post[0])}
+                //     isCreator={address === post[1]}
+                //     postId={post[0]}
+                //     state={state}
+                //     hasPaid={post.hasPaid}
+                //     hasListed = {post[11]}
+                //     decryptedFiles={post.decryptedFiles}
+                //     ipfsHashes={post.ipfsHashes}
+                // />
+
                 <Post
-                    key={post[0]}
-                    displayName={post[1]}
+                    key={post.NFTID}
+                    displayName={post.username}
                     text={post.postText}
                     price={Number(post.viewPrice) / 100}
                     deletePostHandler={deletePostHandler(post[0])}
-                    isCreator={address === post[1]}
-                    postId={post[0]}
+                    isCreator={address === post.username}
+                    postId={post.NFTID}
                     state={state}
                     hasPaid={post.hasPaid}
-                    hasListed = {post[11]}
+                    hasListed = {post.hasListed}
                     decryptedFiles={post.decryptedFiles}
                     ipfsHashes={post.ipfsHashes}
                 />

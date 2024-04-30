@@ -309,4 +309,14 @@ contract PostManagement is ERC721 {
         return followerList;
     }
 
+    //for fetching a single post
+    function getSinglePost(
+        uint256 _id
+    ) public view returns (DataTypes.Post memory) {
+        return posts[_id];
+    }
+
+
+
 }
+

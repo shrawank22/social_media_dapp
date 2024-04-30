@@ -25,19 +25,82 @@ const PostState = ({ children }) => {
     const [posted, setPosted] = useState(false); // Just to trigger useEffect when post is added
     const [posts, setPosts] = useState([])
     const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
+    const [followEvent, setFollowEvent] = useState([]);
+    const serializeBigInt = (key, value) => {
+        if (typeof value === "bigint") {
+            return { type: "BigInt", value: value.toString() };
+        }
+        return value;
+    };
 
     //------------------------------ useEffect hooks ------------------------------
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 if (contract) {
-                    let allPosts = await contract.getAllPosts();
+
+                    for (let e of followEvent) {
+                        const follower = e.args[0];
+                        const user = e.args[1];
+                        const id = e.args[2];
+                        if (user === address) {
+                            const postData = await contract.getSinglePost(id);
+                            console.log(postData)
+                            console.log(follower);
+                            //console.log(postData);
+
+                            try {
+                                const res = await axios.post(
+                                    `${host}/api/postsFollowing`,
+                                    {
+                                        followerUsername: follower,
+                                        NFTID: postData[0].toString(),
+                                        username: postData[1],
+                                        postText: postData[2],
+                                        viewPrice: postData[3].toString(),
+                                        isDeleted: postData[4],
+                                        userWhoPaid: postData[10],
+                                        hasListed: postData[11],
+                                        listPrice: postData[12].toString(),
+                                    },
+                                    {
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                    }
+                                );
+                            } catch (error) {
+                                console.log(error);
+                                showAlert("danger", "Error add PostData");
+                                return error;
+                            }
+                        }
+                    }
+                    let posts;
+                    try {
+                        const limit = 5;
+                        const response = await axios.get(
+                            `${host}/api/topPosts/${address}/${limit}`
+                        );
+                        posts = response.data;
+                        console.log(posts)
+                    } catch (error) {
+                        console.error("Error fetching top posts:", error);
+                        throw error;
+                    }
+
+                    //old method of fetching posts
+                    //let allPosts = await contract.getAllPosts();
+                    let allPosts = posts;
+
+
+                    //let allPosts = await contract.getAllPosts();
                     // let allPosts = await contract.getFollowedUsersPosts();
                     // console.log(allPosts);
 
                     // Fetching text from IPFS for each post
                     const postsWithData = await Promise.all(
-                        allPosts.map(async (post) => {
+                        allPosts.posts.map(async (post) => {
                             if (post.viewPrice > 0) {
                                 const { ciphertext, uniqueId, encryptedFiles, price } = await fetchTextFromIPFS(post.postText);
 
@@ -67,7 +130,12 @@ const PostState = ({ children }) => {
         };
 
         fetchPosts();
-    }, [state, posted]);
+        return () => {
+            if (contract) {
+                contract.removeAllListeners("NewPostForFollower");
+            }
+        };
+    }, [state, posted, contract, address]);
 
     //--------------------------------- API Calls ---------------------------------
     const getPost = async (id) => {
@@ -225,7 +293,47 @@ const PostState = ({ children }) => {
 
                     // Storing some info about post to DB
                     const addPostEvent = receipt.logs.find(log => log.fragment.name === 'AddPost');
+                    //const postId = addPostEvent.args[1].toString();
+
+                    const username = addPostEvent.args[0].toString();
                     const postId = addPostEvent.args[1].toString();
+
+                    const postData = await contract.getSinglePost(postId);
+                    console.log("Here is the details of my new post..", postData);
+                    try {
+                        const res = await axios.post(
+                            `${host}/api/postsFollowing`,
+                            {
+                                followerUsername: postData[1],
+                                NFTID: postData[0].toString(),
+                                username: postData[1],
+                                postText: postData[2],
+                                viewPrice: postData[3].toString(),
+                                isDeleted: postData[4],
+                                userWhoPaid: postData[10],
+                                hasListed: postData[11],
+                                listPrice: postData[12].toString(),
+                            },
+                            {
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                            }
+                        );
+                    } catch (error) {
+                        console.log(error);
+                        showAlert("danger", "Error add PostData");
+                        return error;
+                    }
+
+                    const followEvent = receipt.logs.filter(
+                        (log) =>
+                            log.hasOwnProperty("args") &&
+                            log.fragment.name === "NewPostForFollower"
+                    );
+                    setFollowEvent(followEvent);
+
+
                     if (encryptedFiles.length === 0) {
                         postPost({ NFTID: postId, uniqueID: uniqueId });
                     } else {
@@ -273,7 +381,47 @@ const PostState = ({ children }) => {
 
                     // Storing some info about post to DB
                     const addPostEvent = receipt.logs.find(log => log.fragment.name === 'AddPost');
+                    //const postId = addPostEvent.args[1].toString();
+
+                    const username = addPostEvent.args[0].toString();
                     const postId = addPostEvent.args[1].toString();
+
+                    const postData = await contract.getSinglePost(postId);
+                    console.log(postData)
+                    try {
+                        const res = await axios.post(
+                            `${host}/api/postsFollowing`,
+                            {
+                                followerUsername: postData[1],
+                                NFTID: postData[0].toString(),
+                                username: postData[1],
+                                postText: postData[2],
+                                viewPrice: postData[3].toString(),
+                                isDeleted: postData[4],
+                                userWhoPaid: postData[10],
+                                hasListed: postData[11],
+                                listPrice: postData[12].toString(),
+                            },
+                            {
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                            }
+                        );
+                    } catch (error) {
+                        console.log(error);
+                        showAlert("danger", "Error add PostData");
+                        return error;
+                    }
+
+                    const followEvent = receipt.logs.filter(
+                        (log) =>
+                            log.hasOwnProperty("args") &&
+                            log.fragment.name === "NewPostForFollower"
+                    );
+                    setFollowEvent(followEvent);
+
+
                     if (ipfsHashes.length === 0) {
                         postPost({ NFTID: postId, uniqueID: uniqueId });
                     } else {
@@ -300,7 +448,7 @@ const PostState = ({ children }) => {
         const retrievedShares = [];
 
         const { gatekeepers, gatekeepersCount } = await fetchGatekeepers();
-        
+
         for (let i = 0; i < gatekeepersCount; i++) {
             const response = await axios.get(`http://${gatekeepers[i].ip}:${gatekeepers[i].port}/api/gatekeepers/${i}/share/${uniqueId}`, {
                 params: {

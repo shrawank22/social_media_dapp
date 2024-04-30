@@ -1084,6 +1084,126 @@ const contractABI = [
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSinglePost",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address payable",
+            "name": "username",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "postText",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "viewPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "isDeleted",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "likes",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "dislikes",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum DataTypes.Visibility",
+            "name": "visibility",
+            "type": "uint8"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address payable",
+                "name": "commenter",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "commentText",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct DataTypes.Comment[]",
+            "name": "comments",
+            "type": "tuple[]"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "reporter",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "reason",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct DataTypes.Report[]",
+            "name": "reports",
+            "type": "tuple[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "userWhoPaid",
+            "type": "address[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasListed",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "listPrice",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct DataTypes.Post",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "",
         "type": "address"
