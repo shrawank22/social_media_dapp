@@ -104,11 +104,11 @@ const PostState = ({ children }) => {
                             if (post.viewPrice > 0) {
                                 const { ciphertext, uniqueId, encryptedFiles, price } = await fetchTextFromIPFS(post.postText);
 
-                                let usersWhoPaid = await contract.getPaidUsersByPostId(post.id);
+                                let usersWhoPaid = await contract.getPaidUsersByPostId(post.NFTID);
                                 const hasPaid = usersWhoPaid.includes(address);
 
                                 // If Paid Post is created by the user itself
-                                if (post[1] === address || hasPaid) {
+                                if (post.username === address || hasPaid) {
                                     const { postText, viewPrice, decryptedFiles } = await retrieveDecryptedContent(uniqueId, ciphertext, encryptedFiles);
                                     return { ...post, postText, viewPrice, decryptedFiles, hasPaid }
                                 } else {

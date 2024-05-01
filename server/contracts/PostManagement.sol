@@ -289,7 +289,7 @@ contract PostManagement is ERC721 {
         // Count the number of followers for the user
         for (uint256 i = 0; i < arrayList[user].length; i++) {
             address followerAddress = arrayList[user][i];
-            if (followers[user][followerAddress]) {
+            if (followers[followerAddress][user]) {
                 followerCount++;
             }
         }
@@ -300,7 +300,7 @@ contract PostManagement is ERC721 {
         // Populate the followerList array with the follower addresses
         for (uint256 i = 0; i < arrayList[user].length; i++) {
             address followerAddress = arrayList[user][i];
-            if (followers[user][followerAddress]) {
+            if (followers[followerAddress][user]) {
                 followerList[index] = followerAddress;
                 index++;
             }
