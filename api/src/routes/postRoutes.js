@@ -78,38 +78,37 @@ router.get('/topPosts/:username/:limit', async (req, res) => {
     }
 });
 
-router.get('/topPosts/:username/:limit', async (req, res) => {
-    try {
-      const { username, limit } = req.params;
+// router.get('/topPosts/:username/:limit', async (req, res) => {
+//     try {
+//       const { username, limit } = req.params;
   
-      // Find the user by username
-      const user = await User.findOne({ username });
+//       // Find the user by username
+//       const user = await User.findOne({ username });
   
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
+//       if (!user) {
+//         return res.status(404).json({ error: 'User not found' });
+//       }
   
-      // Sort the followingPosts array by timestamp in descending order
-      const sortedPosts = user.followingPosts.sort((a, b) => b.timestamp - a.timestamp);
+//       // Sort the followingPosts array by timestamp in descending order
+//       const sortedPosts = user.followingPosts.sort((a, b) => b.timestamp - a.timestamp);
   
-      // Get the total number of posts
-      const totalPosts = sortedPosts.length;
+//       // Get the total number of posts
+//       const totalPosts = sortedPosts.length;
   
-      // Calculate the starting index for the last k posts
-      const startIndex = Math.max(totalPosts - parseInt(limit), 0);
+//       // Calculate the starting index for the last k posts
+//       const startIndex = Math.max(totalPosts - parseInt(limit), 0);
   
-      // Get the last k posts from the sorted array
-      const lastPosts = sortedPosts.slice(startIndex);
-      res.status(200).json({ posts: lastPosts });
-    } catch (error) {
-      console.error('Error fetching top posts:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+//       // Get the last k posts from the sorted array
+//       const lastPosts = sortedPosts.slice(startIndex);
+//       res.status(200).json({ posts: lastPosts });
+//     } catch (error) {
+//       console.error('Error fetching top posts:', error);
+//       res.status(500).json({ error: 'Internal server error' });
+//     }
+//   });
 
   router.post('/postsFollowing', async (req, res) => {
     try {
-        console.log("poujnt 1")
       //const { followerUsername, id, username, postText, viewPrice, isDeleted, userWhoPaid, hasListed, listPrice, timestampp, NFTID, uniqueID, ipfsHashes, encryptedFiles } = req.body;
     const { followerUsername, NFTID, username,  postText,  viewPrice,
       isDeleted, userWhoPaid, hasListed,listPrice } = req.body;
@@ -135,7 +134,8 @@ router.get('/topPosts/:username/:limit', async (req, res) => {
       { $set: { 'followingPosts.$': newPost } },
       { new: true }
     )
-
+    //await updatedUser.save();
+    //res.json({updatedUser}); 
     if (!updatedUser) {
       // If no post with matching NFTID found, add a new post to the array
       await User.findOneAndUpdate(
@@ -145,7 +145,27 @@ router.get('/topPosts/:username/:limit', async (req, res) => {
       );
     }
       res.status(201).json({ message: 'Post stored successfully' });
-    } catch (error) {
+
+    // Check if there is already a post with the same NFTID
+    // const existingPostIndex = followerUser.followingPosts.findIndex(post => post.NFTID === NFTID);
+    // console.log(existingPostIndex) 
+    // if (existingPostIndex !== -1) {
+    //   // Update existing post
+    //   console.log(followerUser.followingPosts)
+    //   console.log("-----------", newPost)
+    //   followerUser.followingPosts[existingPostIndex] = {...followerUser.followingPosts[existingPostIndex], ...newPost};
+    //   followerUser.markModified('followingPosts'); // Mark the array as modified
+    //   await followerUser.save();
+    //   res.status(200).json({ message: 'Post updated successfully' });
+    // } else {
+    //   // Add new post
+    //   followerUser.followingPosts.push(newPost);
+    //   await followerUser.save();
+    //   res.status(201).json({ message: 'Post added successfully' });
+    // }
+
+  } 
+    catch (error) {
       console.error('Error storing post:', error);
       res.status(500).json({ error: 'Internal server error' });
     }

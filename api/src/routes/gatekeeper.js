@@ -31,11 +31,12 @@ fs.readFile('./abi.json', 'utf8').then(json => {
         try {
             // Call get post route to get NFTID from uniqueID
             const postResponse = await axios.get(`http://localhost:8080/api/posts/${uniqueId}`);
-
+            //console.log(postResponse.data[0])
             const NFTID = parseInt(postResponse.data[0].NFTID);
-
+            //console.log(NFTID, address)
             // Check if the user has paid for the post
             const hasPaid = await contract.hasUserPaidForPost(NFTID, address);
+            //console.log(hasPaid)
 
             if (!hasPaid) {
                 res.status(403).send({ message: 'You have not view rights of this post.' });

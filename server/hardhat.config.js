@@ -17,7 +17,7 @@ module.exports = {
   },
   networks: {
     polygon: {
-      url:  `https://polygon-amoy.g.alchemy.com/v2/${API_KEY}`,
+      url:  `https://polygon-amoy.g.alchemy.com/v2/paPNdNiUMbD_oeG0X3Oas0_J3Z43nbAo`,
       accounts: [
         PRIVATE_KEY,
       ],
