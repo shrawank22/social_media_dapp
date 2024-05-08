@@ -3,13 +3,14 @@ require('dotenv').config();
 const express = require("express");
 const expressSanitizer = require('express-sanitizer');
 const cors = require('cors');
+const { Server } = require('socket.io');
 
 const app = express();
 
 // App config
 const options = {
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "DELETE"],
 };
 app.use(cors(options));
@@ -23,9 +24,10 @@ app.use(expressSanitizer());
 const User = require('./models/User');
 
 // routes imported
-const authRoutes = require('./routes/authRoutes');
+// const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
-const gatekeeperRoutes = require('./routes/gatekeeper')
+const gatekeeperRoutes = require('./routes/gatekeeper');
+const ssiRoutes = require('./routes/ssiRoutes');
 
 // DB Connection
 const connectMongo = require('./connect');
@@ -66,14 +68,20 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 
 // imported routes use
-app.use("/api", authRoutes);
-app.use("/api", postRoutes);
-app.use("/api", gatekeeperRoutes)
+// app.use("/api", authRoutes);
+// app.use("/api", postRoutes);
+// app.use("/api", gatekeeperRoutes);
+app.use("/api", ssiRoutes);
 
 // app listen config
 const PORT = process.env.PORT || 8080;
 const IP = process.env.IP || "0.0.0.0";
-app.listen(PORT, IP, () =>
+const server = app.listen(PORT, IP, () =>
     console.log(`Server started on http://localhost:${PORT}`)
 );
 
+global.io = new Server(server, {
+    cors: {
+        origin: process.env.FRONTEND_URL,
+    },
+});
