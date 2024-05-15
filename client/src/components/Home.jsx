@@ -62,7 +62,7 @@ const Home = () => {
                     displayName={post.username}
                     text={post.postText}
                     price={Number(post.viewPrice) / 100}
-                    deletePostHandler={deletePostHandler(post[0])}
+                    deletePostHandler={deletePostHandler(post.NFTID)}
                     isCreator={address === post.username}
                     postId={post.NFTID}
                     state={state}

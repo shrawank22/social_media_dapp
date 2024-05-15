@@ -10,29 +10,24 @@ contract FollowManagement {
     mapping(address => mapping(address => bool)) public blockedBy;
 
     // Functions 
-    function followUser(address _userToFollow) external {
-        require(_userToFollow != msg.sender, "You cannot follow yourself");
-        require(!isFollowing(msg.sender, _userToFollow), "You are already following this user");
+    // function followUser(address _userToFollow) external {
+    //     require(_userToFollow != msg.sender, "You cannot follow yourself");
+    //     require(!isFollowing(msg.sender, _userToFollow), "You are already following this user");
 
-        following[msg.sender].push(_userToFollow);
-        followers[_userToFollow].push(msg.sender);
-    }
+    //     following[msg.sender].push(_userToFollow);
+    //     followers[_userToFollow].push(msg.sender);
+    // }
 
-    function unfollowUser(address _userToUnfollow) external {
-        require(isFollowing(msg.sender, _userToUnfollow), "You are not following this user");
+    // function unfollowUser(address _userToUnfollow) external {
+    //     require(isFollowing(msg.sender, _userToUnfollow), "You are not following this user");
 
-        _removeFromFollowing(msg.sender, _userToUnfollow);
-        _removeFromFollowers(_userToUnfollow, msg.sender);
-    }
+    //     _removeFromFollowing(msg.sender, _userToUnfollow);
+    //     _removeFromFollowers(_userToUnfollow, msg.sender);
+    // }
 
-    function isFollowing(address _follower, address _following) public view returns (bool) {
-        for (uint i = 0; i < following[_follower].length; i++) {
-            if (following[_follower][i] == _following) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // function isFollowing(address _follower, address _following) public view returns (bool) {
+    //    return foll
+    // }
 
     function _removeFromFollowing(address _follower, address _following) private {
         uint index;

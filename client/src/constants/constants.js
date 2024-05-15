@@ -277,6 +277,31 @@ const contractABI = [
 		"type": "function"
 	},
 	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "follower",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "postId",
+				"type": "uint256"
+			}
+		],
+		"name": "BuyPostEvent",
+		"type": "event"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -288,6 +313,31 @@ const contractABI = [
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "follower",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "postId",
+				"type": "uint256"
+			}
+		],
+		"name": "CancelPostEvent",
+		"type": "event"
 	},
 	{
 		"inputs": [],
@@ -1277,6 +1327,25 @@ const contractABI = [
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_postId",
+				"type": "uint256"
+			}
+		],
+		"name": "getOwnerName",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "postId",
 				"type": "uint256"
 			}
@@ -1541,6 +1610,30 @@ const contractABI = [
 			}
 		],
 		"name": "isApprovedForAll",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_follower",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_following",
+				"type": "address"
+			}
+		],
+		"name": "isFollowing",
 		"outputs": [
 			{
 				"internalType": "bool",

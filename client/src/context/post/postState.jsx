@@ -83,7 +83,7 @@ const PostState = ({ children }) => {
           }
           let posts;
           try {
-            const limit = 6;
+            const limit = 100;
             const response = await axios.get(
               `${host}/api/topPosts/${address}/${limit}`
             );
@@ -97,10 +97,30 @@ const PostState = ({ children }) => {
           //old method of fetching posts
           //let allPosts = await contract.getAllPosts();
           let allPosts = posts;
+          
+          for(let p of allPosts.posts)
+          {
+            let postId = p.NFTID
+            let postData = await contract.getSinglePost(postId)
+            //console.log(p)
+            let arr2, arr1; 
+            arr2 = [postData[0].toString(), postData[1],postData[2], postData[3].toString(), postData[4], postData[11], postData[12].toString()]
+            //console.log("arr2:",arr2)
+            arr1 = [p.NFTID,p.username,p.postText, p.viewPrice.toString(),p.isDeleted ,p.hasListed, p.listPrice.toString()]
+            //console.log("arr1:", arr1) 
+           
+            let isequal = arr1.length === arr2.length && arr1.every(item => arr2.includes(item));
+            if(isequal)
+            console.log("All good to go with post id",p.NFTID);
+            else
+            {console.log("Post has been maniupoulated"); 
+            showAlert("danger", "Post with id", p.NFTID ,"has been manipulated");
+            }
+          }
 
           //let allPosts = await contract.getAllPosts();
           // let allPosts = await contract.getFollowedUsersPosts();
-          // console.log(allPosts);
+          //console.log("allposts",allPosts);
 
           // Fetching text from IPFS for each post
           const postsWithData = await Promise.all(
@@ -181,6 +201,13 @@ const PostState = ({ children }) => {
   const deletePost = async (id) => {
     try {
       const res = await axios.delete(`${host}/api/posts/${id}`);
+      const owner = await contract.getOwnerName(id); 
+      const listofFollowers = await contract.getFollowers(owner); 
+      const res2 = await axios.delete(`${host}/api/deletePost/${owner}/${id}`);
+      for(let e of listofFollowers)
+      {
+        const res3 = await axios.delete(`${host}/api/deletePost/${e}/${id}`);
+      }
       return res.data;
     } catch (error) {
       console.log(error);

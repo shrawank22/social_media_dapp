@@ -98,10 +98,64 @@ const Post = ({
     try {
       if (!isCreator) {
         const listPrice = await contract.getListPrice(postId);
+        const prevOwner = await contract.getOwnerName(postId); 
+        console.log("prevowner,", prevOwner, postId);
+        const listofFollowers = await contract.getFollowers(prevOwner); 
+        console.log("List of followrs",listofFollowers); 
         const tx = await contract.buyPost(postId, { value: listPrice });
+        //console.log("tx....", tx); 
         const receipt = await tx.wait(); // Wait for the transaction to be mined
         if (receipt.status === 1) {
+          //Delete the posts from the prevOwner and its followers also. 
+          
+          try {
+            const res = await axios.delete(`${host}/api/deletePost/${prevOwner}/${postId}`);
+            //console.log(res.response)
+          } catch (error) {
+            console.log(error);
+            showAlert("danger", "Error deleting PostData");
+            return error;
+          }
+          
+          for(let e of listofFollowers)
+          {
+            const res = await axios.delete(`${host}/api/deletePost/${e}/${postId}`);
+          }
+          const postData = await contract.getSinglePost(postId);
+          console.log("Deleted success", postData);
+          try {
+            const res = await axios.post(
+              `${host}/api/postsFollowing`,
+              {
+                followerUsername: postData[1],
+                NFTID: postData[0].toString(),
+                username: postData[1],
+                postText: postData[2],
+                viewPrice: postData[3].toString(),
+                isDeleted: postData[4],
+                userWhoPaid: postData[10],
+                hasListed: postData[11],
+                listPrice: postData[12].toString(),
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+          } catch (error) {
+            console.log(error);
+            showAlert("danger", "Error add PostData");
+            return error;
+          }
+          const followEvent = receipt.logs.filter(
+            (log) =>
+              log.hasOwnProperty("args") && log.fragment.name === "ListPostEvent"
+          );
+          setFollowEvent(followEvent);
           console.log("Post Purchase successful");
+
+
         } else {
           console.error("Post Purchase failed");
         }
@@ -145,7 +199,14 @@ const Post = ({
           showAlert("danger", "Error add PostData");
           return error;
         }
-        
+
+        const followEvent = receipt.logs.filter(
+          (log) =>
+            log.hasOwnProperty("args") && log.fragment.name === "CancelPostEvent"
+        );
+
+        // Set the followEvent using the setFollowEvent function from the context
+        setFollowEvent(followEvent);
         console.log("Listing cancelled successfully");
         // Handle post-cancellation logic, e.g., updating state
       } else {
@@ -254,7 +315,7 @@ const Post = ({
       // Getting meta data of post which is saved in DB
       const data = await getPost(postId);
       const { uniqueID, ipfsHashes, encryptedFiles } = data[0];
-
+      let receipt; 
       if (editedPrice > 0) {
         // Retrieving key from gatekeepers
         const retrievedShares = [];
@@ -294,7 +355,7 @@ const Post = ({
           String(ipfsHash),
           parseInt(content.viewPrice)
         );
-        await tx.wait();
+        receipt = await tx.wait();
       } else {
         content.ipfsHashes = ipfsHashes;
         // console.log(content);
@@ -323,8 +384,46 @@ const Post = ({
           String(ipfsHash),
           parseInt(content.viewPrice)
         );
-        await tx.wait();
+        receipt = await tx.wait();
       }
+      if(receipt.status == 1)
+      {
+        //Now update in db for each user and its followers 
+      const postData = await contract.getSinglePost(postId);
+      console.log(postData);
+      try {
+        const res = await axios.post(
+          `${host}/api/postsFollowing`,
+          {
+            followerUsername: postData[1],
+            NFTID: postData[0].toString(),
+            username: postData[1],
+            postText: postData[2],
+            viewPrice: postData[3].toString(),
+            isDeleted: postData[4],
+            userWhoPaid: postData[10],
+            hasListed: postData[11],
+            listPrice: postData[12].toString(),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      } catch (error) {
+        console.log(error);
+        showAlert("danger", "Error add PostData");
+        return error;
+      }
+      const followEvent = receipt.logs.filter(
+        (log) =>
+          log.hasOwnProperty("args") && log.fragment.name === "NewPostForFollower"
+      );
+      setFollowEvent(followEvent);
+      }
+      
+
     } catch (error) {
       console.log(error);
       showAlert("danger", "Error updating post");

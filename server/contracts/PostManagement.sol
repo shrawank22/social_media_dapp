@@ -44,6 +44,16 @@ contract PostManagement is ERC721 {
         address indexed sender,
         uint256 indexed postId
     );
+    event CancelPostEvent(
+        address indexed follower,
+        address indexed sender,
+        uint256 indexed postId
+    );
+    event BuyPostEvent(
+        address indexed follower,
+        address indexed sender,
+        uint256 indexed postId
+    );
 
     constructor() ERC721("PostNFT", "PNFT") {}
 
@@ -89,6 +99,13 @@ contract PostManagement is ERC721 {
 
         posts[_postId].postText = _newPostText;
         posts[_postId].viewPrice = _newPrice;
+
+         address[] memory followerList = getFollowers(msg.sender);
+        for (uint256 i = 0; i < followerList.length; i++) {
+            address follower = followerList[i];
+            emit NewPostForFollower(follower, msg.sender, _postId);
+        }
+
     }
 
     // Delete a post
@@ -163,7 +180,7 @@ contract PostManagement is ERC721 {
         uint256 postId,
         address user
     ) public view returns (bool) {
-        if ( posts[postId].username == user) {
+        if (posts[postId].username == user) {
             return true;
         }
 
@@ -188,6 +205,9 @@ contract PostManagement is ERC721 {
         followers[_user][msg.sender] = false;
     }
 
+     function isFollowing(address _follower, address _following) public view returns (bool) {
+       return followers[_follower][_following]; 
+    }
     // Like a Post
     function likePost(uint256 postId) external {
         posts[postId].likes++;
@@ -301,6 +321,7 @@ contract PostManagement is ERC721 {
 
         posts[postId].hasListed = true;
         posts[postId].listPrice = _listPrice;
+
         address[] memory followerList = getFollowers(msg.sender);
         for (uint256 i = 0; i < followerList.length; i++) {
             address follower = followerList[i];
@@ -318,6 +339,12 @@ contract PostManagement is ERC721 {
 
         posts[postId].hasListed = false;
         posts[postId].listPrice = 0 ether;
+
+        address[] memory followerList = getFollowers(msg.sender);
+        for (uint256 i = 0; i < followerList.length; i++) {
+            address follower = followerList[i];
+            emit CancelPostEvent(follower, msg.sender, postId);
+        }
     }
 
     //buy the post
@@ -345,6 +372,12 @@ contract PostManagement is ERC721 {
         // Optionally, reset the listing state if the post should no longer be considered listed after the sale
         posts[postId].hasListed = false;
         posts[postId].listPrice = 0;
+
+        address[] memory followerList = getFollowers(msg.sender);
+        for (uint256 i = 0; i < followerList.length; i++) {
+            address follower = followerList[i];
+            emit ListPostEvent(follower, msg.sender, postId);
+        }
     }
 
     //get ListPrice
@@ -383,6 +416,11 @@ contract PostManagement is ERC721 {
     function getSinglePost(
         uint256 _id
     ) public view returns (DataTypes.Post memory) {
+        require(_id>0 && _id<=postCounter && posts[_id].isDeleted == false, "Post Id is wrong or deleted");
         return posts[_id];
+    }
+
+    function getOwnerName(uint256 _postId) public view returns (address) {
+        return posts[_postId].username;
     }
 }

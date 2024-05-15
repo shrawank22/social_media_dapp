@@ -134,8 +134,6 @@ router.get('/topPosts/:username/:limit', async (req, res) => {
       { $set: { 'followingPosts.$': newPost } },
       { new: true }
     )
-    //await updatedUser.save();
-    //res.json({updatedUser}); 
     if (!updatedUser) {
       // If no post with matching NFTID found, add a new post to the array
       await User.findOneAndUpdate(
@@ -146,30 +144,36 @@ router.get('/topPosts/:username/:limit', async (req, res) => {
     }
       res.status(201).json({ message: 'Post stored successfully' });
 
-    // Check if there is already a post with the same NFTID
-    // const existingPostIndex = followerUser.followingPosts.findIndex(post => post.NFTID === NFTID);
-    // console.log(existingPostIndex) 
-    // if (existingPostIndex !== -1) {
-    //   // Update existing post
-    //   console.log(followerUser.followingPosts)
-    //   console.log("-----------", newPost)
-    //   followerUser.followingPosts[existingPostIndex] = {...followerUser.followingPosts[existingPostIndex], ...newPost};
-    //   followerUser.markModified('followingPosts'); // Mark the array as modified
-    //   await followerUser.save();
-    //   res.status(200).json({ message: 'Post updated successfully' });
-    // } else {
-    //   // Add new post
-    //   followerUser.followingPosts.push(newPost);
-    //   await followerUser.save();
-    //   res.status(201).json({ message: 'Post added successfully' });
-    // }
-
   } 
     catch (error) {
       console.error('Error storing post:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
+
+  router.delete('/deletePost/:followerUsername/:NFTID', async (req, res) => {
+    // console.log(req.params, req.query)
+    const { followerUsername, NFTID } = req.params; // Extract params from URL
+    try {
+        // Find the user and update by pulling the post with the given NFTID from the followingPosts array
+        const result = await User.findOneAndUpdate(
+          { username: followerUsername },
+          { $pull: { followingPosts: { NFTID: NFTID } } },
+          { new: true }  // Return the updated document
+      );
+          console.log("maggga",result); 
+      if (!result) {
+          return res.status(404).json({ error: "User not found or no post matches the given NFTID." });
+      }
+
+      res.status(200).json({ message: "Post deleted successfully", updatedUser: result }); 
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
 
 module.exports = router
 

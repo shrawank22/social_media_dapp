@@ -36,12 +36,13 @@ fs.readFile('./abi.json', 'utf8').then(json => {
             //console.log(NFTID, address)
             // Check if the user has paid for the post
             const hasPaid = await contract.hasUserPaidForPost(NFTID, address);
-            //console.log(hasPaid)
+            console.log("?dssgfs",hasPaid)
 
             if (!hasPaid) {
                 res.status(403).send({ message: 'You have not view rights of this post.' });
                 return;
             }
+            
 
             // Retrieve the share from the file
             const shareFileName = `${uniqueId}_share_${id}.txt`;
