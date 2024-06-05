@@ -2,57 +2,57 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Notification = require('../models/Notification');
-const middleware = require('../../middleware');
+const middleware = require('../middleware');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 // Register route----------------
-router.post('/register', async (req, res) => {
-    const username = req.sanitize(req.body.username);
-    const password = req.sanitize(req.body.password);
-    const name = req.sanitize(req.body.name);
-    const email = req.sanitize(req.body.email);
+// router.post('/register', async (req, res) => {
+//     const username = req.sanitize(req.body.username);
+//     const password = req.sanitize(req.body.password);
+//     const name = req.sanitize(req.body.name);
+//     const email = req.sanitize(req.body.email);
 
-    try {
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-        if (existingUser) {
-            return res.status(400).send('A user with this username or email already exists.');
-        }
+//     try {
+//         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+//         if (existingUser) {
+//             return res.status(400).send('A user with this username or email already exists.');
+//         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, name, email, password: hashedPassword });
-        await user.save();
+//         const hashedPassword = await bcrypt.hash(password, 10);
+//         const user = new User({ username, name, email, password: hashedPassword });
+//         await user.save();
 
-        const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
-        return res.send({ user, authtoken: token });
-    } catch (err) {
-        return res.status(500).send(err.message);
-    }
-});
+//         const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
+//         return res.send({ user, authtoken: token });
+//     } catch (err) {
+//         return res.status(500).send(err.message);
+//     }
+// });
 
 // Login Route ------------------------
-router.post('/login', async(req, res) => {
-	const { username, password } = req.body;
-    try {
-        const user = await User.findOne({ username });
+// router.post('/login', async(req, res) => {
+// 	const { username, password } = req.body;
+//     try {
+//         const user = await User.findOne({ username });
 
-        if (!user) {
-            return res.status(400).send({ error: 'Invalid username.' });
-        }
+//         if (!user) {
+//             return res.status(400).send({ error: 'Invalid username.' });
+//         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
+//         const isMatch = await bcrypt.compare(password, user.password);
 
-        if (!isMatch) {
-            return res.status(400).send({ error: 'Invalid password.' });
-        }
+//         if (!isMatch) {
+//             return res.status(400).send({ error: 'Invalid password.' });
+//         }
 
-        const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
-        res.send({ user, authtoken: token });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Internal server error.' });
-    }
-});
+//         const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
+//         res.send({ user, authtoken: token });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send({ error: 'Internal server error.' });
+//     }
+// });
 
 // Logout Route
 // router.get('/logout', middleware.isLoggedIn, (req, res) => {

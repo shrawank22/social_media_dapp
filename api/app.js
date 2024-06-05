@@ -24,7 +24,7 @@ app.use(expressSanitizer());
 const User = require('./models/User');
 
 // routes imported
-// const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
 const gatekeeperRoutes = require('./routes/gatekeeper');
 const ssiRoutes = require('./routes/ssiRoutes');
@@ -68,9 +68,9 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 
 // imported routes use
-// app.use("/api", authRoutes);
-// app.use("/api", postRoutes);
-// app.use("/api", gatekeeperRoutes);
+app.use("/api", authRoutes);
+app.use("/api", postRoutes);
+app.use("/api", gatekeeperRoutes);
 app.use("/api", ssiRoutes);
 
 // app listen config

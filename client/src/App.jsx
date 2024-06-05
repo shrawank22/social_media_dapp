@@ -12,6 +12,8 @@ import Alert from './components/Alert'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import PostState from './context/post/postState'
 import web3Context from './context/web3/web3Context'
+import Connection from './components/Connection'
+import Logout from './components/Logout'
 
 function App() {
   const context = useContext(web3Context);
@@ -21,6 +23,8 @@ function App() {
     connectWallet();
   }, []);
 
+  const shouldShowWidgets = !['/login', '/register', '/connection'].includes(window.location.pathname);
+
   return (
     <PostState>
       <Router>
@@ -28,20 +32,25 @@ function App() {
         <Alert />
         <div className='container'>
           <div className='row'>
-            <div className='col-md-9 col-sm-12 scrollable-content'>
+            {/* <div className='col-md-9 col-sm-12 scrollable-content'> */}
               <Routes>
                 <Route exact path='/' element={<Home />} />
                 <Route exact path='/profile' element={<Profile />} />
                 <Route exact path='/login' element={<Login />} />
+                <Route exact path='/connection' element={<Connection />} />
                 <Route exact path='/register' element={<Register />} />
                 <Route exact path='/notification' element={<Notification />} />
+                <Route exact path='/logout' element={<Logout />} />
+                <Route path='*'>404 Not Found</Route>
               </Routes>
             </div>
-            <div className='col-md-3 col-sm-12 scrollable-sidebar'>
-              <Widgets />
-            </div>
+            {shouldShowWidgets && (
+              <div className='col-md-3 col-sm-12 scrollable-sidebar'>
+                <Widgets />
+              </div>
+            )}
           </div>
-        </div>
+        {/* </div> */}
       </Router>
     </PostState>
   )

@@ -1,8 +1,9 @@
-import { useState, useContext } from "react"
-import { useNavigate } from 'react-router'
-import axios from 'axios'
+import { useState, useContext, useEffect } from "react"
 import postContext from '../context/post/postContext';
 import web3Context from '../context/web3/web3Context';
+import { Center, Container } from "@chakra-ui/react";
+import PolygonIDVerifier from "./PolygonIDVerifier";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const context1 = useContext(postContext);
@@ -10,65 +11,40 @@ const Login = () => {
     const { showAlert } = context1;
     const { state } = context2;
 
+    const [provedAccess, setProvedAccess] = useState(false);
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const handleWallet = () => {
-        setUsername(state.address)
-    }
+    const navigate = useNavigate();
 
-    let navigateTo = useNavigate();
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-      
-        try {
-            const response = await axios.post("http://localhost:8080/api/login", { username, password }, {
-                withCredentials: "true",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
-
-            console.log(response.data)
-
-            localStorage.setItem('token', response.data.authtoken);
-            navigateTo("/");
-            showAlert("success", `Welcome ${response.data.user.username}!`)
-
-
-        } catch (err) {
-            showAlert("danger", err.response.data.error)
-            console.log(err.response.data.error);
-           
-        }
-    }
-
-    const onChange = (e) => {
-        setPassword(e.target.value)
-    }
-
+    useEffect(() => {
+        if(provedAccess) {
+            setTimeout(() => {
+                navigate("/");
+            }, 1500);
+        }   
+    })
 
     return (
         <>
-            <h1>Login Page</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <label htmlFor="username" className="form-label">User Wallet</label>
-                    <div className="input-group">
-                        <input id="username" name="username" type="text" className="form-control" disabled readOnly placeholder="Eth Address" value={username} />
-                        <button className="btn btn-outline-secondary" type="button" onClick={handleWallet} >
-                            <i className="bi bi-wallet"></i>
-                        </button>
-                    </div>
+            {!provedAccess &&
+                <Center className="vc-check-page">
+                    <Container>
+                        <PolygonIDVerifier
+                            publicServerURL={
+                                import.meta.env.VITE_REACT_APP_VERIFICATION_SERVER_PUBLIC_URL
+                              }
+                              localServerURL={
+                                import.meta.env.VITE_REACT_APP_VERIFICATION_SERVER_LOCAL_HOST_URL
+                              }
+                              credentialType={"userprofile"}
+                              issuerOrHowToLink={
+                                "https://oceans404.notion.site/How-to-get-a-Verifiable-Credential-f3d34e7c98ec4147b6b2fae79066c4f6?pvs=4"
+                              }
+                              onVerificationResult={setProvedAccess}
+                        />
+                    </Container>
+                </Center>
+            }
 
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Password</label>
-                    <input type="password" name="password" className="form-control" id="password" value={password} onChange={onChange} />
-                </div>
-                <button type="submit" className="btn btn-primary">Login</button>
-            </form>
         </>
     )
 }
