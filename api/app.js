@@ -20,9 +20,6 @@ app.use(express.json({limit: '1mb'}));
 app.use(express.urlencoded({ limit: '1mb', extended: true }));
 app.use(expressSanitizer());
 
-// DB Models exports
-const User = require('./models/User');
-
 // routes imported
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
