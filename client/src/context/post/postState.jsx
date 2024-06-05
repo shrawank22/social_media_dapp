@@ -35,6 +35,55 @@ const PostState = ({ children }) => {
     return value;
   };
 
+  async function checkPlagiarism(content) {
+    const text1 = content.postText;
+    const numPerm = 128;
+  
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/check_plagiarism', {
+        text1: text1,
+        num_perm: numPerm
+      });
+  
+      const plagiarism = response.data.plagiarism;
+      if (plagiarism) {
+        showAlert("Plag Found!!", "Please edit the post content and make a new post");
+        console.log("Plagiarism detected! Please create a new post.");
+        return null;
+      } else {
+        console.log("No plagiarism detected. Post created successfully.");
+        // Continue with post creation logic here
+        // ...
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  async function checkPlagiarismImage(file) {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+  
+      const response = await axios.post('http://127.0.0.1:5000/check_plagiarism_image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+  
+      console.log(response);
+      const plagiarism = response.data.plagiarism;
+      if (plagiarism) {
+        showAlert("Plag Found!!", "Please edit the post content and make a new post");
+        console.log("Plagiarism detected! Please create a new post.");
+        return null;
+      } else {
+        console.log("No plagiarism detected. Image created successfully.");
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+
   <postContext.Provider value={followEvent}>
     <Post />
   </postContext.Provider>;
@@ -133,6 +182,7 @@ const PostState = ({ children }) => {
                   post.NFTID
                 );
                 const hasPaid = usersWhoPaid.includes(address);
+                // console.log(hasPaid, post.username === address)
 
                 // If Paid Post is created by the user itself
                 if (post.username === address || hasPaid) {
@@ -240,13 +290,15 @@ const PostState = ({ children }) => {
     });
     setTimeout(() => {
       setAlert(null);
-    }, 1500);
+      window.location.reload();
+    }, 3000);
   };
 
   const handleFileEncrypt = (key) => {
     const encryptedFilesArray = [];
 
     selectedFiles.forEach((file) => {
+
       const reader = new FileReader();
 
       reader.onload = (event) => {
@@ -285,6 +337,7 @@ const PostState = ({ children }) => {
     return decryptedFilesArray;
   };
 
+
   const fetchTextFromIPFS = async (ipfsHash) => {
     try {
       // const response = await axios.get(`https://ipfs.io/ipfs/${ipfsHash}`);
@@ -315,6 +368,14 @@ const PostState = ({ children }) => {
         const uniqueId = uuidv4();
 
         if (content.viewPrice > 0) {
+
+          //check for plag here: 
+
+          const result = await checkPlagiarism(content);
+          if (result === null) {
+            return; 
+          }
+
           // Encrypt the content and split the key
           let key = CryptoJS.lib.WordArray.random(256 / 8).toString(); // Generate a random encryption key
           const ciphertext = CryptoJS.AES.encrypt(
@@ -325,6 +386,15 @@ const PostState = ({ children }) => {
           // Encrypt all the selected files
           let encryptedFiles = [];
           if (selectedFiles) {
+
+            //handling image plagirism 
+            for (const file of selectedFiles) { 
+              const result = await checkPlagiarismImage(file);
+              if (result === null) {
+                // Plagiarism detected, handle accordingly
+                return;
+              }
+            }
             encryptedFiles = handleFileEncrypt(key);
           }
 
