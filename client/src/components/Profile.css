@@ -27,7 +27,6 @@
     flex: 1;
     padding: 10px;
     background-color: #fff;
-    border-bottom: 3px solid var(--app-background);
 }
 
 .cover-image {

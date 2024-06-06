@@ -1,17 +1,50 @@
 const middlewareObj = {};
 const jwt = require('jsonwebtoken');
+const authRequests = require('../helper/authRequestsMap');
+const didMap = require('../helper/didMap');
 
-middlewareObj.isLoggedIn = (req, res, next) => {
+middlewareObj.isLoggedIn = async (req, res, next) => {
     if (req.headers.authorization) {
         const token = req.headers.authorization.split(' ')[1];
-        jwt.verify(token, 'your_secret_key', (err, decoded) => {
-            if (err) {
-                return res.status(401).send("Invalid token");
-            } else {
-                req.user = decoded;
-                next();
-            }
+        console.log('token middleware : ', token);
+
+        const sessionId = req.query.sessionId;
+        console.log("sessionId : ", sessionId);
+        
+        const authRequest = authRequests.get(`${sessionId}`);
+        console.log('authRequest : ', authRequest);
+        
+        const userDid = didMap.get(sessionId);
+        console.log('userDid : ', userDid);
+        
+        const ethStateResolver = new resolver.EthStateResolver(
+            process.env.RPC_URL_AMOY,
+            process.env.AMOY_CONTRACT_ADDRESS
+        );
+
+        const resolvers = {
+            ["polygon:amoy"]: ethStateResolver,
+        };
+
+        const verifier = await auth.Verifier.newVerifier({
+            stateResolver: resolvers,
+            circuitsDir: path.join(__dirname, keyDIR),
+            ipfsGatewayURL: "https://ipfs.io",
         });
+
+        const opts = {
+            AcceptedStateTransitionDelay: 5 * 60 * 1000, // up to a 5 minute delay accepted by the Verifier
+        };
+
+        authResponse = await verifier.fullVerify(token, authRequest, opts);
+
+        console.log("authResponse : ", authResponse);
+
+        if(authResponse.to === authRequest.from && authResponse.from === userDid){
+            next();
+        } else {
+            return res.status(401).send("You are not authorized to do that!");
+        }
     } else {
         return res.status(401).send("You need to be logged in to do that!");
     }

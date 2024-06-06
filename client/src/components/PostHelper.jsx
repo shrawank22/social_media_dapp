@@ -16,6 +16,7 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
         try {
             const token = localStorage.getItem('token'); 
             // console.log(token)
+            console.log(isFollowing);
             if (!isFollowing) {
                 await contract.followUser(displayName);
 
@@ -46,7 +47,9 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
 
     useEffect(() => {
         const checkFollowingStatus = async () => {
-            const followingStatus = await contract.followers(address, displayName);
+           
+            const followingStatus = await contract.isFollowing( displayName, address);
+            //console.log(followingStatus); 
             setIsFollowing(followingStatus);
         };
 
