@@ -20,6 +20,8 @@ const PostState = ({ children }) => {
   //--------------------------------- States ---------------------------------
   const [alert, setAlert] = useState(null);
   const [postText, setPostText] = useState("");
+  const [loader, setLoader] = useState(true);
+
   const [viewPrice, setViewPrice] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [fileURLs, setFileURLs] = useState([]);
@@ -223,9 +225,12 @@ const PostState = ({ children }) => {
           );
           const reversedPostsWithData = postsWithData.reverse();
           setPosts(reversedPostsWithData);
+          setLoader(false);
         }
       } catch (error) {
         console.log(error);
+        setLoader(false);
+
       }
     };
 
@@ -702,6 +707,8 @@ const PostState = ({ children }) => {
         setPosts,
         setFollowEvent,
         followEvent,
+        setLoader,
+        loader
       }}
     >
       {children}

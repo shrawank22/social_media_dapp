@@ -12,10 +12,38 @@ const MSG = {
     connectionAuthReason: "Authentication to connect"
 }
 
+// Function to extract values and return an object
+const extractCredentialValues = (authResponse) => {
+    let extractedValues = {};
+
+    authResponse?.body?.scope.forEach((scopeItem) => {
+        const credentialSubject = scopeItem?.vp?.verifiableCredential?.credentialSubject;
+        if (credentialSubject?.aadhaarNo) {
+            extractedValues.aadhaarNo = credentialSubject.aadhaarNo;
+        }
+        if (credentialSubject?.name) {
+            extractedValues.name = credentialSubject.name;
+        }
+        if (credentialSubject?.city) {
+            extractedValues.city = credentialSubject.city;
+        }
+        if (credentialSubject?.gender) {
+            extractedValues.gender = credentialSubject.gender;
+        }
+        if (credentialSubject?.dob) {
+            extractedValues.dob = credentialSubject.dob;
+        }
+    });
+
+    return extractedValues;
+};
+
 const credentialSubject = {
-    city: {
-      $eq: "Guwahati",
-    },
+    aadhaarNo: {},
+    city: {},
+    name: {},
+    dob: {},
+    gender: {}
 };
 
 const proofRequest = profileCredential(credentialSubject);
@@ -30,5 +58,6 @@ module.exports = {
     STATUS,
     MSG,
     proofRequest,
-    socketMessage
+    socketMessage,
+    extractCredentialValues
 }

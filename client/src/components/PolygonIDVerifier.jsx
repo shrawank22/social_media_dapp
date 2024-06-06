@@ -33,7 +33,7 @@ function PolygonIDVerifier({
         : localServerURL;
 
     const getQrCodeApi = (sessionId) =>
-        serverUrl + `/api/get-auth-qr?sessionId=${sessionId}`;
+        serverUrl + `/api/login?sessionId=${sessionId}`;
 
     const socket = io(serverUrl);
 
@@ -57,7 +57,7 @@ function PolygonIDVerifier({
             const response = await fetch(getQrCodeApi(sessionId));
             const data = await response.text();
             console.log("data : ", data);
-            return JSON.parse(data);
+            return data;
         };
 
         if (sessionId) {
@@ -80,6 +80,7 @@ function PolygonIDVerifier({
                     if (currentSocketEvent.status === "DONE") {
                         localStorage.setItem('userDid', currentSocketEvent.data.userDid);
                         localStorage.setItem('jwz-token', currentSocketEvent.data.jwzToken);
+                        localStorage.setItem('profile', JSON.stringify(currentSocketEvent.data.profile));
                         setVerificationMessage("✅ Verified proof");
                         console.log("data : ", currentSocketEvent.data);
                         setTimeout(() => {
@@ -117,7 +118,7 @@ function PolygonIDVerifier({
                                 Scan the QR Code using your Mobile Wallet to prove access
                             </h4>
                             <div className="flex justify-center items-center mb-4">
-                                <QRCode invitationUrl={JSON.stringify(qrCodeData)} size={200} />
+                                <QRCode invitationUrl={qrCodeData} size={200} />
                             </div>
                             <p className="text-center text-sm text-gray-500">
                                 {verificationMessage}

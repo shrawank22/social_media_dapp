@@ -5,9 +5,9 @@ const axios = require('axios');
 const path = require('path');
 const authRequests = require('../helper/authRequestsMap');
 const didMap = require('../helper/didMap');
-const { STATUS, MSG, proofRequest, socketMessage } = require('../helper/helper');
+const { STATUS, MSG, proofRequest, socketMessage, extractCredentialValues } = require('../helper/helper');
 const router = express.Router();
-const middleware = require('../middleware');
+const Cache = require("cache-manager")
 
 const keyDIR = "../keys";
 const API_URL = process.env.HOSTED_ISSUER_URL;
@@ -17,11 +17,9 @@ const RPC_URL_AMOY = process.env.RPC_URL_AMOY;
 const AMOY_CONTRACT_ADDRESS = process.env.AMOY_CONTRACT_ADDRESS;
 const HOSTED_SERVER_URL = process.env.HOSTED_SERVER_URL;
 
-// const authRequests = new Map();
-
-router.post('/testing', middleware.isLoggedIn, (req, res) => {
-    console.log("testing route called");
-    res.status(200).send("testing route called");
+const cPromise = Cache.caching("memory", {
+    max: 100,
+    ttl: 60 * 1000
 });
 
 router.post('/logout', async (req, res) => {
@@ -185,7 +183,7 @@ router.post('/connection-callback', async (req, res) => {
 });
 
 // GetAuthQR returns auth request
-router.get('/get-auth-qr', (req, res) => {
+router.get('/login', async (req, res) => {
     const sessionId = req.query.sessionId;
 
     io.sockets.emit(
@@ -203,24 +201,52 @@ router.get('/get-auth-qr', (req, res) => {
 
     request.id = sessionId;
     request.thid = sessionId;
-  
-    const scope = request.body.scope ?? [];
-    request.body.scope = [...scope, proofRequest];
+
+    console.log("proofRequest : ", proofRequest);
+
+    request.body.scope = proofRequest;
   
     // store this session's auth request
     authRequests.set(sessionId, request);
+
+    console.log("request : ", request);
+
+    const cacheManager = await cPromise;
+    console.log("cacheManager : ", cacheManager);
+
+    await cacheManager.set(`login_${sessionId}`, JSON.stringify(request), {ttl: 60 * 1000});
+
+    const qrUrl = `iden3comm://?request_uri=${HOSTED_SERVER_URL}/api/qr-code?sessionId=${sessionId}`;
+
   
-    io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, request));
+    io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, qrUrl));
   
-    return res.status(200).set("Content-Type", "application/json").send(request);
+    return res.status(200).set("Content-Type", "application/json").send(qrUrl);
 });
+
+router.get('/qr-code', async (req, res) => {
+    const sessionId = req.query.sessionId;
+    console.log("sessionId : ", sessionId);
+  
+    const cacheManager = await cPromise;
+    console.log("cacheManager : ", cacheManager);
+
+    const request = await cacheManager.get(`login_${sessionId}`);
+    console.log("request : ", request);
+
+    if(!request) {
+        return res.status(404).send({error: "Data not found"});
+    }
+
+    return res.status(200).send(JSON.parse(request));
+})
 
 // handleVerification verifies the proof after get-auth-qr callbacks
 router.post('/verification-callback', async (req, res) => {
     const sessionId = req.query.sessionId;
     console.log("sessionId : ", sessionId);
     
-    const authRequest = authRequests.get(`${sessionId}`);
+    const authRequest = authRequests.get(sessionId);
   
     console.log(`handleVerification for ${sessionId}`);
     console.log('authRequest : ', authRequest);
@@ -256,12 +282,14 @@ router.post('/verification-callback', async (req, res) => {
         authResponse = await verifier.fullVerify(tokenStr, authRequest, opts);
 
         console.log("authResponse : ", authResponse);
+        const profile = extractCredentialValues(authResponse);
     
         io.sockets.emit(
             sessionId,
             socketMessage("handleVerification", STATUS.DONE, {
                 userDid: authResponse.from,
                 jwzToken: tokenStr,
+                profile: profile,
             })
         );
 
@@ -276,6 +304,10 @@ router.post('/verification-callback', async (req, res) => {
         );
         return res.status(500).send(error);
     }
-})
+});
+
+
+
+
 
 module.exports = router;

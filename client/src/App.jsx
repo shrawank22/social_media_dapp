@@ -23,16 +23,13 @@ function App() {
     connectWallet();
   }, []);
 
-  const shouldShowWidgets = !['/login', '/register', '/connection'].includes(window.location.pathname);
-
   return (
     <PostState>
       <Router>
         <Navbar />
         <Alert />
         <div className='container'>
-          <div className='row'>
-            {/* <div className='col-md-9 col-sm-12 scrollable-content'> */}
+          <div className='row mb-10'>
               <Routes>
                 <Route exact path='/' element={<Home />} />
                 <Route exact path='/profile' element={<Profile />} />
@@ -44,13 +41,7 @@ function App() {
                 <Route path='*'>404 Not Found</Route>
               </Routes>
             </div>
-            {shouldShowWidgets && (
-              <div className='col-md-3 col-sm-12 scrollable-sidebar'>
-                <Widgets />
-              </div>
-            )}
           </div>
-        {/* </div> */}
       </Router>
     </PostState>
   )

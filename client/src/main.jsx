@@ -4,11 +4,9 @@ import App from './App.jsx'
 import './index.css'
 import Web3State from './context/web3/Web3State.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx';
-import ThemeToggleButton from './components/ThemeToggleButton';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>
-    <ThemeToggleButton />
     <Web3State>
       <App />
     </Web3State>
