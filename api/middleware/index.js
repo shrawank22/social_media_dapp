@@ -2,16 +2,22 @@ const middlewareObj = {};
 const jwt = require('jsonwebtoken');
 const authRequests = require('../helper/authRequestsMap');
 const didMap = require('../helper/didMap');
+const { auth, resolver } = require("@iden3/js-iden3-auth");
+const path = require('path');
+
+const keyDIR = "../keys";
 
 middlewareObj.isLoggedIn = async (req, res, next) => {
     if (req.headers.authorization) {
         const token = req.headers.authorization.split(' ')[1];
-        console.log('token middleware : ', token);
+        // console.log('token middleware : ', token);
 
         const sessionId = req.query.sessionId;
         console.log("sessionId : ", sessionId);
+
+        console.log("authRequests : ", authRequests);
         
-        const authRequest = authRequests.get(`${sessionId}`);
+        const authRequest = authRequests.get(sessionId);
         console.log('authRequest : ', authRequest);
         
         const userDid = didMap.get(sessionId);

@@ -36,7 +36,7 @@ function App() {
                 <Route exact path='/login' element={<Login />} />
                 <Route exact path='/connection' element={<Connection />} />
                 <Route exact path='/register' element={<Register />} />
-                <Route exact path='/notification' element={<Notification />} />
+                <Route exact path='/notifications' element={<Notification />} />
                 <Route exact path='/logout' element={<Logout />} />
                 <Route path='*'>404 Not Found</Route>
               </Routes>
