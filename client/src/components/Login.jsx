@@ -40,6 +40,7 @@ const Login = () => {
                                 "https://oceans404.notion.site/How-to-get-a-Verifiable-Credential-f3d34e7c98ec4147b6b2fae79066c4f6?pvs=4"
                               }
                               onVerificationResult={setProvedAccess}
+                              userAddress={state.address}
                         />
                     </Container>
                 </Center>

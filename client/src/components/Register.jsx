@@ -24,10 +24,6 @@ const Register = () => {
     const [loader, setLoader] = useState(false);
     const [qrcode, setQrcode] = useState("");
 
-    // const handleWallet = () => {
-    //     setUsername(state.address)
-    // }
-
     let navigateTo = useNavigate();
 
     useEffect(() => {
@@ -52,7 +48,10 @@ const Register = () => {
         };
 
         try {
-            const res = await issueCredential(data);
+            const res = await issueCredential({
+                userDetails: data,
+                userAddress: state.address,
+            });
 
             if (res.data) {
                 setLoader(false);
@@ -61,21 +60,25 @@ const Register = () => {
                 setQrcode(JSON.stringify(res.data));
                 console.log(qrcode);
             }
-
-            // console.log(response.data)
-            // navigateTo("/");
-            // showAlert("success", `Welcome ${response.data.user.username}!`)
         } catch (err) {
             console.log("Error in creating profile : ", err);
             setLoader(false);
-            setError(err.response?.data?.message);
             if (err.code === "ECONNABORTED") {
                 setError("Error in creating profile!!!");
+                return;
             }
-            // showAlert("danger", err.response.data)
-            // console.log(err.response.data);
+            if (err.response?.data?.message) {
+                setError(err.response?.data?.message);
+            } else {
+                setError("Something went wrong!!! Retry...");
+            }
         }
     };
+
+    const redoConnection = () => {
+        localStorage.clear();
+        navigateTo("/connection");
+    }
 
     return (
         <>
@@ -183,7 +186,7 @@ const Register = () => {
                                         {loader ? <Loader size={8} /> : "Register"}
                                     </button>
 
-                                    <p>Redo Connection</p>
+                                    <p onClick={redoConnection} className="text-center cursor-pointer text-sm font-medium" >Redo Connection</p>
                                 </form>
                             </>
                         )}

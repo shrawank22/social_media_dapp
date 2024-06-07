@@ -17,6 +17,7 @@ function PolygonIDVerifier({
     onVerificationResult,
     publicServerURL,
     localServerURL,
+    userAddress,
 }) {
     const [sessionId, setSessionId] = useState("");
     const [qrCodeData, setQrCodeData] = useState();
@@ -33,7 +34,7 @@ function PolygonIDVerifier({
         : localServerURL;
 
     const getQrCodeApi = (sessionId) =>
-        serverUrl + `/api/login?sessionId=${sessionId}`;
+        serverUrl + `/api/login?sessionId=${sessionId}&userAddress=${userAddress}`;
 
     const socket = io(serverUrl);
 

@@ -35,8 +35,10 @@ router.post('/logout', async (req, res) => {
 })
 
 router.post('/register', async (req, res) => {
-    const userDetails = req.body;
+    const userDetails = req.body.userDetails;
+    const userAddress = req.body.userAddress;
     console.log(userDetails);
+    console.log(userAddress);
 
     let credDetails = {
         credentialSchema: 'https://gist.githubusercontent.com/raj-71/1662fdca98c9dad3a034e404ae9a9701/raw/a5b7146a786e28e9b15e162e08dbdd7a4769718f/schema.json',
@@ -185,6 +187,10 @@ router.post('/connection-callback', async (req, res) => {
 // GetAuthQR returns auth request
 router.get('/login', async (req, res) => {
     const sessionId = req.query.sessionId;
+    const userAddress = req.query.userAddress;
+
+    console.log("sessionId : ", sessionId);
+    console.log("userAddress : ", userAddress);
 
     io.sockets.emit(
       sessionId,
@@ -212,7 +218,6 @@ router.get('/login', async (req, res) => {
     console.log("request : ", request);
 
     const cacheManager = await cPromise;
-    console.log("cacheManager : ", cacheManager);
 
     await cacheManager.set(`login_${sessionId}`, JSON.stringify(request), {ttl: 60 * 1000});
 
@@ -229,7 +234,6 @@ router.get('/qr-code', async (req, res) => {
     console.log("sessionId : ", sessionId);
   
     const cacheManager = await cPromise;
-    console.log("cacheManager : ", cacheManager);
 
     const request = await cacheManager.get(`login_${sessionId}`);
     console.log("request : ", request);
