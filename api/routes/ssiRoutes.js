@@ -52,9 +52,9 @@ router.post('/logout', async (req, res) => {
 
 router.post('/register', async (req, res) => {
     const userDetails = req.body.userDetails;
-    const userAddress = req.body.userAddress;
+    const username = req.body.userAddress;
     console.log(userDetails);
-    console.log(userAddress);
+    console.log(username);
 
     let credDetails = {
         credentialSchema: 'https://gist.githubusercontent.com/raj-71/1662fdca98c9dad3a034e404ae9a9701/raw/a5b7146a786e28e9b15e162e08dbdd7a4769718f/schema.json',
@@ -98,9 +98,7 @@ router.post('/register', async (req, res) => {
             const user = new User({ username });
             await user.save();
 
-            console.log("User saved successfully", user);
-            // const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
-            // return res.send({ user, authtoken: token });
+            // res.status(200).send({qrCodeLink: qrCodeLinkRes.data, user});  
         } catch (err) {
             return res.status(500).send(err.message);
         }
