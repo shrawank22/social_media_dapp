@@ -5,10 +5,11 @@ function Logout() {
     useEffect(() => {
         async function handleLogout() {
           try {
+            if(!localStorage.getItem('userDid'))
+              return;
             const res = await logoutUser();
             if (res.status === 200) {
-              localStorage.removeItem("userDid");
-              localStorage.removeItem("jwz-token");
+              localStorage.clear();
               window.location.href = "/";
             } else {
               console.error("Error logging out");

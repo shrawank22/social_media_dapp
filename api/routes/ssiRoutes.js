@@ -7,7 +7,8 @@ const authRequests = require('../helper/authRequestsMap');
 const didMap = require('../helper/didMap');
 const { STATUS, MSG, proofRequest, socketMessage, extractCredentialValues } = require('../helper/helper');
 const router = express.Router();
-const Cache = require("cache-manager")
+const Cache = require("cache-manager");
+const md5 = require('md5');
 
 const keyDIR = "../keys";
 const API_URL = process.env.HOSTED_ISSUER_URL;
@@ -22,14 +23,27 @@ const cPromise = Cache.caching("memory", {
     ttl: 60 * 1000
 });
 
+const replaceAuthRequestMapKey = (oldKey, newKey) => {
+    console.log("oldKey : ", oldKey);
+    console.log("value : ", authRequests.get(oldKey));
+    console.log("authRequests : ", authRequests);
+    if(authRequests.get(oldKey)){
+        authRequests.set(newKey, authRequests.get(oldKey));
+        authRequests.delete(oldKey);
+    }
+}
+
 router.post('/logout', async (req, res) => {
     // fetch sessionId
-    const sessionId = req.query.sessionId;
-    console.log("sessionId : ", sessionId);
+    // const sessionId = req.query.sessionId;
+    // console.log("sessionId : ", sessionId);
+
+    const token = req.headers.authorization.split(' ')[1];
+    console.log('token middleware : ', token);
 
     // remove the sessionId from map
-    authRequests.delete(sessionId);
-    didMap.delete(sessionId);
+    authRequests.delete(token);
+    didMap.delete(token);
 
     res.status(200).send("Logged out successfully");
 })
@@ -263,6 +277,15 @@ router.post('/verification-callback', async (req, res) => {
     // get JWZ token params from the post request
     const raw = await getRawBody(req);
     const tokenStr = raw.toString().trim();
+
+    const token = md5(tokenStr);
+
+    console.log("md5 token : ", token);
+
+    replaceAuthRequestMapKey(sessionId, token);
+
+    console.log("after replace authRequest sessionId : ", authRequests.get(sessionId));
+    console.log("after replace authRequest token : ", authRequests.get(token));
   
     const ethStateResolver = new resolver.EthStateResolver(
         RPC_URL_AMOY,
@@ -297,7 +320,7 @@ router.post('/verification-callback', async (req, res) => {
             })
         );
 
-        didMap.set(sessionId, authResponse.from);
+        didMap.set(token, authResponse.from);
 
         return res.status(200).send(authResponse);
     } catch (error) {

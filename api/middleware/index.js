@@ -3,27 +3,31 @@ const authRequests = require('../helper/authRequestsMap');
 const didMap = require('../helper/didMap');
 const { auth, resolver } = require("@iden3/js-iden3-auth");
 const path = require('path');
+const md5 = require('md5');
 
 const keyDIR = "../keys";
 
 middlewareObj.isLoggedIn = async (req, res, next) => {
+    console.log("inside isLoggedIn middleware");
     if (req.headers.authorization) {
-        const token = req.headers.authorization.split(' ')[1];
-        // console.log('token middleware : ', token);
+        const jwz = req.headers.authorization.split(' ')[1];
+        console.log('jwz middleware : ', jwz);
 
-        const sessionId = req.query.sessionId;
-        console.log("sessionId0 : ", sessionId);
+        const token = md5(jwz);
+        console.log('token middleware : ', token);
         
-        const authRequest = authRequests.get(`${sessionId}`);
+        const authRequest = authRequests.get(token);
         console.log('authRequest0 : ', authRequest);
         
-        const userDid = didMap.get(sessionId);
+        const userDid = didMap.get(token);
         console.log('userDid0 : ', userDid);
         
         const ethStateResolver = new resolver.EthStateResolver(
             process.env.RPC_URL_AMOY,
             process.env.AMOY_CONTRACT_ADDRESS
         );
+
+        console.log("checkpoint 1");
 
         const resolvers = {
             ["polygon:amoy"]: ethStateResolver,
@@ -35,11 +39,15 @@ middlewareObj.isLoggedIn = async (req, res, next) => {
             ipfsGatewayURL: "https://ipfs.io",
         });
 
+        console.log("checkpoint 2")
+
         const opts = {
             AcceptedStateTransitionDelay: 5 * 60 * 1000, // up to a 5 minute delay accepted by the Verifier
         };
 
-        authResponse = await verifier.fullVerify(token, authRequest, opts);
+        authResponse = await verifier.fullVerify(jwz, authRequest, opts);
+
+        console.log("checkpoint 3")
 
         console.log("authResponse : ", authResponse);
 

@@ -14,11 +14,27 @@ apiCall.interceptors.request.use(
             config.headers.Authorization = `Bearer ${token}`;
         }
 
+        config.headers['ngrok-skip-browser-warning'] = 1;
+
         return config;
     },
     (error) => {
         return Promise.reject(error);
     }
 );
+
+apiCall.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response.status === 401) {
+            localStorage.clear();
+            window.location.href = '/login';
+        }
+
+        return Promise.reject(error);
+    }
+)
 
 export default apiCall;

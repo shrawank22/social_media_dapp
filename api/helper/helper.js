@@ -52,12 +52,12 @@ const socketMessage = (fn, status, data) => ({
     fn,
     status,
     data,
-});  
+});
 
 module.exports = {
     STATUS,
     MSG,
     proofRequest,
     socketMessage,
-    extractCredentialValues
+    extractCredentialValues,
 }
