@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useWeb3Modal } from '@web3modal/ethers/react'
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -7,8 +8,9 @@ const Navbar = () => {
     let location = useLocation();
     let navigate = useNavigate();
     const token = localStorage.getItem("jwz-token");
-    const isAuthenticated = !!token; // Check if token exists
-    console.log("isAuthenticated : ", isAuthenticated);
+    const isAuthenticated = !!token;
+
+    const { open } = useWeb3Modal();
 
     const handleLogout = () => {
         localStorage.removeItem("userDid");
@@ -18,6 +20,8 @@ const Navbar = () => {
     const toggleNavbar = () => {
         setIsOpen(!isOpen);
     };
+
+
 
     return (
         <>
