@@ -10,6 +10,7 @@ const { STATUS, MSG, proofRequest, socketMessage, extractCredentialValues } = re
 const router = express.Router();
 const Cache = require("cache-manager");
 const md5 = require('md5');
+const User = require('../models/User');
 
 const keyDIR = "../keys";
 const API_URL = process.env.HOSTED_ISSUER_URL;
@@ -28,7 +29,7 @@ const replaceAuthRequestMapKey = (oldKey, newKey) => {
     console.log("oldKey : ", oldKey);
     console.log("value : ", authRequests.get(oldKey));
     console.log("authRequests : ", authRequests);
-    if(authRequests.get(oldKey)){
+    if (authRequests.get(oldKey)) {
         authRequests.set(newKey, authRequests.get(oldKey));
         authRequests.delete(oldKey);
     }
@@ -67,16 +68,16 @@ router.post('/register', async (req, res) => {
         // create credential
         const issuerRes = await axios.post(`${API_URL}/v1/credentials`, credDetails, {
             headers: {
-              'Content-Type': 'application/json',
-              'Accept' : 'application/json',
-              'Authorization': BASIC_AUTH
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': BASIC_AUTH
             }
         });
 
         // create VC qr-code
         const qrCodeRes = await axios.get(`${API_URL}/v1/credentials/${issuerRes.data.id}/qrcode`, {
             headers: {
-                'Accept' : 'application/json'
+                'Accept': 'application/json'
             }
         });
 
@@ -87,19 +88,36 @@ router.post('/register', async (req, res) => {
         const qrCodeLinkRes = await axios.get(`${qrCodeLink}`);
         qrCodeLinkRes.data.body.url = `${API_URL}/v1/agent`;
 
+        // store the user address to db 
+        try {
+            const existingUser = await User.findOne({ username });
+            if (existingUser) {
+                return res.status(400).send('A user with this username already exists.');
+            }
+
+            const user = new User({ username });
+            await user.save();
+
+            console.log("User saved successfully", user);
+            // const token = jwt.sign({ id: user.id }, 'your_secret_key', { expiresIn: '1h' });
+            // return res.send({ user, authtoken: token });
+        } catch (err) {
+            return res.status(500).send(err.message);
+        }
+
         res.status(200).send(qrCodeLinkRes.data);
     } catch (err) {
         console.log("Error : ", err.response.data);
 
-        if(err.response.data.message === "claim details incorrect") {
-        return res.status(404).send({message: "Incorrect Details"});
+        if (err.response.data.message === "claim details incorrect") {
+            return res.status(404).send({ message: "Incorrect Details" });
         }
 
-        if(err.response.data.message === "Error in aadhaar service") {
-        return res.status(500).send({message: "Error in aadhaar service"});
+        if (err.response.data.message === "Error in aadhaar service") {
+            return res.status(500).send({ message: "Error in aadhaar service" });
         }
-        
-        return res.status(500).send({message: "Error in creating profile"});
+
+        return res.status(500).send({ message: "Error in creating profile" });
     }
 });
 
@@ -147,9 +165,9 @@ router.post('/connection-callback', async (req, res) => {
     );
 
     const authRequest = authRequests.get(`${sessionId}`);
-  
+
     console.log(`handleConnectionCallback for ${sessionId}`);
-    
+
     const raw = await getRawBody(req);
     console.log("raw : ", raw);
 
@@ -157,39 +175,39 @@ router.post('/connection-callback', async (req, res) => {
     console.log("tokenStr : ", tokenStr);
 
     const ethStateResolver = new resolver.EthStateResolver(
-      RPC_URL_AMOY,
-      AMOY_CONTRACT_ADDRESS
+        RPC_URL_AMOY,
+        AMOY_CONTRACT_ADDRESS
     );
 
     const resolvers = {
-      ["polygon:amoy"]: ethStateResolver,
+        ["polygon:amoy"]: ethStateResolver,
     };
 
     const verifier = await auth.Verifier.newVerifier({
-      stateResolver: resolvers,
-      circuitsDir: path.join(__dirname, keyDIR),
-      ipfsGatewayURL: "https://ipfs.io",
+        stateResolver: resolvers,
+        circuitsDir: path.join(__dirname, keyDIR),
+        ipfsGatewayURL: "https://ipfs.io",
     });
 
     try {
         console.log("inside try block");
-  
+
         const token = await verifier.verifyJWZ(tokenStr);
-  
+
         console.log("token : ", token);
-  
+
         authResponse = JSON.parse(
-          token.getPayload(),
+            token.getPayload(),
         );
-  
+
         console.log("authResponse : ", authResponse);
         console.log("token.getPayload(): ", token.getPayload());
-    
+
         await verifier.verifyAuthResponse(authResponse, authRequest);
-  
+
         io.sockets.emit(
-          sessionId,
-          socketMessage("handleConnectionCallback", STATUS.DONE, authResponse.from)
+            sessionId,
+            socketMessage("handleConnectionCallback", STATUS.DONE, authResponse.from)
         );
 
         return res.status(200).send(authResponse);
@@ -208,8 +226,8 @@ router.get('/login', async (req, res) => {
     console.log("userAddress : ", userAddress);
 
     io.sockets.emit(
-      sessionId,
-      socketMessage("getAuthQr", STATUS.IN_PROGRESS, sessionId)
+        sessionId,
+        socketMessage("getAuthQr", STATUS.IN_PROGRESS, sessionId)
     );
 
     const uri = `${HOSTED_SERVER_URL}/api/verification-callback?sessionId=${sessionId}`;
@@ -226,7 +244,7 @@ router.get('/login', async (req, res) => {
     console.log("proofRequest : ", proofRequest);
 
     request.body.scope = proofRequest;
-  
+
     // store this session's auth request
     authRequests.set(sessionId, request);
 
@@ -234,28 +252,28 @@ router.get('/login', async (req, res) => {
 
     const cacheManager = await cPromise;
 
-    await cacheManager.set(`login_${sessionId}`, JSON.stringify(request), {ttl: 60 * 1000});
+    await cacheManager.set(`login_${sessionId}`, JSON.stringify(request), { ttl: 60 * 1000 });
 
     const qrUrl = `iden3comm://?request_uri=${HOSTED_SERVER_URL}/api/qr-code?sessionId=${sessionId}`;
 
     addressMap.set(sessionId, userAddress);
-  
+
     io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, qrUrl));
-  
+
     return res.status(200).set("Content-Type", "application/json").send(qrUrl);
 });
 
 router.get('/qr-code', async (req, res) => {
     const sessionId = req.query.sessionId;
     console.log("sessionId : ", sessionId);
-  
+
     const cacheManager = await cPromise;
 
     const request = await cacheManager.get(`login_${sessionId}`);
     console.log("request : ", request);
 
-    if(!request) {
-        return res.status(404).send({error: "Data not found"});
+    if (!request) {
+        return res.status(404).send({ error: "Data not found" });
     }
 
     return res.status(200).send(JSON.parse(request));
@@ -267,17 +285,17 @@ router.post('/verification-callback', async (req, res) => {
     console.log("sessionId : ", sessionId);
     const userAddress = addressMap.get(sessionId);
     console.log("userAddress : ", userAddress);
-    
+
     const authRequest = authRequests.get(sessionId);
-  
+
     console.log(`handleVerification for ${sessionId}`);
     console.log('authRequest : ', authRequest);
-  
+
     io.sockets.emit(
-      sessionId,
-      socketMessage("handleVerification", STATUS.IN_PROGRESS, authRequest)
+        sessionId,
+        socketMessage("handleVerification", STATUS.IN_PROGRESS, authRequest)
     );
-  
+
     // get JWZ token params from the post request
     const raw = await getRawBody(req);
     const tokenStr = raw.toString().trim();
@@ -287,7 +305,7 @@ router.post('/verification-callback', async (req, res) => {
     console.log("md5 token : ", token);
 
     replaceAuthRequestMapKey(sessionId, token);
-  
+
     const ethStateResolver = new resolver.EthStateResolver(
         RPC_URL_AMOY,
         AMOY_CONTRACT_ADDRESS
@@ -296,7 +314,7 @@ router.post('/verification-callback', async (req, res) => {
     const resolvers = {
         ["polygon:amoy"]: ethStateResolver,
     };
-    
+
     const verifier = await auth.Verifier.newVerifier({
         stateResolver: resolvers,
         circuitsDir: path.join(__dirname, keyDIR),
@@ -311,7 +329,7 @@ router.post('/verification-callback', async (req, res) => {
 
         console.log("authResponse : ", authResponse);
         const profile = extractCredentialValues(authResponse);
-    
+
         io.sockets.emit(
             sessionId,
             socketMessage("handleVerification", STATUS.DONE, {
