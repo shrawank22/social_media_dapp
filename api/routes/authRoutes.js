@@ -53,7 +53,10 @@ router.post('/unfollow/:username', middleware.isLoggedIn, async (req, res) => {
 // Get Notifications
 router.get('/notifications', middleware.isLoggedIn, async (req, res) => {
     try {
-        const userId = req.user.id; 
+        console.log("Inside notifications route");
+        const userAddress = req.query.userAddress; 
+
+        console.log("[notifications] userAddress : ", userAddress);
         
         // Fetch unread notifications for the current user
         const notifications = await Notification.find({ recipient: userId, read: false }).sort({ createdAt: -1 });

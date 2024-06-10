@@ -5,6 +5,7 @@ const axios = require('axios');
 const path = require('path');
 const authRequests = require('../helper/authRequestsMap');
 const didMap = require('../helper/didMap');
+const addressMap = require('../helper/addressMap');
 const { STATUS, MSG, proofRequest, socketMessage, extractCredentialValues } = require('../helper/helper');
 const router = express.Router();
 const Cache = require("cache-manager");
@@ -237,6 +238,7 @@ router.get('/login', async (req, res) => {
 
     const qrUrl = `iden3comm://?request_uri=${HOSTED_SERVER_URL}/api/qr-code?sessionId=${sessionId}`;
 
+    addressMap.set(sessionId, userAddress);
   
     io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, qrUrl));
   
@@ -263,6 +265,8 @@ router.get('/qr-code', async (req, res) => {
 router.post('/verification-callback', async (req, res) => {
     const sessionId = req.query.sessionId;
     console.log("sessionId : ", sessionId);
+    const userAddress = addressMap.get(sessionId);
+    console.log("userAddress : ", userAddress);
     
     const authRequest = authRequests.get(sessionId);
   
@@ -283,9 +287,6 @@ router.post('/verification-callback', async (req, res) => {
     console.log("md5 token : ", token);
 
     replaceAuthRequestMapKey(sessionId, token);
-
-    console.log("after replace authRequest sessionId : ", authRequests.get(sessionId));
-    console.log("after replace authRequest token : ", authRequests.get(token));
   
     const ethStateResolver = new resolver.EthStateResolver(
         RPC_URL_AMOY,
