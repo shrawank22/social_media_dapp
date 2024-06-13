@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useWeb3Modal } from '@web3modal/ethers/react'
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -9,8 +8,6 @@ const Navbar = () => {
     let navigate = useNavigate();
     const token = localStorage.getItem("jwz-token");
     const isAuthenticated = !!token;
-
-    const { open } = useWeb3Modal();
 
     const handleLogout = () => {
         localStorage.removeItem("userDid");
@@ -21,6 +18,23 @@ const Navbar = () => {
         setIsOpen(!isOpen);
     };
 
+    // const onConnect = async  () => {
+    //     let intervalId;
+    //     const timeoutId = setTimeout(() => {
+    //         clearInterval(intervalId);
+    //         console.log("Client was not initialized");
+    //     }, 30000);
+    
+    //     intervalId = setInterval(() => {
+    //         if (typeof client !== "undefined") {
+    //             clearTimeout(intervalId);
+    //             clearTimeout(timeoutId);
+    //             connect();
+    //         }
+    //     }, 500);
+
+    //     console.log("Inside onConnect\nuri: ", uri);
+    // }
 
 
     return (
@@ -75,6 +89,11 @@ const Navbar = () => {
                                             </Link>
                                         </li>
                                     }
+                                    {/* {
+                                        <li>
+                                            <button onClick={onConnect} type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 md:!my-0 my-2 text-center">Connect</button>
+                                        </li>
+                                    } */}
                                 </>
                             }
                         </ul>
