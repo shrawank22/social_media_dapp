@@ -6,17 +6,20 @@ import Web3State from './context/web3/Web3State.jsx'
 import { ChainDataContextProvider } from './context/ChainDataContext.jsx'
 import { ClientContextProvider } from './context/ClientContext.jsx'
 import { JsonRpcContextProvider } from './context/JsonRpcContext.jsx'
+import { EthereumContextProvider } from './context/EthereumContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ChainDataContextProvider>
+      <EthereumContextProvider>
       {/* <ClientContextProvider> */}
-        <JsonRpcContextProvider>
-          {/* <Web3State> */}
+        {/* <JsonRpcContextProvider> */}
+          <Web3State>
             <App />
-          {/* </Web3State> */}
-        </JsonRpcContextProvider>
+          </Web3State>
+        {/* </JsonRpcContextProvider> */}
       {/* </ClientContextProvider> */}
+      </EthereumContextProvider>
     </ChainDataContextProvider>
   </React.StrictMode>
 )

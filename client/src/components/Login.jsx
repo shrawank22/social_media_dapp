@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useChainData } from "../context/ChainDataContext";
 import { useJsonRpc } from "../context/JsonRpcContext";
 import { useWalletConnectClient } from "../context/ClientContext";
+import { useEthereumConnectClient } from "../context/EthereumContext";
 
 const Login = () => {
     const context1 = useContext(postContext);
@@ -16,17 +17,24 @@ const Login = () => {
     const { state } = context2;
 
     const [provedAccess, setProvedAccess] = useState(false);
-    const { client, session, connect, disconnect, chains, accounts, balances, isFetchingBalances, isInitializing, setChains, uri} = useWalletConnectClient();
-    const { ping, ethereumRpc, isRpcRequestPending, rpcResult } = useJsonRpc();
-    const { chainData } = useChainData();
+    // const { client, session, connect, disconnect, chains, accounts, balances, isFetchingBalances, isInitializing, setChains, uri} = useWalletConnectClient();
+    // const { ping, ethereumRpc, isRpcRequestPending, rpcResult } = useJsonRpc();
+    // const { chainData } = useChainData();
+    const { uri, provider, connectWallet } = useEthereumConnectClient();
 
     const navigate = useNavigate();
 
+    // useEffect(() => {
+    //     if(typeof client !== "undefined") {
+    //         connect();
+    //     }
+    // }, [client]);
+
     useEffect(() => {
-        if(typeof client !== "undefined") {
-            connect();
+        if (provider) {
+            connectWallet();
         }
-    }, [client]);
+    }, [provider]);
 
     useEffect(() => {
         if(provedAccess) {
@@ -41,16 +49,16 @@ const Login = () => {
     }, [uri]);
 
     const handleTransaction = async () => {
-        console.log("session : ", session);
-        console.log("addresses : ", accounts);
-        try {
-            const chainId = 'eip155:80002';
-            const address = '0xf3c95b1a8cabf3d5151912377aeadd84aa41c27c';
+        // console.log("session : ", session);
+        // console.log("addresses : ", accounts);
+        // try {
+        //     const chainId = 'eip155:80002';
+        //     const address = '0xf3c95b1a8cabf3d5151912377aeadd84aa41c27c';
 
-            await ethereumRpc.testSendTransaction(chainId, address);
-        } catch (error) {
-            console.error('handleTransaction error : ', error);
-        }
+        //     await ethereumRpc.testSendTransaction(chainId, address);
+        // } catch (error) {
+        //     console.error('handleTransaction error : ', error);
+        // }
     }
 
     return (
