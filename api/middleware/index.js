@@ -1,9 +1,9 @@
 const middlewareObj = {};
-const authRequests = require('../helper/authRequestsMap');
 const didMap = require('../helper/didMap');
 const { auth, resolver } = require("@iden3/js-iden3-auth");
 const path = require('path');
 const md5 = require('md5');
+const { getAuthRequests } = require('../helper/authRequestsMap');
 
 const keyDIR = "../keys";
 
@@ -16,10 +16,11 @@ middlewareObj.isLoggedIn = async (req, res, next) => {
         const token = md5(jwz);
         console.log('token middleware : ', token);
         
-        const authRequest = authRequests.get(token);
+        // const authRequest = authRequests.get(token);
+        const authRequest = getAuthRequests(token);
         console.log('authRequest0 : ', authRequest);
         
-        const userDid = didMap.get(token);
+        const userDid = didMap.getDidMap(token);
         console.log('userDid0 : ', userDid);
         
         const ethStateResolver = new resolver.EthStateResolver(
