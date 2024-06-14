@@ -26,11 +26,11 @@ const cPromise = Cache.caching("memory", {
 
 const replaceAuthRequestMapKey = (oldKey, newKey) => {
     console.log("oldKey : ", oldKey);
-    console.log("value : ", authRequests.get(oldKey));
-    console.log("authRequests : ", authRequests);
-    if(authRequests.get(oldKey)){
-        authRequests.set(newKey, authRequests.get(oldKey));
-        authRequests.delete(oldKey);
+    console.log("value : ", authRequests.getAuthRequests(oldKey));
+    // console.log("authRequests : ", authRequests);
+    if (authRequests.getAuthRequests(oldKey)) {
+        authRequests.setAuthRequests(newKey, authRequests.getAuthRequests(oldKey));
+        authRequests.deleteAuthRequests(oldKey);
     }
 }
 
@@ -43,8 +43,8 @@ router.post('/logout', async (req, res) => {
     console.log('token middleware : ', token);
 
     // remove the sessionId from map
-    authRequests.delete(token);
-    didMap.delete(token);
+    authRequests.deleteAuthRequests(token);
+    didMap.deleteDidMap(token);
 
     res.status(200).send("Logged out successfully");
 })
@@ -127,7 +127,7 @@ router.get('/get-connection-qr', (req, res) => {
     request.body.scope = [];
 
     // store this session's auth request
-    authRequests.set(sessionId, request);
+    authRequests.setAuthRequests(sessionId, request);
 
     io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, request));
 
@@ -146,7 +146,7 @@ router.post('/connection-callback', async (req, res) => {
         socketMessage("handleConnectionCallback", STATUS.IN_PROGRESS, sessionId)
     );
 
-    const authRequest = authRequests.get(`${sessionId}`);
+    const authRequest = authRequests.getAuthRequests(`${sessionId}`);
   
     console.log(`handleConnectionCallback for ${sessionId}`);
     
@@ -228,7 +228,7 @@ router.get('/login', async (req, res) => {
     request.body.scope = proofRequest;
   
     // store this session's auth request
-    authRequests.set(sessionId, request);
+    authRequests.setAuthRequests(sessionId, request);
 
     console.log("request : ", request);
 
@@ -238,7 +238,8 @@ router.get('/login', async (req, res) => {
 
     const qrUrl = `iden3comm://?request_uri=${HOSTED_SERVER_URL}/api/qr-code?sessionId=${sessionId}`;
 
-    addressMap.set(sessionId, userAddress);
+    // addressMap.set(sessionId, userAddress);
+    addressMap.setAddress(sessionId, userAddress);
   
     io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, qrUrl));
   
@@ -265,10 +266,11 @@ router.get('/qr-code', async (req, res) => {
 router.post('/verification-callback', async (req, res) => {
     const sessionId = req.query.sessionId;
     console.log("sessionId : ", sessionId);
-    const userAddress = addressMap.get(sessionId);
+    // const userAddress = addressMap.get(sessionId);
+    const userAddress = addressMap.getAddress(sessionId);
     console.log("userAddress : ", userAddress);
     
-    const authRequest = authRequests.get(sessionId);
+    const authRequest = authRequests.getAuthRequests(sessionId);
   
     console.log(`handleVerification for ${sessionId}`);
     console.log('authRequest : ', authRequest);
@@ -321,7 +323,7 @@ router.post('/verification-callback', async (req, res) => {
             })
         );
 
-        didMap.set(token, authResponse.from);
+        didMap.setDidMap(token, authResponse.from);
 
         return res.status(200).send(authResponse);
     } catch (error) {

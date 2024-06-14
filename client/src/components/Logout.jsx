@@ -5,9 +5,7 @@ function Logout() {
   useEffect(() => {
     async function handleLogout() {
       try {
-        if (!localStorage.getItem('jwz-token'))
-          return;
-        await logoutUser();
+        logoutUser();
         localStorage.clear();
         window.location.href = "/";
       } catch (error) {

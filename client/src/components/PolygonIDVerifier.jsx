@@ -28,8 +28,6 @@ function PolygonIDVerifier({
     const [verificationMessage, setVerificationMessage] = useState("⌛ Waiting for Proof...");
     const [socketEvents, setSocketEvents] = useState([]);
 
-    // serverUrl is localServerURL if not running in prod
-    // Note: the verification callback will always come from the publicServerURL
     const serverUrl = window.location.href.startsWith("https")
         ? publicServerURL
         : localServerURL;

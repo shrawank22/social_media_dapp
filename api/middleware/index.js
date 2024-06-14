@@ -16,10 +16,10 @@ middlewareObj.isLoggedIn = async (req, res, next) => {
         const token = md5(jwz);
         console.log('token middleware : ', token);
         
-        const authRequest = authRequests.get(token);
+        const authRequest = authRequests.getAuthRequests(token);
         console.log('authRequest0 : ', authRequest);
         
-        const userDid = didMap.get(token);
+        const userDid = didMap.getDidMap(token);
         console.log('userDid0 : ', userDid);
         
         const ethStateResolver = new resolver.EthStateResolver(

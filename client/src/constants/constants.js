@@ -1,25 +1,5 @@
 const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS
 
-export const DEFAULT_APP_METADATA = {
-	name: "Social Media",
-	description: "Social Media Wallet",
-	url: "https://walletconnect.com/",
-	icons: ["https://avatars.githubusercontent.com/u/37784886"],
-	verifyUrl: "https://verify.walletconnect.com",
-};
-
-export const DEFAULT_EIP155_METHODS = {
-	ETH_SEND_TRANSACTION: "eth_sendTransaction",
-	PERSONAL_SIGN: "personal_sign",
-  };
-  
-  export const DEFAULT_EIP155_OPTIONAL_METHODS = {
-	ETH_SIGN_TRANSACTION: "eth_signTransaction",
-	ETH_SIGN: "eth_sign",
-	ETH_SIGN_TYPED_DATA: "eth_signTypedData",
-	ETH_SIGN_TYPED_DATA_V4: "eth_signTypedData_v4",
-  };
-
 const contractABI = [
 	{
 		"inputs": [

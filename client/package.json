@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "vite",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -15,22 +14,12 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@ethereumjs/tx": "^3.5.0",
-    "@walletconnect/core": "^2.13.1",
-    "@walletconnect/encoding": "^1.0.2",
     "@walletconnect/ethereum-provider": "^2.13.2",
-    "@walletconnect/sign-client": "^2.13.1",
-    "@walletconnect/universal-provider": "^2.13.2",
-    "@walletconnect/utils": "^2.13.1",
-    "@web3modal/standalone": "^2.4.3",
     "axios": "^1.6.5",
     "crypto-js": "^4.2.0",
     "emoji-picker-react": "^4.7.10",
     "ethereumjs-util": "^7.1.5",
     "ethers": "5.7",
-    "framer-motion": "^6.5.1",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -50,7 +39,6 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
-    "gh-pages": "^6.1.1",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "vite": "^5.0.8"
