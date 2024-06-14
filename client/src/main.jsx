@@ -10,13 +10,13 @@ import { JsonRpcContextProvider } from './context/JsonRpcContext.jsx'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ChainDataContextProvider>
-      <ClientContextProvider>
+      {/* <ClientContextProvider> */}
         <JsonRpcContextProvider>
-          <Web3State>
+          {/* <Web3State> */}
             <App />
-          </Web3State>
+          {/* </Web3State> */}
         </JsonRpcContextProvider>
-      </ClientContextProvider>
+      {/* </ClientContextProvider> */}
     </ChainDataContextProvider>
   </React.StrictMode>
 )

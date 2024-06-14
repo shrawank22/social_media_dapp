@@ -1,4 +1,4 @@
-import Client from "@walletconnect/sign-client";
+// import Client from "@walletconnect/sign-client";
 import { Web3Modal } from "@web3modal/standalone";
 import { RELAYER_EVENTS } from "@walletconnect/core";
 
@@ -7,9 +7,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { getAppMetadata, getSdkError } from "@walletconnect/utils";
 import { apiGetAccountBalance } from "../helpers";
 import { contractAddress, contractABI, DEFAULT_APP_METADATA } from "../constants/constants";
-import { Contract, providers } from "ethers";
-import UniversalProvider from "@walletconnect/universal-provider";
-// import { EthereumProvider } from "@walletconnect/ethereum-provider";
+import { Contract, ethers } from "ethers";
+// import UniversalProvider from "@walletconnect/universal-provider";
+// import web3 from "web3";
+import { EthereumProvider } from "@walletconnect/ethereum-provider";
 
 
 export const ClientContext = createContext({});
@@ -36,7 +37,7 @@ export function ClientContextProvider({ children }) {
     const [origin, setOrigin] = useState(getAppMetadata().url);
     const [uri, setUri] = useState("");
     const [ethereumProvider, setEthereumProvider] = useState();
-    const [web3Provider, setWeb3Provider] = useState(); 
+    const [web3Provider, setWeb3Provider] = useState();
     const [state, setState] = useState({
         signer: null,
         contract: null,
@@ -78,7 +79,7 @@ export function ClientContextProvider({ children }) {
     }
 
     const onSessionConnected = useCallback(async _session => {
-        if(!ethereumProvider) {
+        if (!ethereumProvider) {
             return;
         }
         const allNamespaceAccounts = Object.values(_session.namespaces)
@@ -148,15 +149,19 @@ export function ClientContextProvider({ children }) {
                 optionalNamespaces
             )
 
-            const { uri, approval } = await client.connect({
-                pairingTopic: pairing?.topic,
-                requiredNamespaces,
-                optionalNamespaces
-            });
+            const res = await ethereumProvider.connect({
+                chains: [80002],
+                optionalChains: [80002],
+                rpcMap: {
+                    '80002': import.meta.env.VITE_RPC_URL
+                },
+            })
 
-            setUri(uri);
+            console.log("res : ", res);
 
-            console.log("inside connect\nuri:", uri);
+            // setUri(uri);
+
+            // console.log("inside connect\nuri:", uri);
 
             const lastKeyIndex = client.session.keys.length - 1
             const _session = client.session.get(client.session.keys[lastKeyIndex])
@@ -176,26 +181,37 @@ export function ClientContextProvider({ children }) {
         }
     }, [chains, client, onSessionConnected]);
 
-    const createWeb3Provider = useCallback(async (ethereumProvider) => {
-        console.log("Inside createWeb3Provider");
-        console.log("ethereumProvider : ", ethereumProvider);
-        const web3Provider = new providers.Web3Provider(ethereumProvider);
-        setWeb3Provider(web3Provider);
-        console.log("web3Provider : ", web3Provider);
-        const signer = await web3Provider.getSigner();
-        console.log('signer : ', signer);
-        const contract = new Contract(contractAddress, contractABI, signer);
-        console.log('contract : ', contract);
-        console.log('getAddress() : ', contract.signer.getAddress());
-        setState({ signer, contract, address: '' });
-        
-        const tx = await contract.addPost(
-            String('ipfsHash_Contract_Testing'),
-            parseInt('10')
-          );
-        console.log('tx : ', tx);
-        const receipt = await tx.wait();
-        console.log('receipt : ', receipt);
+    const createWeb3Provider = useCallback(async (ethprovider) => {
+        const hexChainId = ethers.utils.hexValue(80002);
+        let ethersProvider = new ethers.providers.Web3Provider(ethprovider);
+        console.log("ethersProvider : ", ethersProvider);
+        let signer = await ethersProvider.getSigner();
+        console.log("signer : ", signer);
+        ethersProvider.send("wallet_switchEthereumChain", [
+            { chainId: hexChainId },
+        ]);
+        let network = await ethersProvider.getNetwork();
+        console.log("network : ", network);
+        // console.log("Inside createWeb3Provider");
+        // console.log("ethereumProvider : ", walletProvider);
+        // const web3Provider = new BrowserProvider(walletProvider);
+        // console.log("web3Provider : ", web3Provider);
+        // setWeb3Provider(web3Provider);
+        // const signer = await web3Provider.getSigner();
+        // console.log('signer : ', signer);
+        // const contract = new Contract(contractAddress, contractABI, signer);
+        // console.log('contract : ', contract);
+        // const address = await contract.signer.getAddress();
+        // console.log('getAddress() : ', address);
+        // setState({ signer, contract, address: '' });
+
+        // const tx = await contract.addPost(
+        //     String('ipfsHash_Contract_Testing'),
+        //     parseInt('10')
+        //   );
+        // console.log('tx : ', tx);
+        // const receipt = await tx.wait();
+        // console.log('receipt : ', receipt);
     }, []);
 
     const disconnect = useCallback(async () => {
@@ -252,7 +268,7 @@ export function ClientContextProvider({ children }) {
 
             if (typeof session !== "undefined") return
             // populates (the last) existing session to state
-            if (_client.session.length) {
+            if (_client.session?.length) {
                 const lastKeyIndex = _client.session.keys.length - 1
                 const _session = _client.session.get(_client.session.keys[lastKeyIndex])
                 console.log("RESTORED SESSION:", _session)
@@ -268,7 +284,7 @@ export function ClientContextProvider({ children }) {
             throw new Error("WalletConnect is not initialized")
         }
         try {
-            const clientId = await _client.core.crypto.getClientId()
+            const clientId = await _client?.core?.crypto?.getClientId()
             console.log("WalletConnect ClientID: ", clientId)
             localStorage.setItem("WALLETCONNECT_CLIENT_ID", clientId)
         } catch (error) {
@@ -284,29 +300,59 @@ export function ClientContextProvider({ children }) {
             setIsInitializing(true);
             const claimedOrigin = localStorage.getItem("wallet_connect_dapp_origin") || origin;
 
-            const provider = await UniversalProvider.init({
-                name: 'WalletConnect provider',
+            // const provider = await EthereumProvider.init({
+            //     name: 'WalletConnect provider',
+            //     projectId: import.meta.env.VITE_PUBLIC_PROJECT_ID,
+            //     logger: "debug",
+            //     metadata: {
+            //         ...(DEFAULT_APP_METADATA),
+            //         name: 'WalletConnect Social Media',
+            //         url: claimedOrigin,
+            //         description: "WalletConnect Social Media",
+            //         icons: ['https://avatars.githubusercontent.com/u/37784886']
+            //     },
+            //     relayUrl: relayerRegion,
+            //     // relayUrl: relayerRegion,
+            //     // rpcProviders: ['eip:155']
+            //     // ogger: "debug",
+            //     // relayUrl: relayerRegion,
+            //     // projectId: import.meta.env.VITE_PUBLIC_PROJECT_ID,
+            //     // metadata: {
+            //     //     ...(DEFAULT_APP_METADATA),
+            //     //     url: claimedOrigin,
+            //     //     verifyUrl: DEFAULT_APP_METADATA.verifyUrl,
+            //     //     description: "WalletConnect Social Media",
+            //     // },
+            // })
+            const provider = await EthereumProvider.init({
                 projectId: import.meta.env.VITE_PUBLIC_PROJECT_ID,
-                logger: "debug",
                 metadata: {
-                    name: 'WalletConnect Social Media',
+                    // ...(DEFAULT_APP_METADATA),
+                    name: 'Social_Media',
                     url: claimedOrigin,
                     description: "WalletConnect Social Media",
                     icons: ['https://avatars.githubusercontent.com/u/37784886']
                 },
-                // relayUrl: relayerRegion,
-                // rpcProviders: ['eip:155']
+                chains: [80002],
+                showQrModal: false,
+                optionalChains: [80002],
+                rpcMap: {
+                    80002: import.meta.env.VITE_RPC_URL
+                }
             })
+
+            provider.connect
 
             console.log("provider : ", provider);
 
             setEthereumProvider(provider);
-            setClient(provider.client);
-            setOrigin(provider.client.metadata.url);
+            setClient(provider);
+            // await createWeb3Provider(provider);
+            // setOrigin(provider.client.metadata.url);
             // prevRelayerValue.current = relayerRegion;
-            await _subscribeToEvents(provider.client);
-            await _checkPersistedState(provider.client);
-            await _logClientId(provider.client);
+            await _subscribeToEvents(provider);
+            await _checkPersistedState(provider);
+            await _logClientId(provider);
         } catch (e) {
             throw e;
         } finally {
@@ -326,26 +372,26 @@ export function ClientContextProvider({ children }) {
 
     useEffect(() => {
 
-        if(!client) {
+        if (!client) {
             createClient();
         } else if (
             prevRelayerValue.current && prevRelayerValue.current !== relayerRegion
         ) {
-            client.core.relayer.restartTransport(relayerRegion);
+            // client.core.relayer.restartTransport(relayerRegion);
             prevRelayerValue.current = relayerRegion;
         }
     }, [client, createClient, relayerRegion]);
 
     useEffect(() => {
-        if(!client) return;
+        if (!client) return;
 
-        client.core.relayer.on(RELAYER_EVENTS.connect, () => {
-            console.log("Wallet connection is restored");
-        });
+        // client.core.relayer.on(RELAYER_EVENTS.connect, () => {
+        //     console.log("Wallet connection is restored");
+        // });
 
-        client.core.relayer.on(RELAYER_EVENTS.disconnect, () => {
-            console.log("Wallet connection is lost");
-        });
+        // client.core.relayer.on(RELAYER_EVENTS.disconnect, () => {
+        //     console.log("Wallet connection is lost");
+        // });
     }, [client]);
 
     const value = useMemo(() => ({
@@ -364,12 +410,12 @@ export function ClientContextProvider({ children }) {
         origin,
         uri
     }),
-    [
-        isInitializing, balances, isFetchingBalances, accounts, chains, relayerRegion, client, session, connect, disconnect, setChains, setRelayerRegion, origin, uri
-    ]);
-    
+        [
+            isInitializing, balances, isFetchingBalances, accounts, chains, relayerRegion, client, session, connect, disconnect, setChains, setRelayerRegion, origin, uri
+        ]);
+
     return (
-        <ClientContext.Provider value={{...value}}>
+        <ClientContext.Provider value={{ ...value }}>
             {children}
         </ClientContext.Provider>
     )
