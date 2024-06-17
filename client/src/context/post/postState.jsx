@@ -95,9 +95,12 @@ const PostState = ({ children }) => {
       try {
         if (contract) {
           for (let e of followEvent) {
-            const follower = e.args[0];
-            const user = e.args[1];
-            const id = e.args[2];
+            const follower = e.returnValues[0];
+            const user = e.returnValues[1];
+            const id = e.returnValues[2];
+            // const follower = e.args[0];
+            // const user = e.args[1];
+            // const id = e.args[2];
             if (user === address) {
               const postData = await contract.methods.getSinglePost(id).call();
               console.log(postData);
@@ -444,6 +447,8 @@ const PostState = ({ children }) => {
             String(ipfsHash),
             parseInt(content.viewPrice)
           ).send({ from: address });
+
+          console.log("add post 1");
           // const receipt = await tx.wait();
           // console.log(receipt.logs);
 
@@ -485,11 +490,12 @@ const PostState = ({ children }) => {
             return error;
           }
 
-          const followEvent = receipt.logs.filter(
-            (log) =>
-              log.hasOwnProperty("args") &&
-              log.fragment.name === "NewPostForFollower"
-          );
+          // const followEvent = receipt.logs.filter(
+          //   (log) =>
+          //     log.hasOwnProperty("args") &&
+          //     log.fragment.name === "NewPostForFollower"
+          // );
+          const followEvent = tx.events.hasOwnProperty('NewPostForFollower') && tx.events.hasOwnProperty('args') ? tx.events.NewPostForFollower : {};
           setFollowEvent(followEvent);
 
           if (encryptedFiles.length === 0) {
@@ -550,6 +556,8 @@ const PostState = ({ children }) => {
             parseInt(content.viewPrice)
           ).send({ from: address });
           // const receipt = await tx.wait();
+
+          console.log("add post 2");
 
           // Storing some info about post to DB
           // const addPostEvent = receipt.logs.find(

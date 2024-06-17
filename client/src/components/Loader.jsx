@@ -5,7 +5,7 @@ export const Loader = (props) => {
 				<div role="status">
 					<svg
 						aria-hidden="true"
-						className={`inline mr-2 text-gray-200 animate-spin fill-${props.color || 'white' }`}
+						className={`inline mr-2 text-gray-200 animate-spin fill-white`}
 						viewBox="0 0 100 101"
 						fill="none"
 						xmlns="http://www.w3.org/2000/svg"

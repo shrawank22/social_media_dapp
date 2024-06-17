@@ -28,6 +28,8 @@ export function EthereumContextProvider({ children }) {
     const reset = () => {
         setBalance({});
         setAddress('');
+        setWeb3();
+        setContract();
     }
 
     const _checkPersistedState = useCallback(async () => {
@@ -74,10 +76,10 @@ export function EthereumContextProvider({ children }) {
         const provider = await EthereumProvider.init({
             projectId: import.meta.env.VITE_PUBLIC_PROJECT_ID,
             metadata: {
-                name: 'My Website',
-                description: 'My website description',
+                name: 'SocialX',
+                description: 'A Social Media Platform on Polygon Network',
                 url: 'http://localhost:5173',
-                icons: ['https://avatars.githubusercontent.com/u/37784886']
+                icons: ['https://i.ibb.co/M8S8RXt/logo-removebg-preview.png']
             },
             showQrModal: false,
             optionalChains: [80002],
@@ -111,6 +113,8 @@ export function EthereumContextProvider({ children }) {
             return;
         provider.on("display_uri", handleUri);
         await provider.enable();
+
+        console.log("uri : ", uri);
 
         let web3 = new Web3(provider);
         setWeb3(web3);
@@ -151,8 +155,9 @@ export function EthereumContextProvider({ children }) {
         createContract,
         disconnectWallet,
         balance,
-        state
-    }), [provider, web3, uri, address, connectWallet, createContract, disconnectWallet, balance, state]);
+        state,
+        reset
+    }), [provider, web3, uri, address, connectWallet, createContract, disconnectWallet, balance, state, reset]);
 
     return (
         <EthereumContext.Provider value={{ state, ...value }}>

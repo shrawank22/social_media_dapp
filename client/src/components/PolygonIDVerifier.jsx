@@ -139,7 +139,7 @@ function PolygonIDVerifier({
                                     colorScheme="purple"
                                     onClick={() => openInNewTab(linkDownloadPolygonIDWalletApp)}
                                 >
-                                Download Polygon ID Wallet App{" "}
+                                Download Wallet App{" "}
                                 <ExternalLinkIcon marginLeft={2} />
                                 </Button>
                             </p>

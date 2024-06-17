@@ -5,20 +5,20 @@ const Notification = require('../models/Notification');
 const middleware = require('../middleware');
 
 // Follow Route
-router.post('/follow/:username', middleware.isLoggedIn, async (req, res) => {
+router.post('/follow/:following/:currentUser', middleware.isLoggedIn, async (req, res) => {
     try {
-		const { username } = req.params;
-        const followerId = req.user.id;
-        const follower = await User.findById(followerId);
-
-		const user = await User.findOneAndUpdate({ username: username }, { $addToSet: { followers: followerId } });
+		const { following, currentUser } = req.params;
+        // const followerId = req.user.id;
+        const _currentUser = await User.findOne({ username: currentUser});
+        const _following = await User.findOneAndUpdate({ username: following }, { $addToSet: { followers: _currentUser._id } });
+		// const user = await User.findOneAndUpdate({ username: username }, { $addToSet: { followers: followerId } });
 
         // Create a notification for the user being followed
 		await Notification.create({
-            recipient: user._id,
-            sender: followerId,
+            recipient: _following._id,
+            sender: _currentUser._id,
             type: 'follow',
-            message: `${follower.username} started following you.`
+            message: `${currentUser} started following you.`
         });
 
         res.status(200).send({ message: 'Followed successfully.' });
@@ -29,17 +29,17 @@ router.post('/follow/:username', middleware.isLoggedIn, async (req, res) => {
 });
 
 // Unfollow Route
-router.post('/unfollow/:username', middleware.isLoggedIn, async (req, res) => {
+router.post('/unfollow/:following/:currentUser', middleware.isLoggedIn, async (req, res) => {
     try {
-        const { username } = req.params;
-        const followerId = req.user.id;
+        const { following, currentUser } = req.params;
 
-        const user = await User.findOneAndUpdate({ username: username }, { $pull: { followers: followerId } });
+        const _currentUser = await User.findOne({ username: currentUser});
+        const _following = await User.findOneAndUpdate({ username: following }, { $pull: { followers: _currentUser._id } });
 
         // Delete the 'follow' notification
         await Notification.findOneAndDelete({
-            recipient: user._id,
-            sender: followerId,
+            recipient: _following._id,
+            sender: _currentUser._id,
             type: 'follow'
         });
 
@@ -57,9 +57,11 @@ router.get('/notifications', middleware.isLoggedIn, async (req, res) => {
         const userAddress = req.query.userAddress; 
 
         console.log("[notifications] userAddress : ", userAddress);
+
+        const user = await User.findOne({ username: userAddress });
         
         // Fetch unread notifications for the current user
-        const notifications = await Notification.find({ recipient: userId, read: false }).sort({ createdAt: -1 });
+        const notifications = await Notification.find({ recipient: user._id, read: false }).sort({ createdAt: -1 });
         
         res.status(200).send(notifications);
     } catch (error) {

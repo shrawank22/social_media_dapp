@@ -16,14 +16,14 @@ const Home = () => {
 
     const deletePostHandler = key => async () => {
         try {
-            const usersWhoPaid = await contract.getPaidUsersByPostId(key);
+            const usersWhoPaid = await contract.methods.getPaidUsersByPostId(key).call();
             if (usersWhoPaid.length > 0) {
                 showAlert("danger", "You cannot delete a post that has been paid for");
                 return null;
             }
 
-            const receipt = await contract.deletePost(key);
-            await receipt.wait();
+            await contract.methods.deletePost(key).send({ from: address });
+            // await receipt.wait();
             setPosts(posts.filter(post => post[0] !== key));
             deletePost(key);
         } catch (error) {
@@ -36,14 +36,22 @@ const Home = () => {
 
     return (
         <>
+            {localStorage.getItem('jwz-token') ? 
             <div className='mt-3'>
                 <PostContainer />
             </div>
+            :
+            <>
+                <div className='flex justify-center items-center'>
+                    <h1 className='text-xl font-bold my-5'>Please login / register using wallet app to view posts</h1>
+                </div>
+            </>
+            }
 
             {loader ? 
             <>
                 <div className='flex justify-center items-center pl-48'>
-                    <Loader size={20} color="gray-600" />
+                    <Loader size={20} color="gray-900" />
                 </div>
             </> : posts.map((post) => (
                 <Post

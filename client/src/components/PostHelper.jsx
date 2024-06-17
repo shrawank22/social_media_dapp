@@ -1,11 +1,11 @@
-import web3Context from '../context/web3/web3Context';
 import postContext from '../context/post/postContext';
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { EthereumContext } from '../context/EthereumContext';
 
 const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) => {
     const context1 = useContext(postContext);
-    const context2 = useContext(web3Context);
+    const context2 = useContext(EthereumContext);
     const { showAlert } = context1;
     const { state } = context2;
     const { contract, address } = state;
@@ -18,9 +18,9 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
             // console.log(token)
             console.log(isFollowing);
             if (!isFollowing) {
-                await contract.followUser(displayName);
+                await contract.methods.followUser(displayName).send({ from: address });
 
-                const response = await axios.post(`http://localhost:8080/api/follow/${displayName}`, {}, {
+                const response = await axios.post(`http://localhost:8080/api/follow/${displayName}/${address}`, {}, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -29,8 +29,8 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
                 console.log(response.data)
         
             } else {
-                await contract.unfollowUser(displayName);
-                const response = await axios.post(`http://localhost:8080/api/unfollow/${displayName}`, {}, {
+                await contract.methods.unfollowUser(displayName).send({ from: address });
+                const response = await axios.post(`http://localhost:8080/api/unfollow/${displayName}/${address}`, {}, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
     useEffect(() => {
         const checkFollowingStatus = async () => {
            
-            const followingStatus = await contract.isFollowing( displayName, address);
+            const followingStatus = await contract.methods.isFollowing( displayName, address).call();
             //console.log(followingStatus); 
             setIsFollowing(followingStatus);
         };

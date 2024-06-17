@@ -18,8 +18,9 @@ function App() {
   const { connectWallet, provider } = useEthereumConnectClient();
 
   useEffect(() => {
-    if(localStorage.getItem('jwz-token') && !provider)
+    if(localStorage.getItem('jwz-token') && provider) {
       connectWallet();
+    }
   }, [provider]);
 
   return (
