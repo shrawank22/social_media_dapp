@@ -7,14 +7,14 @@ const middleware = require('../middleware');
 // Follow Route
 router.post('/follow/:username', middleware.isLoggedIn, async (req, res) => {
     try {
-		const { username } = req.params;
+        const { username } = req.params;
         const followerId = req.user.id;
         const follower = await User.findById(followerId);
 
-		const user = await User.findOneAndUpdate({ username: username }, { $addToSet: { followers: followerId } });
+        const user = await User.findOneAndUpdate({ username: username }, { $addToSet: { followers: followerId } });
 
         // Create a notification for the user being followed
-		await Notification.create({
+        await Notification.create({
             recipient: user._id,
             sender: followerId,
             type: 'follow',
@@ -54,13 +54,14 @@ router.post('/unfollow/:username', middleware.isLoggedIn, async (req, res) => {
 router.get('/notifications', middleware.isLoggedIn, async (req, res) => {
     try {
         console.log("Inside notifications route");
-        const userAddress = req.query.userAddress; 
+        const userAddress = req.query.userAddress;
+        console.log("----User---", req.user)
 
         console.log("[notifications] userAddress : ", userAddress);
-        
+
         // Fetch unread notifications for the current user
-        const notifications = await Notification.find({ recipient: userId, read: false }).sort({ createdAt: -1 });
-        
+        const notifications = await Notification.find({ recipient: userAddress, read: false }).sort({ createdAt: -1 });
+
         res.status(200).send(notifications);
     } catch (error) {
         console.error(error);

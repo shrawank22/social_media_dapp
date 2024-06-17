@@ -1,0 +1,3 @@
+{
+  "535e24f84a9bcfb26f9b668a4fb17a7d": "did:polygonid:polygon:amoy:2qQjMQanmCBBEY8bzoJ3Edj8Di4N2EK7TTKE3BS3tq"
+}
