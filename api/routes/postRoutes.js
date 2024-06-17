@@ -109,9 +109,11 @@ router.get('/topPosts/:username/:limit', async (req, res) => {
 
 router.post('/postsFollowing', async (req, res) => {
     try {
-        //const { followerUsername, id, username, postText, viewPrice, isDeleted, userWhoPaid, hasListed, listPrice, timestampp, NFTID, uniqueID, ipfsHashes, encryptedFiles } = req.body;
-        const { followerUsername, NFTID, username, postText, viewPrice,
-            isDeleted, userWhoPaid, hasListed, listPrice } = req.body;
+      //const { followerUsername, id, username, postText, viewPrice, isDeleted, userWhoPaid, hasListed, listPrice, timestampp, NFTID, uniqueID, ipfsHashes, encryptedFiles } = req.body;
+    const { followerUsername, NFTID, username,  postText,  viewPrice,
+      isDeleted, userWhoPaid, hasListed,listPrice } = req.body;
+
+      console.log("req.body : ", req.body);
 
         // Find the follower user by username
         const followerUser = await User.findOne({ username: followerUsername });

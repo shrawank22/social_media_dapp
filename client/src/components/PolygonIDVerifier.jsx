@@ -18,6 +18,7 @@ function PolygonIDVerifier({
     publicServerURL,
     localServerURL,
     userAddress,
+    uri
 }) {
     const [sessionId, setSessionId] = useState("");
     const [qrCodeData, setQrCodeData] = useState();
@@ -27,8 +28,6 @@ function PolygonIDVerifier({
     const [verificationMessage, setVerificationMessage] = useState("⌛ Waiting for Proof...");
     const [socketEvents, setSocketEvents] = useState([]);
 
-    // serverUrl is localServerURL if not running in prod
-    // Note: the verification callback will always come from the publicServerURL
     const serverUrl = window.location.href.startsWith("https")
         ? publicServerURL
         : localServerURL;
@@ -55,16 +54,24 @@ function PolygonIDVerifier({
 
     useEffect(() => {
         const fetchQrCode = async () => {
+            if(!uri){
+                return;
+            }
             const response = await fetch(getQrCodeApi(sessionId));
-            const data = await response.text();
+            let data = await response.text();
             console.log("data : ", data);
-            return data;
+            let res = {
+                ssi: data,
+                uri: uri,
+            }
+            console.log("new data : ", res);
+            return res;
         };
 
         if (sessionId) {
             fetchQrCode().then(setQrCodeData).catch(console.error);
         }
-    }, [sessionId]);
+    }, [sessionId, uri]);
 
     // socket event side effects
     useEffect(() => {
@@ -119,7 +126,7 @@ function PolygonIDVerifier({
                                 Scan the QR Code using your Mobile Wallet to prove access
                             </h4>
                             <div className="flex justify-center items-center mb-4">
-                                <QRCode invitationUrl={qrCodeData} size={200} />
+                                <QRCode invitationUrl={JSON.stringify(qrCodeData)} size={200} />
                             </div>
                             <p className="text-center text-sm text-gray-500">
                                 {verificationMessage}
@@ -132,7 +139,7 @@ function PolygonIDVerifier({
                                     colorScheme="purple"
                                     onClick={() => openInNewTab(linkDownloadPolygonIDWalletApp)}
                                 >
-                                Download Polygon ID Wallet App{" "}
+                                Download Wallet App{" "}
                                 <ExternalLinkIcon marginLeft={2} />
                                 </Button>
                             </p>

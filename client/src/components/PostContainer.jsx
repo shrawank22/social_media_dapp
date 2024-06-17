@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import "./PostContainer.css";
 import EmojiPicker from 'emoji-picker-react';
 import postContext from '../context/post/postContext';
+import { Loader } from "./Loader";
 
 function PostContainer() {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -45,62 +46,6 @@ function PostContainer() {
     return (
 
         <>
-            {/* <form onSubmit={(e) => addPostHandler(e)}>
-                <div className="row">
-                    <div className="col-12">
-                        <textarea
-                            className="p-2"
-                            value={postText}
-                            onChange={updatePostText}
-                            placeholder="What's happening?"
-                            required
-                        />
-                    </div>
-                </div>
-
-                <div className="d-flex justify-content-between">
-                    <div>
-                        <i className="bi bi-emoji-smile text-primary fs-4" onClick={toggleEmojiPicker} title="emoji" ></i>
-                        {showEmojiPicker && (
-                            <div className="emoji-picker-container">
-                                <EmojiPicker className="emoji-picker" onEmojiClick={(emoji) => addEmojiToPostText(emoji)} height={400} width={250} />
-                            </div>
-                        )}
-                    </div>
-
-                    <div>
-                        <label htmlFor="media" className="form-label"><i className="bi bi-card-image text-primary fs-4" title="media"></i> </label>
-                        <input accept="image/jpeg, image/png, image/webp, image/gif, video/mp4, video/quicktime" type="file" className="d-none" id="media" onChange={handleFileChange} multiple />
-                        <ul>
-                            {fileURLs.map((file, index) => (
-                                <li key={index}>
-                                    <a href={file.url} target="_blank" rel="noopener noreferrer">{file.name}</a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div style={{ flexBasis: "120px" }}>
-                        <input
-                            onChange={updateViewPrice}
-                            type="number"
-                            min={0}
-                            className="form-control"
-                            placeholder="Price"
-                            value={viewPrice}
-                            required
-                        />
-                        <div className="form-text">ViewPrice, Enter 0 if free</div>
-                    </div>
-
-                    <div>
-                        <button disabled={isPosting} className="btn btn-primary rounded-pill" type="submit">Post</button>
-                    </div>
-                </div>
-
-            </form > */}
-
-
             <form onSubmit={(e) => addPostHandler(e)} className="mb-5">
                 <div className="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50">
                     <div className="px-4 py-2 bg-gray-50 rounded-t-lg">
@@ -153,7 +98,8 @@ function PostContainer() {
 
                         </div>
                         <button disabled={isPosting} type="submit" className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800">
-                            Post
+                            {isPosting ? <Loader />
+                             : "Post"}
                         </button>
                     </div>
                 </div>

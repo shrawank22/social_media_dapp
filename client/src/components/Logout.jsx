@@ -1,13 +1,16 @@
 import { useEffect } from "react";
 import { logoutUser } from "../api/authApi";
+import { useEthereumConnectClient } from "../context/EthereumContext";
 
 function Logout() {
+  const { reset } = useEthereumConnectClient();
+
   useEffect(() => {
     async function handleLogout() {
       try {
-        if (!localStorage.getItem('jwz-token'))
-          return;
-        await logoutUser();
+        logoutUser();
+        reset();
+        indexedDB.deleteDatabase("WALLET_CONNECT_V2_INDEXED_DB");
         localStorage.clear();
         window.location.href = "/";
       } catch (error) {

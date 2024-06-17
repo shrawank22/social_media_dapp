@@ -1,10 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { QRCode } from "./QRCode";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import {Loader} from "./Loader";
+import { EthereumContext } from "../context/EthereumContext";
 
 function Connection() {
+    const context1 = useContext(EthereumContext);
+    const { uri, provider, connectWallet } = context1;
+
     const [sessionId, setSessionId] = useState("");
     const [qrCodeData, setQrCodeData] = useState("");
     const [isHandlingConnection, setIsHandlingConnection] = useState(false);
@@ -16,13 +20,19 @@ function Connection() {
     const serverUrl = window.location.href.startsWith("https") ? import.meta.env.VITE_REACT_APP_VERIFICATION_SERVER_PUBLIC_URL : import.meta.env.VITE_REACT_APP_VERIFICATION_SERVER_LOCAL_HOST_URL;
     console.log("serverUrl : ", serverUrl);
     const socket = io(serverUrl);
-    const getQrCodeApi = (sessionId) => serverUrl + `/api/get-connection-qr?sessionId=${sessionId}`;
+    const getQrCodeApi = (sessionId) => serverUrl + `/api/connection?sessionId=${sessionId}`;
 
     useEffect(() => {
         if (localStorage.getItem('userDid')) {
             navigate("/register");
         }
     });
+
+    useEffect(() => {
+        if(provider) {
+            connectWallet();
+        }
+    }, [provider])
 
     useEffect(() => {
         console.log("useEffect 1");
@@ -38,10 +48,20 @@ function Connection() {
     useEffect(() => {
         console.log("useEffect 2");
         const fetchQrCode = async () => {
+            if(!uri){
+                return;
+            }
             const response = await fetch(getQrCodeApi(sessionId));
             const data = await response.text();
             console.log("connection qrcode data : ", data);
-            return JSON.parse(data);
+            let res = {
+                ssi: data,
+                uri: uri
+            }
+
+            console.log("new data : ", res);
+
+            return res;
         };
 
         console.log("sessionId : ", sessionId);
@@ -49,7 +69,7 @@ function Connection() {
         if (sessionId) {
             fetchQrCode().then(setQrCodeData).catch(console.error);
         }
-    }, [sessionId]);
+    }, [sessionId,  uri]);
 
     console.log("qrCodeData : ", qrCodeData);
 

@@ -1,16 +1,15 @@
-import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useWeb3Modal } from '@web3modal/ethers/react'
+import { useContext, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { EthereumContext } from '../context/EthereumContext';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const { web3, reset, connectWallet } = useContext(EthereumContext);
 
     let location = useLocation();
     let navigate = useNavigate();
     const token = localStorage.getItem("jwz-token");
     const isAuthenticated = !!token;
-
-    const { open } = useWeb3Modal();
 
     const handleLogout = () => {
         localStorage.removeItem("userDid");
@@ -21,7 +20,7 @@ const Navbar = () => {
         setIsOpen(!isOpen);
     };
 
-
+    console.log("web3 : ", web3)
 
     return (
         <>
@@ -70,12 +69,21 @@ const Navbar = () => {
                                         (location.pathname !== "/register") && (location.pathname !== "/connection") &&
 
                                         <li>
-                                            <Link to="/register">
+                                            <Link to="/connection">
                                                 <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 md:!my-0 my-2 text-center">Register</button>
                                             </Link>
                                         </li>
                                     }
                                 </>
+                            }
+                            { (localStorage.getItem("userDid") || localStorage.getItem("jwz-token")) &&
+                                <li>
+                                    <button onClick={web3 ? reset : connectWallet} type="button" className={`text-white ${web3 ? 'bg-red-700' : 'bg-green-700'} ${web3 ? 'hover:bg-red-800' : 'hover:bg-green-800'} focus:ring-4 focus:outline-none ${web3 ? 'focus:ring-red-300' : 'focus:ring-green-300'}  font-medium rounded-lg text-sm px-4 py-2 md:!my-0 my-2 text-center`}>
+                                        {
+                                            web3 ? "Disconnect Wallet" : "Connect Wallet"
+                                        }
+                                    </button>
+                                </li>
                             }
                         </ul>
                     </div>

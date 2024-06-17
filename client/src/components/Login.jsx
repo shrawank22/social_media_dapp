@@ -4,16 +4,25 @@ import web3Context from '../context/web3/web3Context';
 import { Center, Container } from "@chakra-ui/react";
 import PolygonIDVerifier from "./PolygonIDVerifier";
 import { useNavigate } from "react-router-dom";
+import { EthereumContext, useEthereumConnectClient } from "../context/EthereumContext";
 
 const Login = () => {
     const context1 = useContext(postContext);
-    const context2 = useContext(web3Context);
+    const context2 = useContext(EthereumContext);
+    const [connectId, setConnectId] = useState("");
     const { showAlert } = context1;
     const { state } = context2;
 
     const [provedAccess, setProvedAccess] = useState(false);
+    const { uri, provider, connectWallet } = useEthereumConnectClient();
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (provider) {
+            connectWallet();
+        }
+    }, [provider]);
 
     useEffect(() => {
         if(provedAccess) {
@@ -21,7 +30,11 @@ const Login = () => {
                 navigate("/");
             }, 1500);
         }   
-    })
+    }, [provedAccess]);
+
+    useEffect(() => {
+        setConnectId(uri);
+    }, [uri]);
 
     return (
         <>
@@ -41,11 +54,11 @@ const Login = () => {
                               }
                               onVerificationResult={setProvedAccess}
                               userAddress={state.address}
+                              uri={connectId}
                         />
                     </Container>
                 </Center>
             }
-
         </>
     )
 }

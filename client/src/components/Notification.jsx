@@ -1,10 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import { getNotifications } from '../api/notificationApi';
-import web3Context from '../context/web3/web3Context';
+import { EthereumContext } from '../context/EthereumContext';
+// import web3Context from '../context/web3/web3Context';
 
 const Notification = () => {
     const [notifications, setNotifications] = useState([]);
-    const context1 = useContext(web3Context);
+    const context1 = useContext(EthereumContext);
     const { state } = context1;
 
     useEffect(() => {

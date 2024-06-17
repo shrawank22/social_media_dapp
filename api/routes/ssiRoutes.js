@@ -40,12 +40,14 @@ router.post('/logout', async (req, res) => {
     // const sessionId = req.query.sessionId;
     // console.log("sessionId : ", sessionId);
 
-    const token = req.headers.authorization.split(' ')[1];
-    console.log('token middleware : ', token);
+    console.log("req.headers: ", req.headers);
 
-    // remove the sessionId from map
-    authRequests.deleteAuthRequests(token);
-    deleteDidMap(token);
+    // const token = req.headers.authorization.split(' ')[1];
+    // console.log('token middleware : ', token);
+
+    // // remove the sessionId from maps
+    // authRequests.deleteAuthRequests(token);
+    // didMap.deleteDidMap(token);
 
     res.status(200).send("Logged out successfully");
 })
@@ -121,7 +123,7 @@ router.post('/register', async (req, res) => {
 });
 
 // GetQR return connection request
-router.get('/get-connection-qr', (req, res) => {
+router.get('/connection', async (req, res) => {
     console.log("getConnectionQr called");
     const sessionId = req.query.sessionId;
 
@@ -146,10 +148,33 @@ router.get('/get-connection-qr', (req, res) => {
     // store this session's auth request
     authRequests.setAuthRequests(sessionId, request);
 
-    io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, request));
+    const cacheManager = await cPromise;
 
-    return res.status(200).set("Content-Type", "application/json").send(request);
+    await cacheManager.set(`connection_${sessionId}`, JSON.stringify(request), {ttl: 120 * 1000});
+
+    const qrUrl = `iden3comm://?request_uri=${HOSTED_SERVER_URL}/api/qr-code-connection?sessionId=${sessionId}`;
+
+    io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, qrUrl));
+
+    return res.status(200).set("Content-Type", "application/json").send(qrUrl);
 });
+
+// GetQR returns connection request
+router.get('/qr-code-connection', async (req, res) => {
+    const sessionId = req.query.sessionId;
+    console.log("sessionId : ", sessionId);
+  
+    const cacheManager = await cPromise;
+
+    const request = await cacheManager.get(`connection_${sessionId}`);
+    console.log("request : ", request);
+
+    if(!request) {
+        return res.status(404).send({error: "Data not found"});
+    }
+
+    return res.status(200).send(JSON.parse(request));
+})
 
 // handleConnectionCallback verifies the proof after get-connection-qr callbacks
 router.post('/connection-callback', async (req, res) => {
@@ -164,7 +189,7 @@ router.post('/connection-callback', async (req, res) => {
     );
 
     const authRequest = authRequests.getAuthRequests(`${sessionId}`);
-
+  
     console.log(`handleConnectionCallback for ${sessionId}`);
 
     const raw = await getRawBody(req);
@@ -251,13 +276,13 @@ router.get('/login', async (req, res) => {
 
     const cacheManager = await cPromise;
 
-    await cacheManager.set(`login_${sessionId}`, JSON.stringify(request), { ttl: 60 * 1000 });
+    await cacheManager.set(`login_${sessionId}`, JSON.stringify(request), {ttl: 120 * 1000});
 
     const qrUrl = `iden3comm://?request_uri=${HOSTED_SERVER_URL}/api/qr-code?sessionId=${sessionId}`;
 
     // addressMap.set(sessionId, userAddress);
     setAddress(sessionId, userAddress);
-
+  
     io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, qrUrl));
 
     return res.status(200).set("Content-Type", "application/json").send(qrUrl);
@@ -286,9 +311,9 @@ router.post('/verification-callback', async (req, res) => {
     // const userAddress = addressMap.get(sessionId);
     const userAddress = getAddress(sessionId);
     console.log("userAddress : ", userAddress);
-
+    
     const authRequest = authRequests.getAuthRequests(sessionId);
-
+  
     console.log(`handleVerification for ${sessionId}`);
     console.log('authRequest : ', authRequest);
 
@@ -352,9 +377,5 @@ router.post('/verification-callback', async (req, res) => {
         return res.status(500).send(error);
     }
 });
-
-
-
-
 
 module.exports = router;

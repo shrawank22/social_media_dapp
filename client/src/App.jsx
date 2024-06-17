@@ -1,27 +1,27 @@
 import './App.css'
-import { useEffect, useContext } from 'react'
+import { useEffect } from 'react'
 
 import Home from './components/Home'
 import Profile from './components/Profile'
 import Login from './components/Login'
 import Register from './components/Register'
 import Notification from './components/Notification'
-import Widgets from './components/Widgets'
 import Navbar from './components/Navbar'
 import Alert from './components/Alert'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import PostState from './context/post/postState'
-import web3Context from './context/web3/web3Context'
 import Connection from './components/Connection'
 import Logout from './components/Logout'
+import { useEthereumConnectClient } from './context/EthereumContext'
 
 function App() {
-  const context = useContext(web3Context);
-  const { connectWallet } = context;
+  const { connectWallet, provider } = useEthereumConnectClient();
 
   useEffect(() => {
-    connectWallet();
-  }, []);
+    if(localStorage.getItem('jwz-token') && provider) {
+      connectWallet();
+    }
+  }, [provider]);
 
   return (
     <PostState>
