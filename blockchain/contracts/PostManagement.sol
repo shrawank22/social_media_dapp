@@ -15,6 +15,7 @@ contract PostManagement is ERC721 {
     mapping(address => bool) public hasAddedGatekeeper;
     mapping(uint256 => mapping(address => bool)) private reportedByUser;
     mapping(address => address[]) arrayList;
+    mapping(string => DataTypes.User[]) private usersByName;
 
     // Events
     event AddPost(address indexed recipient, uint256 indexed postId);
@@ -54,6 +55,7 @@ contract PostManagement is ERC721 {
         address indexed sender,
         uint256 indexed postId
     );
+    event UserRegistered(string name, address userAddress, string imageUrl);
 
     constructor() ERC721("PostNFT", "PNFT") {}
 
@@ -134,6 +136,33 @@ contract PostManagement is ERC721 {
         returns (DataTypes.Post[] memory)
     {
         return _getPostsByCriteria(msg.sender, true);
+    }
+
+    function registerUser(string memory name, string memory imageUrl) public {
+        DataTypes.User[] storage users = usersByName[name];
+        for (uint i = 0; i < users.length; i++) {
+            if (users[i].userAddress == msg.sender) {
+                // If user is already registered, update the imageUrl
+                users[i].imageUrl = imageUrl;
+                emit UserRegistered(name, msg.sender, imageUrl);
+                return;
+            }
+        }
+
+        // If user is not registered, add a new entry
+        DataTypes.User memory newUser = DataTypes.User({
+            userAddress: msg.sender,
+            imageUrl: imageUrl
+        });
+
+        users.push(newUser);
+        emit UserRegistered(name, msg.sender, imageUrl);
+    }
+
+    function getUsersByName(
+        string memory name
+    ) public view returns (DataTypes.User[] memory) {
+        return usersByName[name];
     }
 
     // Add comment to a post

@@ -25,7 +25,7 @@ module.exports = {
     localhost: {
       url: 'http://127.0.0.1:7545',
       accounts: [
-        '0x8ccd98c971e702fa99ea5f4632641319cf08ea123572f5cc21867073677b26e8',
+        '0xc48e4def0f1bce43cf457928321fc9ae4508758cec5c397eca451c5e1df20790',
       ],
     }
   }

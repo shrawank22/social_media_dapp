@@ -24,6 +24,11 @@ library DataTypes {
         uint256 listPrice; //new added
     }
 
+    struct User {
+        address userAddress;
+        string imageUrl;
+    }
+
     struct Comment {
         uint256 id;
         address payable commenter;
