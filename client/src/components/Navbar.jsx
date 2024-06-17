@@ -5,11 +5,19 @@ import { EthereumContext } from '../context/EthereumContext';
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { web3, reset, connectWallet } = useContext(EthereumContext);
+    const [searchText, setSearchText] = useState('');
+    const [showSearchItems, setShowSearchItems] = useState(false);
 
     let location = useLocation();
     let navigate = useNavigate();
     const token = localStorage.getItem("jwz-token");
     const isAuthenticated = !!token;
+    const usersData = [
+        { id: 1, name: 'John Doe', imageUrl: 'https://via.placeholder.com/50', isFollowing: false },
+        { id: 2, name: 'Jane Smith', imageUrl: 'https://via.placeholder.com/50', isFollowing: true },
+        { id: 3, name: 'Alice Johnson', imageUrl: 'https://via.placeholder.com/50', isFollowing: false },
+        { id: 4, name: 'Bob Brown', imageUrl: 'https://via.placeholder.com/50', isFollowing: true },
+    ];
 
     const handleLogout = () => {
         localStorage.removeItem("userDid");
@@ -20,7 +28,10 @@ const Navbar = () => {
         setIsOpen(!isOpen);
     };
 
-    console.log("web3 : ", web3)
+    const handleSearch = () => {
+        console.log("Search Query : ", searchText);
+        setShowSearchItems(true);
+    }
 
     return (
         <>
@@ -35,6 +46,50 @@ const Navbar = () => {
                             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h15M1 7h15M1 13h15" />
                         </svg>
                     </button>
+                    {
+                        <div className="max-w-md mx-auto mt-4">
+                            <div className="mb-4 flex">
+                                <input
+                                    type="text"
+                                    className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
+                                    placeholder="Search Users..."
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                />
+                                <button
+                                    className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-500"
+                                    onClick={handleSearch}
+                                >
+                                    Search
+                                </button>
+                                <ul className="absolute top-[4.5rem] w-80 bg-white shadow-md rounded-md z-10">
+                                    {showSearchItems && usersData.map((user) => (
+                                        <li
+                                            key={user.id}
+                                            className="flex items-center px-4 py-2 border-b last:border-none hover:bg-gray-100"
+                                        >
+                                            <img
+                                                src={user.imageUrl}
+                                                alt={user.name}
+                                                className="w-10 h-10 rounded-full mr-4"
+                                            />
+                                            <span className="flex-grow">{user.name}</span>
+                                            <button
+                                                className={`ml-4 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring ${user.isFollowing ? 'bg-red-700 text-white hover:bg-red-800' : 'bg-green-700 text-white hover:bg-green-800'
+                                                    }`}
+                                                onClick={() => setShowSearchItems(false)}
+                                            >
+                                                {user.isFollowing ? 'Unfollow' : 'Follow'}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+
+                        </div>
+
+                    }
                     <div className={`w-full md:block md:w-auto ${isOpen ? '' : 'hidden'}`} id="navbar-default">
                         <ul className="font-medium flex flex-col my-3 md:p-0 bg-dark md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white-700">
                             <li>
@@ -76,7 +131,7 @@ const Navbar = () => {
                                     }
                                 </>
                             }
-                            { (localStorage.getItem("userDid") || localStorage.getItem("jwz-token")) &&
+                            {(localStorage.getItem("userDid") || localStorage.getItem("jwz-token")) &&
                                 <li>
                                     <button onClick={web3 ? reset : connectWallet} type="button" className={`text-white ${web3 ? 'bg-red-700' : 'bg-green-700'} ${web3 ? 'hover:bg-red-800' : 'hover:bg-green-800'} focus:ring-4 focus:outline-none ${web3 ? 'focus:ring-red-300' : 'focus:ring-green-300'}  font-medium rounded-lg text-sm px-4 py-2 md:!my-0 my-2 text-center`}>
                                         {

@@ -94,6 +94,7 @@ const PostState = ({ children }) => {
     const fetchPosts = async () => {
       try {
         if (contract) {
+          console.log("followEvent: ", followEvent);
           for (let e of followEvent) {
             const follower = e.returnValues[0];
             const user = e.returnValues[1];
@@ -458,6 +459,7 @@ const PostState = ({ children }) => {
           // );
           //const postId = addPostEvent.args[1].toString();
           const addPostEvent = tx.events.hasOwnProperty('AddPost') ? tx.events.AddPost : {};
+          console.log("addPostEvent: ", addPostEvent);
 
           const username = addPostEvent.returnValues[0].toString();
           const postId = addPostEvent.returnValues[1].toString();
@@ -495,7 +497,9 @@ const PostState = ({ children }) => {
           //     log.hasOwnProperty("args") &&
           //     log.fragment.name === "NewPostForFollower"
           // );
-          const followEvent = tx.events.hasOwnProperty('NewPostForFollower') && tx.events.hasOwnProperty('args') ? tx.events.NewPostForFollower : {};
+          console.log("tx.events: ", tx.events);
+          const followEvent = tx.events.hasOwnProperty('NewPostForFollower') ? tx.events.NewPostForFollower : {};
+          console.log("followEvent: ", followEvent);
           setFollowEvent(followEvent);
 
           if (encryptedFiles.length === 0) {
@@ -565,6 +569,7 @@ const PostState = ({ children }) => {
           // );
           //const postId = addPostEvent.args[1].toString();
           const addPostEvent = tx.events.hasOwnProperty('AddPost') ? tx.events.AddPost : {};
+          console.log("addPostEvent: ", addPostEvent);
 
           const username = addPostEvent.returnValues[0].toString();
           const postId = addPostEvent.returnValues[1].toString();
@@ -602,7 +607,9 @@ const PostState = ({ children }) => {
           //     log.hasOwnProperty("args") &&
           //     log.fragment.name === "NewPostForFollower"
           // );
+          console.log("tx.events : ", tx.events);
           const followEvent = tx.events.hasOwnProperty('NewPostForFollower') && tx.events.hasOwnProperty('args') ? tx.events.NewPostForFollower : {};
+          console.log("followEvent: ", followEvent);
           setFollowEvent(followEvent);
 
           if (ipfsHashes.length === 0) {

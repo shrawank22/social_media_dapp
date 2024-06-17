@@ -30,6 +30,11 @@ export function EthereumContextProvider({ children }) {
         setAddress('');
         setWeb3();
         setContract();
+        setState({
+            provider: null,
+            contract: null,
+            address: null
+        })
     }
 
     const _checkPersistedState = useCallback(async () => {
@@ -73,7 +78,9 @@ export function EthereumContextProvider({ children }) {
     }, [provider]);
 
     const createEthereumProvider = useCallback(async () => {
-        const provider = await EthereumProvider.init({
+        if(provider)
+            return;
+        let ethProvider = await EthereumProvider.init({
             projectId: import.meta.env.VITE_PUBLIC_PROJECT_ID,
             metadata: {
                 name: 'SocialX',
@@ -88,10 +95,10 @@ export function EthereumContextProvider({ children }) {
             },
             disableProviderPing: false
         });
-        console.log("provider : ", provider);
-        window.provider = provider;
-        provider.modal
-        setProvider(provider);
+        console.log("provider : ", ethProvider);
+        window.provider = ethProvider;
+        ethProvider.modal
+        setProvider(ethProvider);
     }, [_subscribeToEvents]);
 
     const getBalance = async () => {
@@ -110,7 +117,7 @@ export function EthereumContextProvider({ children }) {
 
     const connectWallet = useCallback(async () => {
         if(!provider)
-            return;
+            await createEthereumProvider();
         provider.on("display_uri", handleUri);
         await provider.enable();
 
@@ -137,7 +144,7 @@ export function EthereumContextProvider({ children }) {
 
     useEffect(() => {
         createEthereumProvider();
-    }, []);
+    }, [provider]);
 
     useEffect(() => {
         if(web3) {
@@ -156,8 +163,9 @@ export function EthereumContextProvider({ children }) {
         disconnectWallet,
         balance,
         state,
-        reset
-    }), [provider, web3, uri, address, connectWallet, createContract, disconnectWallet, balance, state, reset]);
+        reset,
+        setProvider
+    }), [provider, web3, uri, address, connectWallet, createContract, disconnectWallet, balance, state, reset, setProvider]);
 
     return (
         <EthereumContext.Provider value={{ state, ...value }}>
