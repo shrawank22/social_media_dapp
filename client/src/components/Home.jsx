@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import PostContainer from './PostContainer';
 import Post from './Post';
@@ -10,7 +10,7 @@ import { EthereumContext } from '../context/EthereumContext';
 const Home = () => {
     const context1 = useContext(postContext);
     const context2 = useContext(EthereumContext);
-    const { showAlert, deletePost, posts, setPosts, loader, setLoader } = context1;
+    const { showAlert, deletePost, posts, setPosts, loader, setLoader, fetchPosts, posted, followEvent } = context1;
     const { state } = context2;
     const { contract, address } = state;
 
@@ -32,6 +32,13 @@ const Home = () => {
             return null;
         }
     }
+
+    useEffect(() => {
+        if (contract) {
+            fetchPosts();
+            // contract.removeAllListeners("NewPostForFollower");
+        }
+      }, [state, posted, contract, address, followEvent]);
 
 
     return (

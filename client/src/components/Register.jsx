@@ -10,9 +10,10 @@ import { EthereumContext } from "../context/EthereumContext";
 
 const Register = () => {
     const context1 = useContext(postContext);
-    const context2 = useContext(EthereumContext);
+    const { state } = useContext(EthereumContext);
     const { showAlert } = context1;
-    const { state } = context2;
+
+    const { address, contract } = state;
 
     const [name, setName] = useState("");
     const [aadhaarNo, setAadhaarNo] = useState("");
@@ -32,6 +33,8 @@ const Register = () => {
         }
     });
 
+    console.log("contract : ", contract);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoader(true);
@@ -50,13 +53,25 @@ const Register = () => {
         try {
             const res = await issueCredential({
                 userDetails: data,
-                userAddress: state.address,
+                userAddress: address,
             });
 
             if (res.data) {
                 setLoader(false);
                 setSuccess("Scan using Polygon Wallet to get Credentials!!!");
                 console.log("res.data : ", res.data);
+
+                try {
+                    console.log("contract : ", contract);
+
+                    const tx = await contract.methods.registerUser(name, 'https://via.placeholder.com/50').send({
+                        from: address
+                    });
+                    console.log("tx : ", tx);
+                } catch (e) {
+                    console.log("Error adding user to blockchain : ", e);
+                }
+
                 setQrcode(JSON.stringify(res.data));
                 console.log(qrcode);
             }

@@ -90,7 +90,7 @@ const PostState = ({ children }) => {
   </postContext.Provider>;
 
   //------------------------------ useEffect hooks ------------------------------
-  useEffect(() => {
+  // useEffect(() => {
     const fetchPosts = async () => {
       try {
         if (contract) {
@@ -237,13 +237,13 @@ const PostState = ({ children }) => {
       }
     };
 
-    fetchPosts();
-    return () => {
-      if (contract) {
-        contract.removeAllListeners("NewPostForFollower");
-      }
-    };
-  }, [state, posted, contract, address, followEvent]);
+  //   fetchPosts();
+  //   return () => {
+  //     if (contract) {
+  //       contract.removeAllListeners("NewPostForFollower");
+  //     }
+  //   };
+  // }, [state, posted, contract, address, followEvent]);
 
   //--------------------------------- API Calls ---------------------------------
   const getPost = async (id) => {
@@ -725,7 +725,8 @@ const PostState = ({ children }) => {
         setFollowEvent,
         followEvent,
         setLoader,
-        loader
+        loader,
+        fetchPosts
       }}
     >
       {children}

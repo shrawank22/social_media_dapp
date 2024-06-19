@@ -144,7 +144,8 @@ export function EthereumContextProvider({ children }) {
 
     useEffect(() => {
         createEthereumProvider();
-    }, [provider]);
+        window.callReset = reset;
+    }, [provider, contract]);
 
     useEffect(() => {
         if(web3) {

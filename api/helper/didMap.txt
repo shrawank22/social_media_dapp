@@ -2,5 +2,7 @@
   "9e4006b3f4c353ba64b088664f3c246c": "did:polygonid:polygon:amoy:2qY43pvtQXBSwedhM4YD2CMGB2i6v8GVPb6VrCoRWU",
   "69bce7355883dbeae146aa3ed4b5444b": "did:polygonid:polygon:amoy:2qY43pvtQXBSwedhM4YD2CMGB2i6v8GVPb6VrCoRWU",
   "3250f0ce22963f390e384f9ac88ced37": "did:polygonid:polygon:amoy:2qY43pvtQXBSwedhM4YD2CMGB2i6v8GVPb6VrCoRWU",
-  "d53494a2fbb9d862bed981019b9dc1c8": "did:polygonid:polygon:amoy:2qXQt8uHuwxkMwHStownNvHVLsY868pjMn8BrQLGgK"
+  "d53494a2fbb9d862bed981019b9dc1c8": "did:polygonid:polygon:amoy:2qXQt8uHuwxkMwHStownNvHVLsY868pjMn8BrQLGgK",
+  "3217dca6e98579431256f4138cd2bb75": "did:polygonid:polygon:amoy:2qXbSup534aRFq5bkEgMAWGvTtgZY6nqHfd98jNhUA",
+  "0f3f24810ba2daf1a095f985dcab5a17": "did:polygonid:polygon:amoy:2qXbSup534aRFq5bkEgMAWGvTtgZY6nqHfd98jNhUA"
 }

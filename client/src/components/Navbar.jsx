@@ -4,9 +4,12 @@ import { EthereumContext } from '../context/EthereumContext';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const { web3, reset, connectWallet } = useContext(EthereumContext);
+    const { web3, reset, connectWallet, state } = useContext(EthereumContext);
     const [searchText, setSearchText] = useState('');
     const [showSearchItems, setShowSearchItems] = useState(false);
+    const [searchResult, setSearchResult] = useState([]);
+
+    const { contract, address } = state;
 
     let location = useLocation();
     let navigate = useNavigate();
@@ -28,9 +31,63 @@ const Navbar = () => {
         setIsOpen(!isOpen);
     };
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         console.log("Search Query : ", searchText);
-        setShowSearchItems(true);
+        
+            try {
+                console.log("contract : ", contract);
+                console.log("address: ", address);
+                const tx = await contract.methods.getUsersByName(searchText).call();
+                console.log("tx: ", tx);
+
+                const promises = tx.map(async item => {
+                    const followTx = await contract.methods.isFollowing(item[0], address).call();
+                    console.log("followTx : ", followTx);
+
+                    return {
+                        address : item[0],
+                        imageUrl : item[1],
+                        name: searchText,
+                        isFollowing: followTx || false
+                    };
+                });
+
+                console.log("promises : ", promises);
+                const newSearchResult = await Promise.all(promises);
+                console.log("newSearchResult : ", newSearchResult);
+                setSearchResult(newSearchResult);
+                setShowSearchItems(true);
+            } catch (e) {
+                console.log("Error searching user : ", e);
+            }
+
+        return;
+    }
+
+    const followUser = async (addr) => {
+        console.log("addr : ", addr);
+        console.log("address : ", address);
+        try {
+            const tx = await contract.methods.followUser(addr).send({
+                from: address
+            });
+            console.log("tx : ", tx);
+        } catch(e) {
+            console.log("followUser error : ", e)
+        }
+    }
+
+    const unFollowUser = async (addr) => {
+        console.log("addr : ", addr);
+        console.log("address : ", address);
+        try {
+            const tx = await contract.methods.unfollowUser(addr).send({
+                from: address
+            });
+            console.log("tx : ", tx);
+        } catch(e) {
+            console.log("unFollowUser error : ", e)
+        }
     }
 
     return (
@@ -63,9 +120,9 @@ const Navbar = () => {
                                     Search
                                 </button>
                                 <ul className="absolute top-[4.5rem] w-80 bg-white shadow-md rounded-md z-10">
-                                    {showSearchItems && usersData.map((user) => (
+                                    {showSearchItems && searchResult.map((user) => (
                                         <li
-                                            key={user.id}
+                                            key={user.address}
                                             className="flex items-center px-4 py-2 border-b last:border-none hover:bg-gray-100"
                                         >
                                             <img
@@ -77,7 +134,9 @@ const Navbar = () => {
                                             <button
                                                 className={`ml-4 px-3 py-1 rounded-md shadow-sm focus:outline-none focus:ring ${user.isFollowing ? 'bg-red-700 text-white hover:bg-red-800' : 'bg-green-700 text-white hover:bg-green-800'
                                                     }`}
-                                                onClick={() => setShowSearchItems(false)}
+                                                onClick={() => {
+                                                    user.isFollowing ? unFollowUser(user.address) : followUser(user.address);
+                                                }}
                                             >
                                                 {user.isFollowing ? 'Unfollow' : 'Follow'}
                                             </button>
