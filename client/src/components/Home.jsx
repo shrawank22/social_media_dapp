@@ -10,7 +10,7 @@ import { EthereumContext } from '../context/EthereumContext';
 const Home = () => {
     const context1 = useContext(postContext);
     const context2 = useContext(EthereumContext);
-    const { showAlert, deletePost, posts, setPosts, loader, setLoader, fetchPosts, posted, followEvent } = context1;
+    const { showAlert, deletePost, posts, setPosts, loader, setLoader, posted, followEvent } = context1;
     const { state } = context2;
     const { contract, address } = state;
 
@@ -33,12 +33,12 @@ const Home = () => {
         }
     }
 
-    useEffect(() => {
-        if (contract) {
-            fetchPosts();
-            // contract.removeAllListeners("NewPostForFollower");
-        }
-      }, [state, posted, contract, address, followEvent]);
+    // useEffect(() => {
+    //     if (contract) {
+    //         fetchPosts();
+    //         // contract.removeAllListeners("NewPostForFollower");
+    //     }
+    //   }, [state, posted, contract, address, followEvent]);
 
 
     return (

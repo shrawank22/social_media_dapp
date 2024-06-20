@@ -54,9 +54,9 @@ function PolygonIDVerifier({
 
     useEffect(() => {
         const fetchQrCode = async () => {
-            if(!uri){
-                return;
-            }
+            // if(!uri){
+            //     return;
+            // }
             const response = await fetch(getQrCodeApi(sessionId));
             let data = await response.text();
             console.log("data : ", data);

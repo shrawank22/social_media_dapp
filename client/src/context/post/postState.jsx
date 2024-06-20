@@ -48,7 +48,8 @@ const PostState = ({ children }) => {
   
       const plagiarism = response.data.plagiarism;
       if (plagiarism) {
-        showAlert("Plag Found!!", "Please edit the post content and make a new post");
+        showAlert("danger", "Plag Found!! Please edit the post content and make a new post");
+        setLoader(false);
         console.log("Plagiarism detected! Please create a new post.");
         return null;
       } else {
@@ -73,7 +74,7 @@ const PostState = ({ children }) => {
       console.log(response);
       const plagiarism = response.data.plagiarism;
       if (plagiarism) {
-        showAlert("Plag Found!!", "Please edit the post content and make a new post");
+        showAlert("danger", "Plag Found!! Please edit the post content and make a new post");
         console.log("Plagiarism detected! Please create a new post.");
         return null;
       } else {
@@ -90,7 +91,7 @@ const PostState = ({ children }) => {
   </postContext.Provider>;
 
   //------------------------------ useEffect hooks ------------------------------
-  // useEffect(() => {
+  useEffect(() => {
     const fetchPosts = async () => {
       try {
         if (contract) {
@@ -237,13 +238,13 @@ const PostState = ({ children }) => {
       }
     };
 
-  //   fetchPosts();
-  //   return () => {
-  //     if (contract) {
-  //       contract.removeAllListeners("NewPostForFollower");
-  //     }
-  //   };
-  // }, [state, posted, contract, address, followEvent]);
+    fetchPosts();
+    return () => {
+      if (contract) {
+        contract.removeAllListeners("NewPostForFollower");
+      }
+    };
+  }, [state, posted, contract, address, followEvent]);
 
   //--------------------------------- API Calls ---------------------------------
   const getPost = async (id) => {
@@ -298,8 +299,8 @@ const PostState = ({ children }) => {
     });
     setTimeout(() => {
       setAlert(null);
-      window.location.reload();
-    }, 3000);
+      // window.location.reload();
+    }, 5000);
   };
 
   const handleFileEncrypt = (key) => {
@@ -447,7 +448,7 @@ const PostState = ({ children }) => {
           const tx = await contract.methods.addPost(
             String(ipfsHash),
             parseInt(content.viewPrice)
-          ).send({ from: address });
+          ).send({ from: address, gasPrice: '30000000000' });
 
           console.log("add post 1");
           // const receipt = await tx.wait();
@@ -558,7 +559,7 @@ const PostState = ({ children }) => {
           const tx = await contract.methods.addPost(
             String(ipfsHash),
             parseInt(content.viewPrice)
-          ).send({ from: address });
+          ).send({ from: address, gasPrice: '30000000000' });
           // const receipt = await tx.wait();
 
           console.log("add post 2");
@@ -726,7 +727,6 @@ const PostState = ({ children }) => {
         followEvent,
         setLoader,
         loader,
-        fetchPosts
       }}
     >
       {children}

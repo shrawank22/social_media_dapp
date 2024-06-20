@@ -244,7 +244,7 @@ const Post = ({
 
   const handleViewClick = async () => {
     if (!isCreator) {
-      const tx = await contract.methods.viewPaidPost(postId, { value: price }).send({ from: address });
+      const tx = await contract.methods.viewPaidPost(postId, { value: price }).send({ from: address, gasPrice: '30000000000' });
       // const receipt = await tx.wait(); // Wait for the transaction to be mined
       if (tx.status === 1) {
         console.log("Transaction successful");
