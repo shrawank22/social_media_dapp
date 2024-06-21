@@ -448,7 +448,7 @@ const PostState = ({ children }) => {
           const tx = await contract.methods.addPost(
             String(ipfsHash),
             parseInt(content.viewPrice)
-          ).send({ from: address, gasPrice: '30000000000' });
+          ).send({ from: address });
 
           console.log("add post 1");
           // const receipt = await tx.wait();
@@ -559,7 +559,7 @@ const PostState = ({ children }) => {
           const tx = await contract.methods.addPost(
             String(ipfsHash),
             parseInt(content.viewPrice)
-          ).send({ from: address, gasPrice: '30000000000' });
+          ).send({ from: address });
           // const receipt = await tx.wait();
 
           console.log("add post 2");

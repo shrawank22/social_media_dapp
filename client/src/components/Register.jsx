@@ -65,7 +65,7 @@ const Register = () => {
                     console.log("contract : ", contract);
 
                     const tx = await contract.methods.registerUser(name, 'https://via.placeholder.com/50').send({
-                        from: address
+                        from: address,
                     });
                     console.log("tx : ", tx);
                 } catch (e) {
