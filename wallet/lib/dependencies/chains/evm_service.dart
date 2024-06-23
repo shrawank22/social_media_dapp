@@ -403,8 +403,9 @@ class EVMService {
 
   Future<dynamic> _approveTransaction(Map<String, dynamic> tJson) async {
     Transaction transaction = tJson.toTransaction();
-
+    printDebug("ethClient : ", ethClient);
     final gasPrice = await ethClient.getGasPrice();
+    printDebug("gasPrice : ", gasPrice);
     try {
       final gasLimit = await ethClient.estimateGas(
         sender: transaction.from,

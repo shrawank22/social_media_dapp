@@ -298,7 +298,7 @@ const PostState = ({ children }) => {
     });
     setTimeout(() => {
       setAlert(null);
-      window.location.reload();
+      // window.location.reload();
     }, 3000);
   };
 
@@ -447,7 +447,7 @@ const PostState = ({ children }) => {
           const tx = await contract.methods.addPost(
             String(ipfsHash),
             parseInt(content.viewPrice)
-          ).send({ from: address });
+          ).send({ from: address, gasPrice: '30000000000' });
 
           console.log("add post 1");
           // const receipt = await tx.wait();
@@ -558,7 +558,7 @@ const PostState = ({ children }) => {
           const tx = await contract.methods.addPost(
             String(ipfsHash),
             parseInt(content.viewPrice)
-          ).send({ from: address });
+          ).send({ from: address, gasPrice: '30000000000' });
           // const receipt = await tx.wait();
 
           console.log("add post 2");

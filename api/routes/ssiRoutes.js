@@ -59,7 +59,7 @@ router.post('/register', async (req, res) => {
     console.log(username);
 
     let credDetails = {
-        credentialSchema: 'https://gist.githubusercontent.com/raj-71/1662fdca98c9dad3a034e404ae9a9701/raw/a5b7146a786e28e9b15e162e08dbdd7a4769718f/schema.json',
+        credentialSchema: 'https://gist.githubusercontent.com/raj-71/1bb1de438d30cb5d94d330737b3b6957/raw/bfe66511446f3654992cf92db469f74063f655f6/schema_v4.json',
         type: 'profile',
         credentialSubject: userDetails,
         signatureProof: true,
@@ -91,20 +91,20 @@ router.post('/register', async (req, res) => {
         qrCodeLinkRes.data.body.url = `${API_URL}/v1/agent`;
 
         // store the user address to db 
-        try {
-            const existingUser = await User.findOne({ username });
-            if (existingUser) {
-                return res.status(400).send('A user with this username already exists.');
-            }
+        // try {
+        //     const existingUser = await User.findOne({ username });
+        //     if (existingUser) {
+        //         return res.status(400).send('A user with this username already exists.');
+        //     }
 
-            const user = new User({ username });
-            await user.save();
+        //     const user = new User({ username });
+        //     await user.save();
 
-            // res.status(200).send({qrCodeLink: qrCodeLinkRes.data, user});  
-        } catch (err) {
-            console.log("Error in saving user : ", err);
-            return res.status(500).send(err.message);
-        }
+        //     // res.status(200).send({qrCodeLink: qrCodeLinkRes.data, user});  
+        // } catch (err) {
+        //     console.log("Error in saving user : ", err);
+        //     return res.status(500).send(err.message);
+        // }
 
         res.status(200).send(qrCodeLinkRes.data);
     } catch (err) {
@@ -267,7 +267,8 @@ router.get('/login', async (req, res) => {
 
     console.log("proofRequest : ", proofRequest);
 
-    request.body.scope = proofRequest;
+    const scope = request.body.scope ?? [];
+    request.body.scope = [...scope, proofRequest];
 
     // store this session's auth request
     authRequests.setAuthRequests(sessionId, request);

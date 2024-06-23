@@ -42,11 +42,13 @@ const Register = () => {
         setSuccess("");
 
         const data = {
-            name,
-            gender,
-            aadhaarNo,
-            dob: new Date(dob).toLocaleDateString("en-GB").replace(/\//g, '-'),
-            city,
+            data : JSON.stringify({
+                name,
+                gender,
+                aadhaarNo,
+                dob: new Date(dob).toLocaleDateString("en-GB").replace(/\//g, '-'),
+                city,
+            }),
             id: localStorage.getItem("userDid"),
         };
 
