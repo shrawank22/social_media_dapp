@@ -91,20 +91,20 @@ router.post('/register', async (req, res) => {
         qrCodeLinkRes.data.body.url = `${API_URL}/v1/agent`;
 
         // store the user address to db 
-        // try {
-        //     const existingUser = await User.findOne({ username });
-        //     if (existingUser) {
-        //         return res.status(400).send('A user with this username already exists.');
-        //     }
+        try {
+            const existingUser = await User.findOne({ username });
+            if (existingUser) {
+                return res.status(400).send('A user with this username already exists.');
+            }
 
-        //     const user = new User({ username });
-        //     await user.save();
+            const user = new User({ username });
+            await user.save();
 
-        //     // res.status(200).send({qrCodeLink: qrCodeLinkRes.data, user});  
-        // } catch (err) {
-        //     console.log("Error in saving user : ", err);
-        //     return res.status(500).send(err.message);
-        // }
+            // res.status(200).send({qrCodeLink: qrCodeLinkRes.data, user});  
+        } catch (err) {
+            console.log("Error in saving user : ", err);
+            return res.status(500).send(err.message);
+        }
 
         res.status(200).send(qrCodeLinkRes.data);
     } catch (err) {
