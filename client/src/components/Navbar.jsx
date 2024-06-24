@@ -69,8 +69,7 @@ const Navbar = () => {
         console.log("address : ", address);
         try {
             const tx = await contract.methods.followUser(addr).send({
-                from: address,
-                gasPrice: '30000000000'
+                from: address
             });
             console.log("tx : ", tx);
         } catch(e) {
@@ -83,8 +82,7 @@ const Navbar = () => {
         console.log("address : ", address);
         try {
             const tx = await contract.methods.unfollowUser(addr).send({
-                from: address,
-                gasPrice: '30000000000'
+                from: address
             });
             console.log("tx : ", tx);
         } catch(e) {
