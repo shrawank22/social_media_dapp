@@ -22,7 +22,7 @@ const Home = () => {
                 return null;
             }
 
-            await contract.methods.deletePost(key).send({ from: address });
+            await contract.methods.deletePost(key).send({ from: address, gasPrice: '30000000000' });
             // await receipt.wait();
             setPosts(posts.filter(post => post[0] !== key));
             deletePost(key);

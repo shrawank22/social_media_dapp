@@ -43,7 +43,7 @@ const Post = ({
   const handleListClick = async (price) => {
     console.log("Listing post with price:", price);
     try {
-      const tx = await contract.methods.listPost(postId, price).send({ from: address });
+      const tx = await contract.methods.listPost(postId, price).send({ from: address, gasPrice: '30000000000' });
       // const receipt = await tx.wait(); // Wait for the transaction to be mined
       if (tx.status === 1) {
         console.log("Transaction successful");
@@ -103,7 +103,7 @@ const Post = ({
         console.log("prevowner,", prevOwner, postId);
         const listofFollowers = await contract.methods.getFollowers(prevOwner).call(); 
         console.log("List of followrs",listofFollowers); 
-        const tx = await contract.methods.buyPost(postId, { value: listPrice }).send({ from: address });
+        const tx = await contract.methods.buyPost(postId, { value: listPrice }).send({ from: address, gasPrice: '30000000000' });
         //console.log("tx....", tx); 
         // const receipt = await tx.wait(); // Wait for the transaction to be mined
         if (tx.status === 1) {
@@ -170,7 +170,7 @@ const Post = ({
     console.log("Cancelling post listing");
     try {
       // Assuming your contract has a cancelListing method
-      const tx = await contract.methods.cancelListing(postId).send({ from: address });
+      const tx = await contract.methods.cancelListing(postId).send({ from: address, gasPrice: '30000000000' });
       // const receipt = await tx.wait();
       if (tx.status === 1) {
 
@@ -244,7 +244,7 @@ const Post = ({
 
   const handleViewClick = async () => {
     if (!isCreator) {
-      const tx = await contract.methods.viewPaidPost(postId, { value: price }).send({ from: address });
+      const tx = await contract.methods.viewPaidPost(postId, { value: price }).send({ from: address, gasPrice: '30000000000' });
       // const receipt = await tx.wait(); // Wait for the transaction to be mined
       if (tx.status === 1) {
         console.log("Transaction successful");
@@ -261,7 +261,7 @@ const Post = ({
       return;
     }
     try {
-      const tx = await contract.methods.addComment(postId, comment).send({ from: address });
+      const tx = await contract.methods.addComment(postId, comment).send({ from: address, gasPrice: '30000000000' });
       // const receipt = await tx.wait();
       if (tx.status === 1) {
         console.log("Comment posted successfully");
@@ -277,7 +277,7 @@ const Post = ({
   const handleLikeClick = async (postId) => {
     if (isLiked) {
       try {
-        const tx = await contract.methods.unlikePost(postId).send({ from: address });
+        const tx = await contract.methods.unlikePost(postId).send({ from: address, gasPrice: '30000000000' });
         // const receipt = await tx.wait();
         if (tx.status === 1) {
           console.log("Post Unliked successfully");
@@ -291,7 +291,7 @@ const Post = ({
       }
     } else {
       try {
-        const tx = await contract.methods.likePost(postId).send({ from: address });
+        const tx = await contract.methods.likePost(postId).send({ from: address, gasPrice: '30000000000' });
         // const receipt = await tx.wait();
         if (tx.status === 1) {
           localStorage.setItem(`liked-${address}-${postId}`, "true");
@@ -355,7 +355,7 @@ const Post = ({
           postId,
           String(ipfsHash),
           parseInt(content.viewPrice)
-        ).send({ from: address });
+        ).send({ from: address, gasPrice: '30000000000' });
         // receipt = await tx.wait();
       } else {
         content.ipfsHashes = ipfsHashes;
