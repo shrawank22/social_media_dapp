@@ -22,6 +22,14 @@ module.exports = {
         PRIVATE_KEY,
       ],
     },
+    sepolia:{
+      url: "https://polygon-amoy.g.alchemy.com/v2/9VhAqL4GhWY3zQDHCx2c36XVrBa7WLVD",
+      accounts:[PRIVATE_KEY],
+    },
+    quorum: {
+      url: 'http://172.29.25.252:22000',
+      accounts: [PRIVATE_KEY]
+    },
     localhost: {
       url: 'http://127.0.0.1:7545',
       accounts: [

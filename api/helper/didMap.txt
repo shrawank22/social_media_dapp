@@ -1,4 +1,13 @@
 {
   "324c3b9bd0a446b602ca60beeb52d887": "did:polygonid:polygon:amoy:2qWwAAfYp6aYm26QYxvhw81yR68u1kogEn6ngsR43n",
-  "d1af2dc3455a7255f8f91d7b979306b7": "did:polygonid:polygon:amoy:2qS8VAzgPNdFqj6PRfvno7SLoG2qycGrfkMWSAuDNC"
+  "d1af2dc3455a7255f8f91d7b979306b7": "did:polygonid:polygon:amoy:2qS8VAzgPNdFqj6PRfvno7SLoG2qycGrfkMWSAuDNC",
+  "6198e97b6230164175580f4b6d228624": "did:polygonid:polygon:amoy:2qS8VAzgPNdFqj6PRfvno7SLoG2qycGrfkMWSAuDNC",
+  "f106f48034f2df1c11020ac61bb9c261": "did:polygonid:polygon:amoy:2qWwAAfYp6aYm26QYxvhw81yR68u1kogEn6ngsR43n",
+  "9a07e402432bce5011303970098133ae": "did:polygonid:polygon:amoy:2qS8VAzgPNdFqj6PRfvno7SLoG2qycGrfkMWSAuDNC",
+  "22fd14d692226aaed264162bfe56a8b2": "did:polygonid:polygon:amoy:2qS8VAzgPNdFqj6PRfvno7SLoG2qycGrfkMWSAuDNC",
+  "20e69b723974e277861ab5728a801f58": "did:polygonid:polygon:amoy:2qS8VAzgPNdFqj6PRfvno7SLoG2qycGrfkMWSAuDNC",
+  "cb7de2dd9616a19f2f97495cc1963dae": "did:polygonid:polygon:amoy:2qS8VAzgPNdFqj6PRfvno7SLoG2qycGrfkMWSAuDNC",
+  "e72588e5ebb57583d1a83f1339ed99b1": "did:polygonid:polygon:amoy:2qWwAAfYp6aYm26QYxvhw81yR68u1kogEn6ngsR43n",
+  "cb0967b422764e57af3642d6da6bf022": "did:polygonid:polygon:amoy:2qWwAAfYp6aYm26QYxvhw81yR68u1kogEn6ngsR43n",
+  "9b516bb5f22fa08202b58f78681604a3": "did:polygonid:polygon:amoy:2qWwAAfYp6aYm26QYxvhw81yR68u1kogEn6ngsR43n"
 }

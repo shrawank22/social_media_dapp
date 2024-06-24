@@ -61,6 +61,32 @@ contract PostManagement is ERC721 {
 
     // Functions
     // Add a new post
+    // function addPost(
+    //     string memory _postText,
+    //     uint256 _viewPrice
+    // ) external payable {
+    //     postCounter++;
+    //     uint256 postId = postCounter;
+
+    //     DataTypes.Post storage newPost = posts[postId];
+    //     newPost.id = postId;
+    //     newPost.username = payable(msg.sender);
+    //     newPost.postText = _postText;
+    //     newPost.viewPrice = _viewPrice;
+    //     newPost.isDeleted = false;
+    //     newPost.hasListed = false;
+    //     newPost.listPrice = 0 ether;
+    //     _mint(msg.sender, postId); // Mint a new NFT for the post
+
+    //     emit AddPost(msg.sender, postId);
+
+    //     address[] memory followerList = getFollowers(msg.sender);
+    //     for (uint256 i = 0; i < followerList.length; i++) {
+    //         address follower = followerList[i];
+    //         emit NewPostForFollower(follower, msg.sender, postId);
+    //     }
+    // }
+
     function addPost(
         string memory _postText,
         uint256 _viewPrice
@@ -81,11 +107,21 @@ contract PostManagement is ERC721 {
         emit AddPost(msg.sender, postId);
 
         address[] memory followerList = getFollowers(msg.sender);
+        address[] memory followers2 = new address[](followerList.length);
+
         for (uint256 i = 0; i < followerList.length; i++) {
-            address follower = followerList[i];
-            emit NewPostForFollower(follower, msg.sender, postId);
+            followers2[i] = followerList[i];
         }
+
+        emit NewPostForFollowers(followers2, msg.sender, postId);
     }
+
+    // New event definition
+    event NewPostForFollowers(
+        address[] followers,
+        address indexed sender,
+        uint256 indexed postId
+    );
 
     // Edit a post
     function editPost(
