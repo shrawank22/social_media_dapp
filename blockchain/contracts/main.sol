@@ -4,7 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./DataTypes.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract PostManagement is ERC721 {
+contract SocialMedia is ERC721 {
     uint256 public postCounter;
 
     // Mappings
