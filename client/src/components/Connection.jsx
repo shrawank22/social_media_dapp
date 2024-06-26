@@ -108,7 +108,6 @@ function Connection() {
     const handleReset = () => {
         console.log("handleReset");
         reset();
-        setProvider();
         indexedDB.deleteDatabase("WALLET_CONNECT_V2_INDEXED_DB");
         connectWallet();
     }

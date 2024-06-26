@@ -21,8 +21,8 @@ const Post = ({
 }) => {
   const host = "http://localhost:8080";
   const context1 = useContext(postContext);
-  const { setFollowEvent } = context1;
-  
+  const { setFollowEvent, fetchGatekeepers } = context1;
+
   const [isBlurred, setIsBlurred] = useState(!isCreator && !hasPaid);
   const [listPrice, setListPrice] = useState(0); // Initialize listPrice state
   const { contract, address } = state;
@@ -43,12 +43,14 @@ const Post = ({
   const handleListClick = async (price) => {
     console.log("Listing post with price:", price);
     try {
-      const tx = await contract.methods.listPost(postId, price).send({ from: address });
+      const tx = await contract.methods
+        .listPost(postId, price)
+        .send({ from: address, gasPrice: "30000000000" });
       // const receipt = await tx.wait(); // Wait for the transaction to be mined
-      if (tx.status === 1) {
+      if (tx.status === 1n) {
         console.log("Transaction successful");
         setIsBlurred(false);
-        
+
         const postData = await contract.methods.getSinglePost(postId).call();
         try {
           const res = await axios.post(
@@ -82,7 +84,9 @@ const Post = ({
         //     log.hasOwnProperty("args") && log.fragment.name === "ListPostEvent"
         // );
         //const followEvent = tx.events.hasOwnProperty('NewPostForFollower') && tx.events.hasOwnProperty('args') ? tx.events.NewPostForFollower : {};
-        const followEvent = tx.events.ListPostEvent ? tx.events.ListPostEvent.returnValues : {};
+        const followEvent = tx.events.ListPostEvent
+          ? tx.events.ListPostEvent.returnValues
+          : {};
 
         // Set the followEvent using the setFollowEvent function from the context
         setFollowEvent(followEvent);
@@ -100,28 +104,35 @@ const Post = ({
     try {
       if (!isCreator) {
         const listPrice = await contract.methods.getListPrice(postId).call();
-        const prevOwner = await contract.methods.getOwnerName(postId).call(); 
+        const prevOwner = await contract.methods.getOwnerName(postId).call();
         console.log("prevowner,", prevOwner, postId);
-        const listofFollowers = await contract.methods.getFollowers(prevOwner).call(); 
-        console.log("List of followrs",listofFollowers); 
-        const tx = await contract.methods.buyPost(postId, { value: listPrice }).send({ from: address });
-        //console.log("tx....", tx); 
+        const listofFollowers = await contract.methods
+          .getFollowers(prevOwner)
+          .call();
+        console.log("List of followrs", listofFollowers);
+        const tx = await contract.methods
+          .buyPost(postId, { value: listPrice })
+          .send({ from: address, gasPrice: "30000000000" });
+        //console.log("tx....", tx);
         // const receipt = await tx.wait(); // Wait for the transaction to be mined
-        if (tx.status === 1) {
-          //Delete the posts from the prevOwner and its followers also. 
-          
+        if (tx.status === 1n) {
+          //Delete the posts from the prevOwner and its followers also.
+
           try {
-            const res = await axios.delete(`${host}/api/deletePost/${prevOwner}/${postId}`);
+            const res = await axios.delete(
+              `${host}/api/deletePost/${prevOwner}/${postId}`
+            );
             //console.log(res.response)
           } catch (error) {
             console.log(error);
             showAlert("danger", "Error deleting PostData");
             return error;
           }
-          
-          for(let e of listofFollowers)
-          {
-            const res = await axios.delete(`${host}/api/deletePost/${e}/${postId}`);
+
+          for (let e of listofFollowers) {
+            const res = await axios.delete(
+              `${host}/api/deletePost/${e}/${postId}`
+            );
           }
           const postData = await contract.methods.getSinglePost(postId).call();
           console.log("Deleted success", postData);
@@ -154,11 +165,11 @@ const Post = ({
           //   (log) =>
           //     log.hasOwnProperty("args") && log.fragment.name === "ListPostEvent"
           // );
-          const followEvent = tx.events.ListPostEvent ? tx.events.ListPostEvent.returnValues : {};
+          const followEvent = tx.events.ListPostEvent
+            ? tx.events.ListPostEvent.returnValues
+            : {};
           setFollowEvent(followEvent);
           console.log("Post Purchase successful");
-
-
         } else {
           console.error("Post Purchase failed");
         }
@@ -172,10 +183,11 @@ const Post = ({
     console.log("Cancelling post listing");
     try {
       // Assuming your contract has a cancelListing method
-      const tx = await contract.methods.cancelListing(postId).send({ from: address });
+      const tx = await contract.methods
+        .cancelListing(postId)
+        .send({ from: address, gasPrice: "30000000000" });
       // const receipt = await tx.wait();
-      if (tx.status === 1) {
-
+      if (tx.status === 1n) {
         const postData = await contract.methods.getSinglePost(postId).call();
         try {
           const res = await axios.post(
@@ -207,7 +219,9 @@ const Post = ({
         //   (log) =>
         //     log.hasOwnProperty("args") && log.fragment.name === "CancelPostEvent"
         // );
-        const followEvent = tx.events.CancelPostEvent ? tx.events.CancelPostEvent.returnValues : {};
+        const followEvent = tx.events.CancelPostEvent
+          ? tx.events.CancelPostEvent.returnValues
+          : {};
         // Set the followEvent using the setFollowEvent function from the context
         setFollowEvent(followEvent);
         console.log("Listing cancelled successfully");
@@ -246,13 +260,20 @@ const Post = ({
 
   const handleViewClick = async () => {
     if (!isCreator) {
-      const tx = await contract.methods.viewPaidPost(postId, { value: price }).send({ from: address, gasPrice: '30000000000' });
-      // const receipt = await tx.wait(); // Wait for the transaction to be mined
-      if (tx.status === 1) {
-        console.log("Transaction successful");
-        setIsBlurred(false);
-      } else {
-        console.error("Transaction failed");
+      try {
+        const tx = await contract.methods
+          .viewPaidPost(postId, { value: price })
+          .send({ from: address, gasPrice: "30000000000" });
+        // const receipt = await tx.wait(); // Wait for the transaction to be mined
+        console.log("tx : ", tx);
+        if (tx.status === 1n) {
+          console.log("Transaction successful");
+          setIsBlurred(false);
+        } else {
+          console.error("Transaction failed");
+        }
+      } catch (e) {
+        console.log("the error is: ", e);
       }
     }
   };
@@ -263,7 +284,9 @@ const Post = ({
       return;
     }
     try {
-      const tx = await contract.methods.addComment(postId, comment).send({ from: address });
+      const tx = await contract.methods
+        .addComment(postId, comment)
+        .send({ from: address, gasPrice: "30000000000" });
       // const receipt = await tx.wait();
       if (tx.status === 1) {
         console.log("Comment posted successfully");
@@ -279,7 +302,9 @@ const Post = ({
   const handleLikeClick = async (postId) => {
     if (isLiked) {
       try {
-        const tx = await contract.methods.unlikePost(postId).send({ from: address });
+        const tx = await contract.methods
+          .unlikePost(postId)
+          .send({ from: address, gasPrice: "30000000000" });
         // const receipt = await tx.wait();
         if (tx.status === 1) {
           console.log("Post Unliked successfully");
@@ -293,7 +318,9 @@ const Post = ({
       }
     } else {
       try {
-        const tx = await contract.methods.likePost(postId).send({ from: address });
+        const tx = await contract.methods
+          .likePost(postId)
+          .send({ from: address, gasPrice: "30000000000" });
         // const receipt = await tx.wait();
         if (tx.status === 1) {
           localStorage.setItem(`liked-${address}-${postId}`, "true");
@@ -317,19 +344,27 @@ const Post = ({
 
       // Getting meta data of post which is saved in DB
       const data = await getPost(postId);
+      // console.log(data)
       const { uniqueID, ipfsHashes, encryptedFiles } = data[0];
-      let receipt; 
+      let receipt;
       if (editedPrice > 0) {
         // Retrieving key from gatekeepers
         const retrievedShares = [];
-        const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
+        const { gatekeepers, gatekeepersCount } = await fetchGatekeepers();
         for (let i = 0; i < gatekeepersCount; i++) {
           const response = await axios.get(
-            `http://localhost:8080/api/gatekeepers/${i}/share/${uniqueID}`
+            `http://${gatekeepers[i].ip}:${gatekeepers[i].port}/api/gatekeepers/${i}/share/${uniqueID}`,
+            {
+              params: {
+                address: address,
+              },
+            }
           );
           retrievedShares.push(Buffer.from(response.data.share, "hex"));
-
-          if (retrievedShares.length === Math.ceil((2 * gatekeepersCount) / 3))
+          if (
+            retrievedShares.length ===
+            Math.ceil((2 * parseInt(gatekeepersCount)) / 3)
+          )
             break;
         }
 
@@ -353,11 +388,9 @@ const Post = ({
         const ipfsHash = res.data.IpfsHash;
 
         // Store hash onto blockchain
-        receipt = await contract.methods.editPost(
-          postId,
-          String(ipfsHash),
-          parseInt(content.viewPrice)
-        ).send({ from: address });
+        receipt = await contract.methods
+          .editPost(postId, String(ipfsHash), parseInt(content.viewPrice))
+          .send({ from: address, gasPrice: "30000000000" });
         // receipt = await tx.wait();
       } else {
         content.ipfsHashes = ipfsHashes;
@@ -382,48 +415,47 @@ const Post = ({
         const ipfsHash = res.data.IpfsHash;
 
         // Store hash onto blockchain
-        receipt = await contract,methods.editPost(
-          postId,
-          String(ipfsHash),
-          parseInt(content.viewPrice)
-        ).send({ from: address });
+        (receipt = await contract),
+          methods
+            .editPost(postId, String(ipfsHash), parseInt(content.viewPrice))
+            .send({ from: address });
         // receipt = await tx.wait();
       }
-      if(receipt.status == 1)
-      {
-        //Now update in db for each user and its followers 
-      const postData = await contract.methods.getSinglePost(postId).send({ from: address });
-      console.log(postData);
-      try {
-        const res = await axios.post(
-          `${host}/api/postsFollowing`,
-          {
-            followerUsername: postData[1],
-            NFTID: postData[0].toString(),
-            username: postData[1],
-            postText: postData[2],
-            viewPrice: postData[3].toString(),
-            isDeleted: postData[4],
-            userWhoPaid: postData[10],
-            hasListed: postData[11],
-            listPrice: postData[12].toString(),
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
+      if (receipt.status == 1n) {
+        //Now update in db for each user and its followers
+        const postData = await contract.methods
+          .getSinglePost(postId).call(); 
+        console.log(postData);
+        try {
+          const res = await axios.post(
+            `${host}/api/postsFollowing`,
+            {
+              followerUsername: postData[1],
+              NFTID: postData[0].toString(),
+              username: postData[1],
+              postText: postData[2],
+              viewPrice: postData[3].toString(),
+              isDeleted: postData[4],
+              userWhoPaid: postData[10],
+              hasListed: postData[11],
+              listPrice: postData[12].toString(),
             },
-          }
-        );
-      } catch (error) {
-        console.log(error);
-        showAlert("danger", "Error add PostData");
-        return error;
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        } catch (error) {
+          console.log(error);
+          showAlert("danger", "Error add PostData");
+          return error;
+        }
+        const followEvent = receipt.events.NewPostForFollowers
+          ? receipt.events.NewPostForFollowers.returnValues
+          : {};
+        setFollowEvent(followEvent);
       }
-      const followEvent = receipt.events.NewPostForFollowers ? receipt.events.NewPostForFollowers.returnValues : {};
-      setFollowEvent(followEvent);
-      }
-      
-
     } catch (error) {
       console.log(error);
       showAlert("danger", "Error updating post");

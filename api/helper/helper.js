@@ -16,37 +16,19 @@ const MSG = {
 const extractCredentialValues = (authResponse) => {
     let extractedValues = {};
 
+    console.log("authResponse : ", JSON.stringify(authResponse));
+
     authResponse?.body?.scope.forEach((scopeItem) => {
         const credentialSubject = scopeItem?.vp?.verifiableCredential?.credentialSubject;
-        if (credentialSubject?.aadhaarNo) {
-            extractedValues.aadhaarNo = credentialSubject.aadhaarNo;
-        }
-        if (credentialSubject?.name) {
-            extractedValues.name = credentialSubject.name;
-        }
-        if (credentialSubject?.city) {
-            extractedValues.city = credentialSubject.city;
-        }
-        if (credentialSubject?.gender) {
-            extractedValues.gender = credentialSubject.gender;
-        }
-        if (credentialSubject?.dob) {
-            extractedValues.dob = credentialSubject.dob;
+        if (credentialSubject?.data) {
+            extractedValues.data = credentialSubject.data;
         }
     });
 
     return extractedValues;
 };
 
-const credentialSubject = {
-    aadhaarNo: {},
-    city: {},
-    name: {},
-    dob: {},
-    gender: {}
-};
-
-const proofRequest = profileCredential(credentialSubject);
+const proofRequest = profileCredential();
 
 const socketMessage = (fn, status, data) => ({
     fn,

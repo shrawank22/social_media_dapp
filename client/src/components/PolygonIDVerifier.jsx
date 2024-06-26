@@ -88,7 +88,7 @@ function PolygonIDVerifier({
                     if (currentSocketEvent.status === "DONE") {
                         localStorage.setItem('userDid', currentSocketEvent.data.userDid);
                         localStorage.setItem('jwz-token', currentSocketEvent.data.jwzToken);
-                        localStorage.setItem('profile', JSON.stringify(currentSocketEvent.data.profile));
+                        localStorage.setItem('profile', currentSocketEvent.data.profile?.data);
                         setVerificationMessage("✅ Verified proof");
                         console.log("data : ", currentSocketEvent.data);
                         setTimeout(() => {

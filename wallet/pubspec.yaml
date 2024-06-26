@@ -28,7 +28,7 @@ dependencies:
   polkadart_keyring: ^0.4.3
   polkadart: ^0.4.3
   walletconnect_flutter_v2:
-    path: ../..
+    path: ..\..\example\WalletConnectFlutterV2
 
 dev_dependencies:
   flutter_test:
