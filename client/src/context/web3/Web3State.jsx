@@ -26,7 +26,7 @@ const Web3State = ({ children }) => {
                 window.ethereum.on("accountsChanged", () => {
                     window.location.reload();
                 });
-                
+
                 const signer = await provider.getSigner();
                 console.log("signer : ", signer);
                 const address = await signer.getAddress();
