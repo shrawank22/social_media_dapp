@@ -27,14 +27,7 @@ const PostState = ({ children }) => {
     const [isPosting, setIsPosting] = useState(false);
     const [posted, setPosted] = useState(false); // Just to trigger useEffect when post is added
     const [posts, setPosts] = useState([]);
-    const gatekeepersCount = Number(import.meta.env.VITE_KEEPER_COUNT);
     const [followEvent, setFollowEvent] = useState(null);
-    const serializeBigInt = (key, value) => {
-        if (typeof value === "bigint") {
-            return { type: "BigInt", value: value.toString() };
-        }
-        return value;
-    };
 
     async function checkPlagiarism(content) {
         const text1 = content.postText;
@@ -108,7 +101,8 @@ const PostState = ({ children }) => {
             try {
                 if (contract) {
                     let user, id;
-                    if (followEvent) {
+                    // console.log(followEvent)
+                    if (followEvent && Object.keys(followEvent).length > 0) {
                         user = followEvent.sender;
                         id = followEvent.postId;
 
