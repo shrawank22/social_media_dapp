@@ -81,7 +81,8 @@ const Post = ({
         //   (log) =>
         //     log.hasOwnProperty("args") && log.fragment.name === "ListPostEvent"
         // );
-        const followEvent = tx.events.hasOwnProperty('NewPostForFollower') && tx.events.hasOwnProperty('args') ? tx.events.NewPostForFollower : {};
+        //const followEvent = tx.events.hasOwnProperty('NewPostForFollower') && tx.events.hasOwnProperty('args') ? tx.events.NewPostForFollower : {};
+        const followEvent = tx.events.ListPostEvent ? tx.events.ListPostEvent.returnValues : {};
 
         // Set the followEvent using the setFollowEvent function from the context
         setFollowEvent(followEvent);
@@ -149,10 +150,11 @@ const Post = ({
             showAlert("danger", "Error add PostData");
             return error;
           }
-          const followEvent = receipt.logs.filter(
-            (log) =>
-              log.hasOwnProperty("args") && log.fragment.name === "ListPostEvent"
-          );
+          // const followEvent = receipt.logs.filter(
+          //   (log) =>
+          //     log.hasOwnProperty("args") && log.fragment.name === "ListPostEvent"
+          // );
+          const followEvent = tx.events.ListPostEvent ? tx.events.ListPostEvent.returnValues : {};
           setFollowEvent(followEvent);
           console.log("Post Purchase successful");
 
@@ -201,11 +203,11 @@ const Post = ({
           return error;
         }
 
-        const followEvent = receipt.logs.filter(
-          (log) =>
-            log.hasOwnProperty("args") && log.fragment.name === "CancelPostEvent"
-        );
-
+        // const followEvent = receipt.logs.filter(
+        //   (log) =>
+        //     log.hasOwnProperty("args") && log.fragment.name === "CancelPostEvent"
+        // );
+        const followEvent = tx.events.CancelPostEvent ? tx.events.CancelPostEvent.returnValues : {};
         // Set the followEvent using the setFollowEvent function from the context
         setFollowEvent(followEvent);
         console.log("Listing cancelled successfully");
@@ -417,10 +419,7 @@ const Post = ({
         showAlert("danger", "Error add PostData");
         return error;
       }
-      const followEvent = receipt.logs.filter(
-        (log) =>
-          log.hasOwnProperty("args") && log.fragment.name === "NewPostForFollower"
-      );
+      const followEvent = receipt.events.NewPostForFollowers ? receipt.events.NewPostForFollowers.returnValues : {};
       setFollowEvent(followEvent);
       }
       

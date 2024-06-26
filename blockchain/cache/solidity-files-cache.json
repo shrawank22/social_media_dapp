@@ -1,8 +1,8 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/home/shrawan/social_media_dapp/blockchain/contracts/DataTypes.sol": {
-      "lastModificationDate": 1718622208447,
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/contracts/DataTypes.sol": {
+      "lastModificationDate": 1718960737150,
       "contentHash": "30fd7436cf4fd0153c99dd4e78a8562f",
       "sourceName": "contracts/DataTypes.sol",
       "solcConfig": {
@@ -37,8 +37,8 @@
         "DataTypes"
       ]
     },
-    "/home/shrawan/social_media_dapp/blockchain/contracts/main.sol": {
-      "lastModificationDate": 1718622186540,
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/contracts/main.sol": {
+      "lastModificationDate": 1718960737150,
       "contentHash": "a2445b4d06b28732e119d18c6ebec039",
       "sourceName": "contracts/main.sol",
       "solcConfig": {
@@ -76,9 +76,9 @@
         "SocialMedia"
       ]
     },
-    "/home/shrawan/social_media_dapp/blockchain/contracts/PostManagement.sol": {
-      "lastModificationDate": 1718779290862,
-      "contentHash": "741e9eddef6f4b27f3ebe420099cf2d6",
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/contracts/PostManagement.sol": {
+      "lastModificationDate": 1719296898151,
+      "contentHash": "de6e801bf0be5b87d83b9bbfdf49563f",
       "sourceName": "contracts/PostManagement.sol",
       "solcConfig": {
         "version": "0.8.24",
@@ -115,44 +115,8 @@
         "PostManagement"
       ]
     },
-    "/home/shrawan/social_media_dapp/blockchain/contracts/NotificationsManagement.sol": {
-      "lastModificationDate": 1717677840860,
-      "contentHash": "926c5df97e051f69d8b12a18c818983b",
-      "sourceName": "contracts/NotificationsManagement.sol",
-      "solcConfig": {
-        "version": "0.8.24",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">=0.7.0 <0.9.0"
-      ],
-      "artifacts": [
-        "NotificationsManagement"
-      ]
-    },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol": {
-      "lastModificationDate": 1717736508038,
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol": {
+      "lastModificationDate": 1719224302352,
       "contentHash": "95602b04f0b53f1139f4668d123ddeb7",
       "sourceName": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
       "solcConfig": {
@@ -195,8 +159,44 @@
         "ERC721"
       ]
     },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/Address.sol": {
-      "lastModificationDate": 1717736507926,
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
+      "lastModificationDate": 1719224302436,
+      "contentHash": "c22d4395e33763de693fd440c6fd10e1",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC721Receiver"
+      ]
+    },
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/Address.sol": {
+      "lastModificationDate": 1719224302202,
       "contentHash": "211ffd288c1588ba8c10eae668ca3c66",
       "sourceName": "@openzeppelin/contracts/utils/Address.sol",
       "solcConfig": {
@@ -231,8 +231,82 @@
         "Address"
       ]
     },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/Strings.sol": {
-      "lastModificationDate": 1717736508174,
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/Context.sol": {
+      "lastModificationDate": 1719224302221,
+      "contentHash": "f07feb4a44b1a4872370da5aa70e8e46",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol": {
+      "lastModificationDate": 1719224302433,
+      "contentHash": "48de4c9a3a4ae5ef66a2aa620843413f",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../utils/introspection/IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC721"
+      ]
+    },
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/Strings.sol": {
+      "lastModificationDate": 1719224302477,
       "contentHash": "48686fc32a22a3754b8e63321857dd2a",
       "sourceName": "@openzeppelin/contracts/utils/Strings.sol",
       "solcConfig": {
@@ -270,156 +344,8 @@
         "Strings"
       ]
     },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/Context.sol": {
-      "lastModificationDate": 1717736507946,
-      "contentHash": "f07feb4a44b1a4872370da5aa70e8e46",
-      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
-      "solcConfig": {
-        "version": "0.8.24",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Context"
-      ]
-    },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol": {
-      "lastModificationDate": 1717736508006,
-      "contentHash": "0e7db055ce108f9da7bb6686a00287c0",
-      "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
-      "solcConfig": {
-        "version": "0.8.24",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./IERC165.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "ERC165"
-      ]
-    },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol": {
-      "lastModificationDate": 1717736508122,
-      "contentHash": "48de4c9a3a4ae5ef66a2aa620843413f",
-      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
-      "solcConfig": {
-        "version": "0.8.24",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../../utils/introspection/IERC165.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IERC721"
-      ]
-    },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
-      "lastModificationDate": 1717736508126,
-      "contentHash": "c22d4395e33763de693fd440c6fd10e1",
-      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
-      "solcConfig": {
-        "version": "0.8.24",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IERC721Receiver"
-      ]
-    },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol": {
-      "lastModificationDate": 1717736508126,
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol": {
+      "lastModificationDate": 1719224302435,
       "contentHash": "efbc0d15b80a74e34dbe8da0f3e879bb",
       "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
       "solcConfig": {
@@ -456,8 +382,82 @@
         "IERC721Metadata"
       ]
     },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol": {
-      "lastModificationDate": 1717736508174,
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol": {
+      "lastModificationDate": 1719224302314,
+      "contentHash": "0e7db055ce108f9da7bb6686a00287c0",
+      "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC165"
+      ]
+    },
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol": {
+      "lastModificationDate": 1719224302413,
+      "contentHash": "03e6768535ac4da0e9756f1d8a4a018a",
+      "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+      "solcConfig": {
+        "version": "0.8.24",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC165"
+      ]
+    },
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol": {
+      "lastModificationDate": 1719224302474,
       "contentHash": "9488ebd4daacfee8ad04811600d7d061",
       "sourceName": "@openzeppelin/contracts/utils/math/SignedMath.sol",
       "solcConfig": {
@@ -492,8 +492,8 @@
         "SignedMath"
       ]
     },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/math/Math.sol": {
-      "lastModificationDate": 1717736508154,
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/math/Math.sol": {
+      "lastModificationDate": 1719224302454,
       "contentHash": "fe63409d8a06818b926cf89e0ea88b1b",
       "sourceName": "@openzeppelin/contracts/utils/math/Math.sol",
       "solcConfig": {
@@ -528,10 +528,10 @@
         "Math"
       ]
     },
-    "/home/shrawan/social_media_dapp/blockchain/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol": {
-      "lastModificationDate": 1717736508102,
-      "contentHash": "03e6768535ac4da0e9756f1d8a4a018a",
-      "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+    "/Users/mannugaddhyan/Downloads/social_media_dapp/blockchain/contracts/NotificationsManagement.sol": {
+      "lastModificationDate": 1718960737150,
+      "contentHash": "926c5df97e051f69d8b12a18c818983b",
+      "sourceName": "contracts/NotificationsManagement.sol",
       "solcConfig": {
         "version": "0.8.24",
         "settings": {
@@ -558,10 +558,10 @@
       },
       "imports": [],
       "versionPragmas": [
-        "^0.8.0"
+        ">=0.7.0 <0.9.0"
       ],
       "artifacts": [
-        "IERC165"
+        "NotificationsManagement"
       ]
     }
   }

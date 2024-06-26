@@ -35,23 +35,18 @@ contract PostManagement is ERC721 {
         address indexed reporter,
         string reason
     );
-    event NewPostForFollower(
-        address indexed follower,
-        address indexed sender,
-        uint256 indexed postId
-    );
     event ListPostEvent(
-        address indexed follower,
+        address[] followers,
         address indexed sender,
         uint256 indexed postId
     );
     event CancelPostEvent(
-        address indexed follower,
+        address[] followers,
         address indexed sender,
         uint256 indexed postId
     );
     event BuyPostEvent(
-        address indexed follower,
+        address[] followers,
         address indexed sender,
         uint256 indexed postId
     );
@@ -61,33 +56,69 @@ contract PostManagement is ERC721 {
 
     // Functions
     // Add a new post
+    // function addPost(
+    //     string memory _postText,
+    //     uint256 _viewPrice
+    // ) external payable {
+    //     postCounter++;
+    //     uint256 postId = postCounter;
+
+    //     DataTypes.Post storage newPost = posts[postId];
+    //     newPost.id = postId;
+    //     newPost.username = payable(msg.sender);
+    //     newPost.postText = _postText;
+    //     newPost.viewPrice = _viewPrice;
+    //     newPost.isDeleted = false;
+    //     newPost.hasListed = false;
+    //     newPost.listPrice = 0 ether;
+    //     _mint(msg.sender, postId); // Mint a new NFT for the post
+
+    //     emit AddPost(msg.sender, postId);
+
+    //     address[] memory followerList = getFollowers(msg.sender);
+    //     for (uint256 i = 0; i < followerList.length; i++) {
+    //         address follower = followerList[i];
+    //         emit NewPostForFollower(follower, msg.sender, postId);
+    //     }
+    // }
+
     function addPost(
-        string memory _postText,
-        uint256 _viewPrice
-    ) external payable {
-        postCounter++;
-        uint256 postId = postCounter;
+    string memory _postText,
+    uint256 _viewPrice
+) external payable {
+    postCounter++;
+    uint256 postId = postCounter;
 
-        DataTypes.Post storage newPost = posts[postId];
-        newPost.id = postId;
-        newPost.username = payable(msg.sender);
-        newPost.postText = _postText;
-        newPost.viewPrice = _viewPrice;
-        newPost.isDeleted = false;
-        newPost.hasListed = false;
-        newPost.listPrice = 0 ether;
-        _mint(msg.sender, postId); // Mint a new NFT for the post
+    DataTypes.Post storage newPost = posts[postId];
+    newPost.id = postId;
+    newPost.username = payable(msg.sender);
+    newPost.postText = _postText;
+    newPost.viewPrice = _viewPrice;
+    newPost.isDeleted = false;
+    newPost.hasListed = false;
+    newPost.listPrice = 0 ether;
+    _mint(msg.sender, postId); // Mint a new NFT for the post
 
-        emit AddPost(msg.sender, postId);
+    emit AddPost(msg.sender, postId);
 
-        address[] memory followerList = getFollowers(msg.sender);
-        for (uint256 i = 0; i < followerList.length; i++) {
-            address follower = followerList[i];
-            emit NewPostForFollower(follower, msg.sender, postId);
-        }
+    address[] memory followerList = getFollowers(msg.sender);
+    address[] memory followers2 = new address[](followerList.length);
+
+    for (uint256 i = 0; i < followerList.length; i++) {
+        followers2[i] = followerList[i];
     }
 
-    // Edit a post
+    emit NewPostForFollowers(followers2, msg.sender, postId);
+}
+
+// New event definition
+event NewPostForFollowers(
+    address[] followers,
+    address indexed sender,
+    uint256 indexed postId
+);
+
+   // Edit a post
     function editPost(
         uint256 _postId,
         string memory _newPostText,
@@ -103,10 +134,13 @@ contract PostManagement is ERC721 {
         posts[_postId].viewPrice = _newPrice;
 
         address[] memory followerList = getFollowers(msg.sender);
-        for (uint256 i = 0; i < followerList.length; i++) {
-            address follower = followerList[i];
-            emit NewPostForFollower(follower, msg.sender, _postId);
-        }
+        address[] memory followers2 = new address[](followerList.length);
+
+            for (uint256 i = 0; i < followerList.length; i++) {
+                followers2[i] = followerList[i];
+            }
+
+        emit NewPostForFollowers(followers2, msg.sender, _postId);
     }
 
     // Delete a post
@@ -354,10 +388,12 @@ contract PostManagement is ERC721 {
         posts[postId].listPrice = _listPrice;
 
         address[] memory followerList = getFollowers(msg.sender);
+        address[] memory followers2 = new address[](followerList.length);
+
         for (uint256 i = 0; i < followerList.length; i++) {
-            address follower = followerList[i];
-            emit ListPostEvent(follower, msg.sender, postId);
+            followers2[i] = followerList[i];
         }
+        emit ListPostEvent(followers2, msg.sender, postId);
     }
 
     //cancel a listing
@@ -372,10 +408,13 @@ contract PostManagement is ERC721 {
         posts[postId].listPrice = 0 ether;
 
         address[] memory followerList = getFollowers(msg.sender);
+        address[] memory followers2 = new address[](followerList.length);
+
         for (uint256 i = 0; i < followerList.length; i++) {
-            address follower = followerList[i];
-            emit CancelPostEvent(follower, msg.sender, postId);
+            followers2[i] = followerList[i];
         }
+        emit CancelPostEvent(followers2, msg.sender, postId);
+
     }
 
     //buy the post
@@ -405,11 +444,16 @@ contract PostManagement is ERC721 {
         posts[postId].listPrice = 0;
 
         address[] memory followerList = getFollowers(msg.sender);
+        address[] memory followers2 = new address[](followerList.length);
+
         for (uint256 i = 0; i < followerList.length; i++) {
-            address follower = followerList[i];
-            emit ListPostEvent(follower, msg.sender, postId);
+            followers2[i] = followerList[i];
         }
+        emit ListPostEvent(followers2, msg.sender, postId);
     }
+
+
+
 
     //get ListPrice
     function getListPrice(uint256 postId) public view returns (uint256) {
