@@ -9,7 +9,7 @@ This is a decentralized social media application that leverages blockchain techn
 - [Setup and Installation](#setup-and-installation)
 - [Running the Application](#running-the-application)
 - [Contributing](#contributing)
-- [License](#license)
+<!-- - [License](#license) -->
 
 ## Project Structure
 
@@ -38,11 +38,15 @@ This is a decentralized social media application that leverages blockchain techn
    git clone https://github.com/shrawank22/social_media_dapp.git
    ```
 2. Navigate to the project directory:
-```bash
+   ```bash
    cd social_media_dapp
-```
+   ```
 
-### Client
+### Component Setup
+
+For each component (client, api, blockchain, server, and wallet), open a new terminal and follow the corresponding instructions below:
+
+#### Client
 
 1. Navigate to the `client` directory:
    ```bash
@@ -53,7 +57,7 @@ This is a decentralized social media application that leverages blockchain techn
    npm install
    ```
 
-### API
+#### API
 
 1. Navigate to the `api` directory:
    ```bash
@@ -64,7 +68,7 @@ This is a decentralized social media application that leverages blockchain techn
    npm install
    ```
 
-### Blockchain
+#### Blockchain
 
 1. Navigate to the `blockchain` directory:
    ```bash
@@ -83,7 +87,7 @@ This is a decentralized social media application that leverages blockchain techn
    npx hardhat run scripts/deploy.js --network polygon
    ```
 
-### Server
+#### Server
 
 1. Navigate to the `server` directory:
    ```bash
@@ -93,15 +97,14 @@ This is a decentralized social media application that leverages blockchain techn
    ```bash
    pip3 install -r requirements.txt
    ```
-3. After installing nltk, download the stopwords and punkt tokenizer models by opening a python shell (Enter python3 in terminal)
-    ```bash
-    import nltk
-    nltk.download('punkt')
-    nltk.download('stopwords')
-    ```
+3. After installing nltk, download the stopwords and punkt tokenizer models by opening a Python shell:
+   ```python
+   import nltk
+   nltk.download('punkt')
+   nltk.download('stopwords')
+   ```
 
-
-### Wallet
+#### Wallet
 
 1. Navigate to the `wallet` directory:
    ```bash
@@ -112,12 +115,14 @@ This is a decentralized social media application that leverages blockchain techn
    ```bash
    flutter pub get
    ```
-4. Generated freezed files
-    ```bash
-    flutter pub run build_runner build
-    ```
+4. Generate freezed files:
+   ```bash
+   flutter pub run build_runner build
+   ```
 
 ## Running the Application
+
+In each terminal, navigate to the corresponding directory and run the appropriate command:
 
 ### Client
 
