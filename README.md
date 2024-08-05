@@ -7,6 +7,7 @@ This is a decentralized social media application that leverages blockchain techn
 - [Project Structure](#project-structure)
 - [Requirements](#requirements)
 - [Setup and Installation](#setup-and-installation)
+- [Environment Configuration](#environment-configuration)
 - [Running the Application](#running-the-application)
 - [Contributing](#contributing)
 <!-- - [License](#license) -->
@@ -119,6 +120,47 @@ For each component (client, api, blockchain, server, and wallet), open a new ter
    ```bash
    flutter pub run build_runner build
    ```
+
+## Environment Configuration
+
+You need to create .env files in the client, api, and blockchain directories to store environment-specific variables. Here are the instructions for each:
+
+### Client
+
+1. Create a .env file in the client directory:
+   ```bash
+   touch .env
+   ```
+2. Add the necessary environment variables (replace placeholders with actual values):
+   ```env
+   REACT_APP_API_URL=http://localhost:5000
+   REACT_APP_BLOCKCHAIN_NETWORK=polygon
+   ```
+
+### API
+1. Create a .env file in the api directory:
+   ```bash
+   touch .env
+   ```
+2. Add the necessary environment variables:
+   ```env
+   Copy code
+   PORT=5000
+   DATABASE_URL=mongodb://localhost:27017/social_media
+   JWT_SECRET=your_jwt_secret
+   ```
+
+### Blockchain
+1. Create a .env file in the blockchain directory:
+   ```bash
+   touch .env
+   ```
+2. Add the necessary environment variables:
+   ```env
+   PRIVATE_KEY=your_wallet_private_key
+   INFURA_PROJECT_ID=your_infura_project_id
+   ```
+Make sure to replace the placeholder values with your actual configuration details.
 
 ## Running the Application
 
