@@ -22,6 +22,7 @@ This is a decentralized social media application that leverages blockchain techn
 ## Requirements
 
 - **Node.js**: Ensure you have Node.js installed for the API.
+- **Git**: Version Control
 - **Python**: Required for the server-side plagiarism detection.
 - **Flutter**: Needed for the wallet application.
 - **Hardhat**: Required for managing smart contracts.
@@ -29,6 +30,17 @@ This is a decentralized social media application that leverages blockchain techn
 <!-- - **MetaMask or Similar**: A browser extension or app for managing blockchain accounts. -->
 
 ## Setup and Installation
+
+### Cloning the Repository
+
+1. Clone the repository to your local machine using Git. Open your terminal and run the following command:
+   ```bash
+   git clone https://github.com/shrawank22/social_media_dapp.git
+   ```
+2. Navigate to the project directory:
+```bash
+   cd social_media_dapp
+```
 
 ### Client
 

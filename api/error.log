@@ -10,3 +10,4 @@
 {"error":"User validation failed: username: Path `username` is required.","level":"error","message":"Error in saving user:","timestamp":"2024-08-02T05:21:03.335Z"}
 {"error":"User validation failed: username: Path `username` is required.","level":"error","message":"Error in saving user:","timestamp":"2024-08-02T05:21:39.120Z"}
 {"error":"User validation failed: username: Path `username` is required.","level":"error","message":"Error in saving user:","timestamp":"2024-08-02T05:21:41.959Z"}
+{"error":"connect ETIMEDOUT 34.93.171.75:3002","level":"error","message":"Error in registration process","timestamp":"2024-08-05T10:13:16.955Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
