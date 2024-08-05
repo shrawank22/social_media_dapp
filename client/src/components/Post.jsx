@@ -273,7 +273,8 @@ const Post = ({
                 .addComment(postId, comment)
                 .send({ from: address, gasPrice: "30000000000" });
             // const receipt = await tx.wait();
-            if (tx.status === 1) {
+            console.log("tx : ", tx);
+            if (tx.status === 1n) {
                 console.log("Comment posted successfully");
                 setCommentCount(!commentCount); // To trigger useEffect
             } else {
@@ -291,7 +292,7 @@ const Post = ({
                     .unlikePost(postId)
                     .send({ from: address, gasPrice: "30000000000" });
                 // const receipt = await tx.wait();
-                if (tx.status === 1) {
+                if (tx.status === 1n) {
                     console.log("Post Unliked successfully");
                     setLikes((prevLikes) => BigInt(prevLikes) - 1n);
                     localStorage.setItem(`liked-${address}-${postId}`, "false");
@@ -307,7 +308,7 @@ const Post = ({
                     .likePost(postId)
                     .send({ from: address, gasPrice: "30000000000" });
                 // const receipt = await tx.wait();
-                if (tx.status === 1) {
+                if (tx.status === 1n) {
                     localStorage.setItem(`liked-${address}-${postId}`, "true");
                     setLikes((prevLikes) => BigInt(prevLikes) + 1n);
                 } else {

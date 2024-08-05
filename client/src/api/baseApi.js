@@ -28,6 +28,7 @@ apiCall.interceptors.response.use(
         return response;
     },
     (error) => {
+        console.log("error : ", error);
         if (error.response.status === 401) {
             localStorage.clear();
             window.location.href = '/login';

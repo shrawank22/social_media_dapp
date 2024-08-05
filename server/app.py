@@ -4,8 +4,6 @@ from pymongo import MongoClient
 from datasketch import MinHash
 from flask_cors import CORS
 import imagehash
-import requests
-from io import BytesIO 
 from PIL import Image
 
 app = Flask(__name__)

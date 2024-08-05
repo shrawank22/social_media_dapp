@@ -35,6 +35,26 @@ const replaceAuthRequestMapKey = (oldKey, newKey) => {
     }
 }
 
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'combined.log' }),
+    ],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.simple(),
+    }));
+}
+
 router.post('/logout', async (req, res) => {
     // fetch sessionId
     // const sessionId = req.query.sessionId;
@@ -55,8 +75,8 @@ router.post('/logout', async (req, res) => {
 router.post('/register', async (req, res) => {
     const userDetails = req.body.userDetails;
     const username = req.body.userAddress;
-    console.log(userDetails);
-    console.log(username);
+    logger.info(`Registering user: ${username}`);
+    logger.debug('User details:', userDetails);
 
     let credDetails = {
         credentialSchema: 'https://gist.githubusercontent.com/raj-71/1bb1de438d30cb5d94d330737b3b6957/raw/bfe66511446f3654992cf92db469f74063f655f6/schema_v4.json',
@@ -68,6 +88,7 @@ router.post('/register', async (req, res) => {
 
     try {
         // create credential
+        logger.info('Creating credential');
         const issuerRes = await axios.post(`${API_URL}/v1/credentials`, credDetails, {
             headers: {
                 'Content-Type': 'application/json',
@@ -77,6 +98,7 @@ router.post('/register', async (req, res) => {
         });
 
         // create VC qr-code
+        logger.info('Creating QR code');
         const qrCodeRes = await axios.get(`${API_URL}/v1/credentials/${issuerRes.data.id}/qrcode`, {
             headers: {
                 'Accept': 'application/json'
@@ -85,6 +107,7 @@ router.post('/register', async (req, res) => {
 
         // send qr code to user
         const qrCodeLink = API_URL + '/v1/qr-store?id=' + qrCodeRes.data.qrCodeLink.split('=')[2];
+        logger.info(`QR code link generated: ${qrCodeLink}`);
 
         // get qr code link
         const qrCodeLinkRes = await axios.get(`${qrCodeLink}`);
@@ -94,21 +117,28 @@ router.post('/register', async (req, res) => {
         try {
             const existingUser = await User.findOne({ username });
             if (existingUser) {
+                logger.warn(`User already exists: ${username}`);
                 return res.status(400).send('A user with this username already exists.');
             }
 
             const user = new User({ username });
             await user.save();
+            logger.info(`User saved successfully: ${username}`);
 
             // res.status(200).send({qrCodeLink: qrCodeLinkRes.data, user});  
         } catch (err) {
-            console.log("Error in saving user : ", err);
+            logger.error('Error in saving user:', { error: err.message });
             return res.status(500).send(err.message);
         }
 
+        logger.info('Registration successful', { username });
         res.status(200).send(qrCodeLinkRes.data);
     } catch (err) {
-        console.log("Error : ", err.response.data);
+
+        logger.error('Error in registration process', {
+            error: err.response ? err.response.data : err.message,
+            username
+        });
 
         if (err.response.data.message === "claim details incorrect") {
             return res.status(404).send({ message: "Incorrect Details" });
@@ -150,7 +180,7 @@ router.get('/connection', async (req, res) => {
 
     const cacheManager = await cPromise;
 
-    await cacheManager.set(`connection_${sessionId}`, JSON.stringify(request), {ttl: 120 * 1000});
+    await cacheManager.set(`connection_${sessionId}`, JSON.stringify(request), { ttl: 120 * 1000 });
 
     const qrUrl = `iden3comm://?request_uri=${HOSTED_SERVER_URL}/api/qr-code-connection?sessionId=${sessionId}`;
 
@@ -163,14 +193,14 @@ router.get('/connection', async (req, res) => {
 router.get('/qr-code-connection', async (req, res) => {
     const sessionId = req.query.sessionId;
     console.log("sessionId : ", sessionId);
-  
+
     const cacheManager = await cPromise;
 
     const request = await cacheManager.get(`connection_${sessionId}`);
     console.log("request : ", request);
 
-    if(!request) {
-        return res.status(404).send({error: "Data not found"});
+    if (!request) {
+        return res.status(404).send({ error: "Data not found" });
     }
 
     return res.status(200).send(JSON.parse(request));
@@ -189,7 +219,7 @@ router.post('/connection-callback', async (req, res) => {
     );
 
     const authRequest = authRequests.getAuthRequests(`${sessionId}`);
-  
+
     console.log(`handleConnectionCallback for ${sessionId}`);
 
     const raw = await getRawBody(req);
@@ -277,13 +307,13 @@ router.get('/login', async (req, res) => {
 
     const cacheManager = await cPromise;
 
-    await cacheManager.set(`login_${sessionId}`, JSON.stringify(request), {ttl: 120 * 1000});
+    await cacheManager.set(`login_${sessionId}`, JSON.stringify(request), { ttl: 120 * 1000 });
 
     const qrUrl = `iden3comm://?request_uri=${HOSTED_SERVER_URL}/api/qr-code?sessionId=${sessionId}`;
 
     // addressMap.set(sessionId, userAddress);
     setAddress(sessionId, userAddress);
-  
+
     io.sockets.emit(sessionId, socketMessage("getAuthQr", STATUS.DONE, qrUrl));
 
     return res.status(200).set("Content-Type", "application/json").send(qrUrl);
@@ -312,9 +342,9 @@ router.post('/verification-callback', async (req, res) => {
     // const userAddress = addressMap.get(sessionId);
     const userAddress = getAddress(sessionId);
     console.log("userAddress : ", userAddress);
-    
+
     const authRequest = authRequests.getAuthRequests(sessionId);
-  
+
     console.log(`handleVerification for ${sessionId}`);
     console.log('authRequest : ', authRequest);
 

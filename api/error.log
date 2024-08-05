@@ -1,0 +1,12 @@
+{"error":"","level":"error","message":"Error in registration process","timestamp":"2024-07-31T10:13:56.892Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"error":"","level":"error","message":"Error in registration process","timestamp":"2024-07-31T10:18:34.715Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"error":"connect ECONNREFUSED 34.100.214.82:3002","level":"error","message":"Error in registration process","timestamp":"2024-07-31T10:43:22.166Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"error":"connect ECONNREFUSED 34.100.214.82:3002","level":"error","message":"Error in registration process","timestamp":"2024-07-31T10:45:02.353Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"error":{"message":"Error in aadhaar service"},"level":"error","message":"Error in registration process","timestamp":"2024-08-01T09:05:39.861Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"error":{"message":"Error in aadhaar service"},"level":"error","message":"Error in registration process","timestamp":"2024-08-01T09:08:22.763Z"}
+{"error":{"message":"Error in aadhaar service"},"level":"error","message":"Error in registration process","timestamp":"2024-08-01T09:16:10.239Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"error":{"message":"Error in aadhaar service"},"level":"error","message":"Error in registration process","timestamp":"2024-08-01T09:21:57.713Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"error":{"message":"Error in aadhaar service"},"level":"error","message":"Error in registration process","timestamp":"2024-08-01T09:27:51.718Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"error":"User validation failed: username: Path `username` is required.","level":"error","message":"Error in saving user:","timestamp":"2024-08-02T05:21:03.335Z"}
+{"error":"User validation failed: username: Path `username` is required.","level":"error","message":"Error in saving user:","timestamp":"2024-08-02T05:21:39.120Z"}
+{"error":"User validation failed: username: Path `username` is required.","level":"error","message":"Error in saving user:","timestamp":"2024-08-02T05:21:41.959Z"}
