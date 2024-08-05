@@ -126,15 +126,23 @@ For each component (client, api, blockchain, server, and wallet), open a new ter
 You need to create .env files in the client, api, and blockchain directories to store environment-specific variables. Here are the instructions for each:
 
 ### Client
-
 1. Create a .env file in the client directory:
    ```bash
    touch .env
    ```
 2. Add the necessary environment variables (replace placeholders with actual values):
    ```env
-   REACT_APP_API_URL=http://localhost:5000
-   REACT_APP_BLOCKCHAIN_NETWORK=polygon
+   VITE_PINATA_KEY=
+   VITE_PINATA_SECRET_KEY=
+
+   VITE_CONTRACT_ADDRESS=
+
+   VITE_REACT_APP_VERIFICATION_SERVER_PUBLIC_URL=https://27c5-202-3-77-209.ngrok-free.app   # Update HOSTED_SERVER_URL with the ngrok url returned when you run `ngrok http ${SERVER_PORT}`
+   VITE_REACT_APP_VERIFICATION_SERVER_LOCAL_HOST_URL=http://localhost:8080
+
+   VITE_PUBLIC_PROJECT_ID=
+   VITE_PUBLIC_RELAY_URL=wss://relay.walletconnect.com
+   VITE_RPC_URL=
    ```
 
 ### API
@@ -144,10 +152,22 @@ You need to create .env files in the client, api, and blockchain directories to 
    ```
 2. Add the necessary environment variables:
    ```env
-   Copy code
-   PORT=5000
-   DATABASE_URL=mongodb://localhost:27017/social_media
-   JWT_SECRET=your_jwt_secret
+   HOSTED_SERVER_URL=https://27c5-202-3-77-209.ngrok-free.app   # Update HOSTED_SERVER_URL with the ngrok url returned when you run `ngrok http ${SERVER_PORT}`
+   RPC_URL_AMOY=
+
+   VERIFIER_DID=
+   ISSUER_DID=
+   AMOY_CONTRACT_ADDRESS=
+   BASIC_AUTH=
+
+   FRONTEND_URL=http://localhost:5173
+   HOSTED_ISSUER_URL=
+   HOSTED_RESOLVER_URL=
+
+   MONGODB_URI=
+   SECRET=fdhvewuifhjweuhrfwe&&Q&WE007**%%%52dgyfh@^ghqdbhfewnjweuhqwegyqwevqhw
+   CONTRACT_ADDRESS=
+   API_KEY=
    ```
 
 ### Blockchain
@@ -157,10 +177,20 @@ You need to create .env files in the client, api, and blockchain directories to 
    ```
 2. Add the necessary environment variables:
    ```env
-   PRIVATE_KEY=your_wallet_private_key
-   INFURA_PROJECT_ID=your_infura_project_id
+   PRIVATE_KEY=  # metamask account private key
+   API_KEY=   # Alchemy/Infura API_Key
    ```
 Make sure to replace the placeholder values with your actual configuration details.
+
+### Ngrok Setup
+
+   Ngrok is required to expose your local server to the internet. Follow these steps:
+1. Install Ngrok from official website https://ngrok.com/
+2. Start Ngrok and point it to your server port:
+   ```bash
+   ngrok http 8080
+   ```
+3. Copy the ngrok URL displayed in the terminal and update the client and api .env files. 
 
 ## Running the Application
 
