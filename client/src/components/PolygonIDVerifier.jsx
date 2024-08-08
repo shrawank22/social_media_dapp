@@ -8,7 +8,8 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Loader } from "./Loader";
 
 
-const linkDownloadPolygonIDWalletApp = "https://0xpolygonid.github.io/tutorials/wallet/wallet-overview/#quick-start";
+const linkDownloadPolygonIDWalletApp =
+    "https://0xpolygonid.github.io/tutorials/wallet/wallet-overview/#quick-start";
 
 function PolygonIDVerifier({
     credentialType,
@@ -17,16 +18,22 @@ function PolygonIDVerifier({
     publicServerURL,
     localServerURL,
     userAddress,
-    // uri
+    uri
 }) {
     const [sessionId, setSessionId] = useState("");
     const [qrCodeData, setQrCodeData] = useState();
+    const [isHandlingVerification, setIsHandlingVerification] = useState(false);
+    const [verificationCheckComplete, setVerificationCheckComplete] =
+        useState(false);
     const [verificationMessage, setVerificationMessage] = useState("⌛ Waiting for Proof...");
     const [socketEvents, setSocketEvents] = useState([]);
 
-    const serverUrl = window.location.href.startsWith("https") ? publicServerURL : localServerURL;
+    const serverUrl = window.location.href.startsWith("https")
+        ? publicServerURL
+        : localServerURL;
 
-    const getQrCodeApi = (sessionId) => serverUrl + `/api/login?sessionId=${sessionId}&userAddress=${userAddress}`;
+    const getQrCodeApi = (sessionId) =>
+        serverUrl + `/api/login?sessionId=${sessionId}&userAddress=${userAddress}`;
 
     const socket = io(serverUrl);
 
@@ -55,6 +62,7 @@ function PolygonIDVerifier({
             console.log("data : ", data);
             let res = {
                 ssi: data,
+                uri: uri,
             }
             console.log("new data : ", res);
             return res;
@@ -63,7 +71,7 @@ function PolygonIDVerifier({
         if (sessionId) {
             fetchQrCode().then(setQrCodeData).catch(console.error);
         }
-    }, [sessionId]);
+    }, [sessionId, uri]);
 
     // socket event side effects
     useEffect(() => {
@@ -72,10 +80,12 @@ function PolygonIDVerifier({
 
             if (currentSocketEvent.fn === "handleVerification") {
                 if (currentSocketEvent.status === "IN_PROGRESS") {
+                    setIsHandlingVerification(true);
                     setVerificationMessage("🔍 Verifying proof...");
                 } else {
+                    setIsHandlingVerification(false);
+                    setVerificationCheckComplete(true);
                     if (currentSocketEvent.status === "DONE") {
-                        console.log("currentSocketEvent : ", currentSocketEvent);
                         localStorage.setItem('userDid', currentSocketEvent.data.userDid);
                         localStorage.setItem('jwz-token', currentSocketEvent.data.jwzToken);
                         localStorage.setItem('profile', currentSocketEvent.data.profile?.data);
@@ -129,8 +139,8 @@ function PolygonIDVerifier({
                                     colorScheme="purple"
                                     onClick={() => openInNewTab(linkDownloadPolygonIDWalletApp)}
                                 >
-                                    Download Wallet App{" "}
-                                    <ExternalLinkIcon marginLeft={2} />
+                                Download Wallet App{" "}
+                                <ExternalLinkIcon marginLeft={2} />
                                 </Button>
                             </p>
                         </>

@@ -23,7 +23,7 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+      
         try {
             const response = await axios.post("http://localhost:8080/api/register", { username, password, name, email }, {
                 withCredentials: "true",
@@ -70,15 +70,15 @@ const Register = () => {
                 </div>
                 <div className="mb-3">
                     <label htmlFor="email" className="form-label">Email</label>
-                    <input type="email" className="form-control" id="email" value={email} onChange={onChange3} />
+                    <input type="email" className="form-control" id="email"  value={email} onChange={onChange3} />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="name" className="form-label">Name</label>
-                    <input type="text" className="form-control" id="name" name='name' value={name} onChange={onChange2} />
+                    <input type="text" className="form-control" id="name" name='name'  value={name} onChange={onChange2} />
                 </div>
                 <div className="mb-3">
                     <label htmlFor="password" className="form-label">Password</label>
-                    <input type="password" className="form-control" id="password" name='password' value={password} onChange={onChange1} />
+                    <input type="password" className="form-control" id="password" name='password'  value={password} onChange={onChange1} />
                 </div>
                 <button type="submit" className="btn btn-primary">Register</button>
             </form>

@@ -66,9 +66,3 @@
 {"level":"info","message":"Registering user: 0x3524475669908C46b4417743D2B9D0d16a4eF378","timestamp":"2024-08-05T10:12:55.896Z"}
 {"level":"info","message":"Creating credential","timestamp":"2024-08-05T10:12:55.899Z"}
 {"error":"connect ETIMEDOUT 34.93.171.75:3002","level":"error","message":"Error in registration process","timestamp":"2024-08-05T10:13:16.955Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
-{"level":"info","message":"Registering user: 0x3524475669908C46b4417743D2B9D0d16a4eF378","timestamp":"2024-08-08T19:09:10.820Z"}
-{"level":"info","message":"Creating credential","timestamp":"2024-08-08T19:09:10.824Z"}
-{"level":"info","message":"Creating QR code","timestamp":"2024-08-08T19:09:12.159Z"}
-{"level":"info","message":"QR code link generated: http://35.244.0.131:3002/v1/qr-store?id=f9a06e4d-62c7-420e-ae36-ffc7068ce9f2","timestamp":"2024-08-08T19:09:12.274Z"}
-{"level":"info","message":"User saved successfully: 0x3524475669908C46b4417743D2B9D0d16a4eF378","timestamp":"2024-08-08T19:09:12.501Z"}
-{"level":"info","message":"Registration successful","timestamp":"2024-08-08T19:09:12.502Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}

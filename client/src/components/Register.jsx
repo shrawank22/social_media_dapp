@@ -1,15 +1,17 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router";
+import postContext from "../context/post/postContext";
 import { issueCredential } from "../api/credentialApi";
 import { Loader } from "./Loader";
 import TextInput from "./input";
 import { QRCode } from "./QRCode";
-// import { EthereumContext } from "../context/EthereumContext";
-import web3Context from "../context/web3/web3Context";
+import { EthereumContext } from "../context/EthereumContext";
 
 const Register = () => {
-  const context = useContext(web3Context);
-  const { state } = context;
+  const context1 = useContext(postContext);
+  const { state } = useContext(EthereumContext);
+  const { showAlert } = context1;
+
   const { address, contract } = state;
 
   const [name, setName] = useState("");

@@ -5,13 +5,12 @@ import Post from './Post';
 import postContext from '../context/post/postContext';
 
 import { Loader } from './Loader';
-// import { EthereumContext } from '../context/EthereumContext';
-import web3Context from '../context/web3/web3Context';
+import { EthereumContext } from '../context/EthereumContext';
 
 const Home = () => {
     const context1 = useContext(postContext);
-    const context2 = useContext(web3Context);
-    const { showAlert, deletePost, posts, setPosts, loader } = context1;
+    const context2 = useContext(EthereumContext);
+    const { showAlert, deletePost, posts, setPosts, loader, setLoader, posted, followEvent } = context1;
     const { state } = context2;
     const { contract, address } = state;
 
@@ -34,41 +33,49 @@ const Home = () => {
         }
     }
 
+    // useEffect(() => {
+    //     if (contract) {
+    //         fetchPosts();
+    //         // contract.removeAllListeners("NewPostForFollower");
+    //     }
+    //   }, [state, posted, contract, address, followEvent]);
+
+
     return (
         <>
-            {localStorage.getItem('jwz-token') ?
-                <div className='mt-3'>
-                    <PostContainer />
+            {localStorage.getItem('jwz-token') ? 
+            <div className='mt-3'>
+                <PostContainer />
+            </div>
+            :
+            <>
+                <div className='flex justify-center items-center'>
+                    <h1 className='text-xl font-bold my-5'>Please login / register using wallet app to view posts</h1>
                 </div>
-                :
-                <>
-                    <div className='flex justify-center items-center'>
-                        <h1 className='text-xl font-bold my-5'>Please login / register using wallet app to view posts</h1>
-                    </div>
-                </>
+            </>
             }
 
-            {loader ?
-                <>
-                    <div className='flex justify-center items-center pl-48'>
-                        <Loader size={20} color="gray-900" />
-                    </div>
-                </> : posts.map((post) => (
-                    <Post
-                        key={post.NFTID}
-                        displayName={post.username}
-                        text={post.postText}
-                        price={Number(post.viewPrice) / 100}
-                        deletePostHandler={deletePostHandler(post.NFTID)}
-                        isCreator={address === post.username}
-                        postId={post.NFTID}
-                        state={state}
-                        hasPaid={post.hasPaid}
-                        hasListed={post.hasListed}
-                        decryptedFiles={post.decryptedFiles}
-                        ipfsHashes={post.ipfsHashes}
-                    />
-                ))}
+            {loader ? 
+            <>
+                <div className='flex justify-center items-center pl-48'>
+                    <Loader size={20} color="gray-900" />
+                </div>
+            </> : posts.map((post) => (
+                <Post
+                    key={post.NFTID}
+                    displayName={post.username}
+                    text={post.postText}
+                    price={Number(post.viewPrice) / 100}
+                    deletePostHandler={deletePostHandler(post.NFTID)}
+                    isCreator={address === post.username}
+                    postId={post.NFTID}
+                    state={state}
+                    hasPaid={post.hasPaid}
+                    hasListed = {post.hasListed}
+                    decryptedFiles={post.decryptedFiles}
+                    ipfsHashes={post.ipfsHashes}
+                />
+            ))}
 
         </>
     );

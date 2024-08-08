@@ -13,13 +13,11 @@
 
 /* Hide scrollbar for IE, Edge, and Firefox */
 .feed {
-    -ms-overflow-style: none;
-    /* IE and Edge */
-    scrollbar-width: none;
-    /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
-.feed>h2 {
+.feed > h2 {
     font-size: 20px;
     font-weight: 800;
 }

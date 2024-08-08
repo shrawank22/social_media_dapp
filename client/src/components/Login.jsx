@@ -1,19 +1,28 @@
 import { useState, useContext, useEffect } from "react"
+import postContext from '../context/post/postContext';
 import web3Context from '../context/web3/web3Context';
 import { Center, Container } from "@chakra-ui/react";
 import PolygonIDVerifier from "./PolygonIDVerifier";
 import { useNavigate } from "react-router-dom";
-// import { EthereumContext, useEthereumConnectClient } from "../context/EthereumContext";
+import { EthereumContext, useEthereumConnectClient } from "../context/EthereumContext";
 
 const Login = () => {
-    const context = useContext(web3Context);
-    
-    const { state } = context;
+    const context1 = useContext(postContext);
+    const context2 = useContext(EthereumContext);
+    const [connectId, setConnectId] = useState("");
+    const { showAlert } = context1;
+    const { state } = context2;
 
-    // const [connectId, setConnectId] = useState("");
     const [provedAccess, setProvedAccess] = useState(false);
+    const { uri, provider, connectWallet } = useEthereumConnectClient();
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (provider) {
+            connectWallet();
+        }
+    }, [provider]);
 
     useEffect(() => {
         if(provedAccess) {
@@ -22,6 +31,10 @@ const Login = () => {
             }, 1500);
         }   
     }, [provedAccess]);
+
+    useEffect(() => {
+        setConnectId(uri);
+    }, [uri]);
 
     return (
         <>
@@ -41,7 +54,7 @@ const Login = () => {
                               }
                               onVerificationResult={setProvedAccess}
                               userAddress={state.address}
-                            //   uri={connectId}
+                              uri={connectId}
                         />
                     </Container>
                 </Center>

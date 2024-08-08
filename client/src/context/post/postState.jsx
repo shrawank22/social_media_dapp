@@ -1,5 +1,5 @@
 import PostContext from "./postContext";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import { v4 as uuidv4 } from "uuid";
@@ -7,15 +7,13 @@ import { Buffer, split, combine } from "shamirs-secret-sharing";
 
 import postContext from "./postContext";
 import Post from "../../components/Post";
-// import { useEthereumConnectClient } from "../EthereumContext";
-import web3Context from "../web3/web3Context";
+import { useEthereumConnectClient } from "../EthereumContext";
 
 const PostState = ({ children }) => {
     const host = "http://localhost:8080";
 
     //------------------------------ Web3 Context ------------------------------
-    const context = useContext(web3Context);
-    const { state } = context
+    const { state } = useEthereumConnectClient();
     const { contract, address } = state;
 
     //--------------------------------- States ---------------------------------
@@ -274,7 +272,7 @@ const PostState = ({ children }) => {
                 contract.removeAllListeners("NewPostForFollower");
             }
         };
-    }, [posted, followEvent]);
+    }, [state, posted, contract, address, followEvent]);
 
     //--------------------------------- API Calls ---------------------------------
     const getPost = async (id) => {

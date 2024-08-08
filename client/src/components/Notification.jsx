@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
 import { getNotifications } from '../api/notificationApi';
-// import { EthereumContext } from '../context/EthereumContext';
-import web3Context from '../context/web3/web3Context';
+import { EthereumContext } from '../context/EthereumContext';
+// import web3Context from '../context/web3/web3Context';
 
 const Notification = () => {
     const [notifications, setNotifications] = useState([]);
-    const context1 = useContext(web3Context);
+    const context1 = useContext(EthereumContext);
     const { state } = context1;
 
     useEffect(() => {
@@ -14,8 +14,8 @@ const Notification = () => {
                 const response = await getNotifications(state);
 
                 console.log("response : ", response.data);
-
-                if (response.data && response.status === 200) {
+                
+                if(response.data && response.status === 200) {
                     setNotifications(response.data);
                 }
             } catch (error) {
