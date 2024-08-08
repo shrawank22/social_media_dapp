@@ -2,17 +2,17 @@ import { useNavigate } from "react-router-dom";
 import { QRCode } from "./QRCode";
 import { useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import {Loader} from "./Loader";
-import { EthereumContext } from "../context/EthereumContext";
+import { Loader } from "./Loader";
+// import { EthereumContext } from "../context/EthereumContext";
+import web3Context from "../context/web3/web3Context";
 
 function Connection() {
-    const context1 = useContext(EthereumContext);
-    const { uri, provider, connectWallet, reset, setProvider } = context1;
+    // const context1 = useContext(EthereumContext);
+    const context = useContext(web3Context);
+    const { resetConnection } = context;
 
     const [sessionId, setSessionId] = useState("");
     const [qrCodeData, setQrCodeData] = useState("");
-    const [isHandlingConnection, setIsHandlingConnection] = useState(false);
-    const [connectionCheckComplete, setConnectionCheckComplete] = useState(false);
     const [connectionMessage, setConnectionMessage] = useState("⌛ Waiting for Connection...");
     const [socketEvents, setSocketEvents] = useState([]);
 
@@ -27,12 +27,6 @@ function Connection() {
             navigate("/register");
         }
     });
-
-    useEffect(() => {
-        if(provider) {
-            connectWallet();
-        }
-    }, [provider])
 
     useEffect(() => {
         console.log("useEffect 1");
@@ -53,7 +47,6 @@ function Connection() {
             console.log("connection qrcode data : ", data);
             let res = {
                 ssi: data,
-                uri: uri
             }
 
             console.log("new data : ", res);
@@ -66,7 +59,7 @@ function Connection() {
         if (sessionId) {
             fetchQrCode().then(setQrCodeData).catch(console.error);
         }
-    }, [sessionId,  uri]);
+    }, [sessionId]);
 
     console.log("qrCodeData : ", qrCodeData);
 
@@ -78,11 +71,8 @@ function Connection() {
             if (currentSocketEvent.fn === "handleConnectionCallback") {
                 if (currentSocketEvent.status === "IN_PROGRESS") {
                     console.log("in_progress")
-                    setIsHandlingConnection(true);
                     setConnectionMessage("🔄 Establishing connection...")
                 } else {
-                    setIsHandlingConnection(false);
-                    setConnectionCheckComplete(true);
                     if (currentSocketEvent.status === "DONE") {
                         console.log("connection done");
                         console.log("user did: ", currentSocketEvent.data);
@@ -107,7 +97,7 @@ function Connection() {
 
     const handleReset = () => {
         console.log("handleReset");
-        reset();
+        resetConnection();
         indexedDB.deleteDatabase("WALLET_CONNECT_V2_INDEXED_DB");
         connectWallet();
     }

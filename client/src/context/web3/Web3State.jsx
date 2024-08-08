@@ -12,8 +12,8 @@ const Web3State = ({ children }) => {
     });
 
     const connectWallet = async () => {
-        console.log("Connecting Wallet")
-        console.log("window.ethereum : ", window.ethereum)
+        console.log("Connecting Wallet");
+        console.log("window.ethereum : ", window.ethereum);
         if (window.ethereum) {
             try {
                 const provider = new providers.Web3Provider(window.ethereum);
@@ -33,22 +33,31 @@ const Web3State = ({ children }) => {
                 console.log("address : ", address);
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
                 console.log("contract : ", contract);
-                setState({ provider, signer, contract, address })
+                setState({ provider, signer, contract, address });
 
             } catch (err) {
                 console.error(err);
             }
-
         } else {
             console.error("Metamask not Detected");
         }
     };
 
+    const resetConnection = () => {
+        console.log("Resetting Wallet Connection");
+        setState({
+            provider: null,
+            signer: null,
+            contract: null,
+            address: null
+        });
+    };
+
     return (
-        <Web3Context.Provider value={{ state, connectWallet }}>
+        <Web3Context.Provider value={{ state, connectWallet, resetConnection }}>
             {children}
         </Web3Context.Provider>
-    )
-
+    );
 }
+
 export default Web3State;

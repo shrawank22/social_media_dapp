@@ -1,26 +1,24 @@
 import { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { EthereumContext } from '../context/EthereumContext';
+// import { EthereumContext } from '../context/EthereumContext';
+import web3Context from '../context/web3/web3Context';
 
 const Navbar = () => {
+    const context = useContext(web3Context);
+    const { state } = context;
+    const { contract, address } = state;
+
+
     const [isOpen, setIsOpen] = useState(false);
-    const { web3, reset, connectWallet, state } = useContext(EthereumContext);
     const [searchText, setSearchText] = useState('');
     const [showSearchItems, setShowSearchItems] = useState(false);
     const [searchResult, setSearchResult] = useState([]);
 
-    const { contract, address } = state;
 
     let location = useLocation();
     let navigate = useNavigate();
     const token = localStorage.getItem("jwz-token");
     const isAuthenticated = !!token;
-    const usersData = [
-        { id: 1, name: 'John Doe', imageUrl: 'https://via.placeholder.com/50', isFollowing: false },
-        { id: 2, name: 'Jane Smith', imageUrl: 'https://via.placeholder.com/50', isFollowing: true },
-        { id: 3, name: 'Alice Johnson', imageUrl: 'https://via.placeholder.com/50', isFollowing: false },
-        { id: 4, name: 'Bob Brown', imageUrl: 'https://via.placeholder.com/50', isFollowing: true },
-    ];
 
     const handleLogout = () => {
         localStorage.removeItem("userDid");
@@ -192,7 +190,7 @@ const Navbar = () => {
                                     }
                                 </>
                             }
-                            {(localStorage.getItem("userDid") || localStorage.getItem("jwz-token")) &&
+                            {/* {(localStorage.getItem("userDid") || localStorage.getItem("jwz-token")) &&
                                 <li>
                                     <button onClick={web3 ? reset : connectWallet} type="button" className={`text-white ${web3 ? 'bg-red-700' : 'bg-green-700'} ${web3 ? 'hover:bg-red-800' : 'hover:bg-green-800'} focus:ring-4 focus:outline-none ${web3 ? 'focus:ring-red-300' : 'focus:ring-green-300'}  font-medium rounded-lg text-sm px-4 py-2 md:!my-0 my-2 text-center`}>
                                         {
@@ -200,7 +198,7 @@ const Navbar = () => {
                                         }
                                     </button>
                                 </li>
-                            }
+                            } */}
                         </ul>
                     </div>
                 </div>

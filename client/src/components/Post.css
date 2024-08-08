@@ -7,19 +7,23 @@
 .post_content.blurred {
     filter: blur(3px);
 }
+
 .modal-header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background-color: inherit; /* match the background color of the modal */
+    background-color: inherit;
+    /* match the background color of the modal */
 }
+
 .viewButton {
     filter: none;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 2; /* Place the button on top of the blurred content */
+    z-index: 2;
+    /* Place the button on top of the blurred content */
 }
 
 .viewButton.hidden {
@@ -27,7 +31,7 @@
 }
 
 .viewButton.visible {
-    filter:none;
+    filter: none;
     display: block;
     z-index: 2;
 }

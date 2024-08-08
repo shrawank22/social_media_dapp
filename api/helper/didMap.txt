@@ -13,5 +13,6 @@
   "2a1e723b58cdb1c91f4949a923e15148": "did:polygonid:polygon:amoy:2qQMubuA6VnxYfzkizMGmPSP6usZfPD8WTMhF5T3Wf",
   "fdf953c03881bc702bc038dbe409f47b": "did:polygonid:polygon:amoy:2qQMubuA6VnxYfzkizMGmPSP6usZfPD8WTMhF5T3Wf",
   "6ed86aa3f3c8a416e1d9c459e2d4d2e5": "did:polygonid:polygon:amoy:2qQMubuA6VnxYfzkizMGmPSP6usZfPD8WTMhF5T3Wf",
-  "5bd0d058c6bdc418cfd96865fddc0345": "did:polygonid:polygon:amoy:2qQMubuA6VnxYfzkizMGmPSP6usZfPD8WTMhF5T3Wf"
+  "5bd0d058c6bdc418cfd96865fddc0345": "did:polygonid:polygon:amoy:2qQMubuA6VnxYfzkizMGmPSP6usZfPD8WTMhF5T3Wf",
+  "abc454f7268c10207efb252cacb47c67": "did:polygonid:polygon:amoy:2qbQqKGVkuk34Gty8Ga9j9tGqDVBQWdV2kdUbuDkys"
 }
