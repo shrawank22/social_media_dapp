@@ -1,31 +1,35 @@
-import './App.css'
-import { useEffect, useContext } from 'react'
+import './App.css';
+import { useEffect, useContext } from 'react';
 
-import Home from './components/Home'
-import Profile from './components/Profile'
-import Login from './components/Login'
-import Register from './components/Register'
-import Notification from './components/Notification'
-import Navbar from './components/Navbar'
-import Alert from './components/Alert'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import PostState from './context/post/postState'
-import Connection from './components/Connection'
-import Logout from './components/Logout'
-// import { useEthereumConnectClient } from './context/EthereumContext'
-import web3Context from './context/web3/web3Context'
+import Home from './components/Home';
+import Profile from './components/Profile';
+import Login from './components/Login';
+import Register from './components/Register';
+import Notification from './components/Notification';
+import Navbar from './components/Navbar';
+import Alert from './components/Alert';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import PostState from './context/post/postState';
+import Connection from './components/Connection';
+import Logout from './components/Logout';
+import web3Context from './context/web3/web3Context';
 
 function App() {
   const context = useContext(web3Context);
-  const { connectWallet, state } = context;
-  const { provider } = state;
+  const { connectWallet, isMetaMaskAvailable } = context;
 
   useEffect(() => {
-    // if (localStorage.getItem('jwz-token') && provider) {
-    //   connectWallet();
-    // }
-    connectWallet()
+    connectWallet();
   }, []);
+
+  if (!isMetaMaskAvailable) {
+    return (
+      <Router>
+        <Navbar />
+        <div className='block mb-2 text-lg font-medium text-gray-900 py-20 px-80'>Please install MetaMask to use this application.</div>
+      </Router>
+    )
+  }
 
   return (
     <PostState>
@@ -48,7 +52,7 @@ function App() {
         </div>
       </Router>
     </PostState>
-  )
+  );
 }
 
-export default App
+export default App;

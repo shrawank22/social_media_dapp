@@ -15,11 +15,10 @@ const PostState = ({ children }) => {
 
     //------------------------------ Web3 Context ------------------------------
     const context = useContext(web3Context);
-    const { state } = context
+    const { state, showAlert} = context
     const { contract, address } = state;
 
     //--------------------------------- States ---------------------------------
-    const [alert, setAlert] = useState(null);
     const [postText, setPostText] = useState("");
     const [loader, setLoader] = useState(true);
 
@@ -111,9 +110,7 @@ const PostState = ({ children }) => {
                         for (let e of followEvent.followers) {
                             const follower = e;
                             if (user === address) {
-                                const postData = await contract.methods
-                                    .getSinglePost(id)
-                                    .call();
+                                const postData = await contract.getSinglePost(id);
                                 console.log(postData);
                                 console.log(follower);
                                 //console.log(postData);
@@ -165,7 +162,7 @@ const PostState = ({ children }) => {
 
                     // for (let p of allPosts.posts) {
                     //   let postId = p.NFTID;
-                    //   let postData = await contract.methods.getSinglePost(postId).call();
+                    //   let postData = await contract.getSinglePost(postId).call();
                     //   //console.log(p)
                     //   let arr2, arr1;
                     //   arr2 = [
@@ -215,9 +212,7 @@ const PostState = ({ children }) => {
                                 const { ciphertext, uniqueId, encryptedFiles, price } =
                                     await fetchTextFromIPFS(post.postText);
 
-                                let usersWhoPaid = await contract.methods
-                                    .getPaidUsersByPostId(post.NFTID)
-                                    .call();
+                                let usersWhoPaid = await contract.getPaidUsersByPostId(post.NFTID)
                                 const hasPaid = usersWhoPaid.includes(address);
                                 // console.log(hasPaid, post.username === address)
 
@@ -290,8 +285,8 @@ const PostState = ({ children }) => {
     const deletePost = async (id) => {
         try {
             const res = await axios.delete(`${host}/api/posts/${id}`);
-            const owner = await contract.methods.getOwnerName(id).call();
-            const listofFollowers = await contract.methods.getFollowers(owner).call();
+            const owner = await contract.getOwnerName(id);
+            const listofFollowers = await contract.getFollowers(owner);
             const res2 = await axios.delete(`${host}/api/deletePost/${owner}/${id}`);
             for (let e of listofFollowers) {
                 const res3 = await axios.delete(`${host}/api/deletePost/${e}/${id}`);
@@ -321,17 +316,6 @@ const PostState = ({ children }) => {
     };
 
     //--------------------------------- Functions ---------------------------------
-    const showAlert = (type, message) => {
-        setAlert({
-            type: type,
-            msg: message,
-        });
-        setTimeout(() => {
-            setAlert(null);
-            // window.location.reload();
-        }, 5000);
-    };
-
     const handleFileEncrypt = (key) => {
         const encryptedFilesArray = [];
 
@@ -470,9 +454,7 @@ const PostState = ({ children }) => {
                     const ipfsHash = res.data.IpfsHash;
 
                     // Store hash onto blockchain
-                    const tx = await contract.methods
-                        .addPost(String(ipfsHash), parseInt(content.viewPrice))
-                        .send({ from: address, gasPrice: "30000000000" });
+                    const tx = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice))
 
                     const addPostEvent = tx.events.hasOwnProperty("AddPost")
                         ? tx.events.AddPost
@@ -482,7 +464,7 @@ const PostState = ({ children }) => {
                     const username = addPostEvent.returnValues[0].toString();
                     const postId = addPostEvent.returnValues[1].toString();
 
-                    const postData = await contract.methods.getSinglePost(postId).call();
+                    const postData = await contract.getSinglePost(postId);
                     console.log("Here is the details of my new post..", postData);
                     try {
                         const res = await axios.post(
@@ -570,9 +552,7 @@ const PostState = ({ children }) => {
                     const ipfsHash = res.data.IpfsHash;
 
                     // Store hash onto blockchain
-                    const tx = await contract.methods
-                        .addPost(String(ipfsHash), parseInt(content.viewPrice))
-                        .send({ from: address, gasPrice: "30000000000" });
+                    const tx = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice))
 
 
                     const addPostEvent = tx.events.hasOwnProperty("AddPost")
@@ -583,7 +563,7 @@ const PostState = ({ children }) => {
                     const username = addPostEvent.returnValues[0].toString();
                     const postId = addPostEvent.returnValues[1].toString();
 
-                    const postData = await contract.methods.getSinglePost(postId).call();
+                    const postData = await contract.getSinglePost(postId);
                     console.log(postData);
                     try {
                         const res = await axios.post(
@@ -686,12 +666,10 @@ const PostState = ({ children }) => {
 
     const fetchGatekeepers = async () => {
         try {
-            const gatekeepersCount = await contract.methods
-                .getGatekeepersCount()
-                .call();
+            const gatekeepersCount = await contract.getGatekeepersCount()
             let gatekeepers = [];
             for (let i = 0; i < gatekeepersCount; i++) {
-                let { ip, port } = await contract.methods.getGatekeeper(i).call();
+                let { ip, port } = await contract.getGatekeeper(i);
                 gatekeepers.push({ ip, port });
             }
             return { gatekeepers, gatekeepersCount };
@@ -704,8 +682,7 @@ const PostState = ({ children }) => {
     return (
         <PostContext.Provider
             value={{
-                alert,
-                showAlert,
+
                 getPost,
                 deletePost,
                 postPost,

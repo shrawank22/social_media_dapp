@@ -19,7 +19,7 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
             // console.log(token)
             console.log(isFollowing);
             if (!isFollowing) {
-                await contract.methods.followUser(displayName).send({ from: address });
+                await contract.followUser(displayName);
 
                 const response = await axios.post(`http://localhost:8080/api/follow/${displayName}/${address}`, {}, {
                     headers: {
@@ -30,7 +30,7 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
                 console.log(response.data)
 
             } else {
-                await contract.methods.unfollowUser(displayName).send({ from: address });
+                await contract.unfollowUser(displayName);
                 const response = await axios.post(`http://localhost:8080/api/unfollow/${displayName}/${address}`, {}, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -49,7 +49,7 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
     useEffect(() => {
         const checkFollowingStatus = async () => {
 
-            const followingStatus = await contract.methods.isFollowing(displayName, address).call();
+            const followingStatus = await contract.isFollowing(displayName, address);
             //console.log(followingStatus); 
             setIsFollowing(followingStatus);
         };

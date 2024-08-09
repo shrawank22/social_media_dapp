@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { logoutUser } from "../api/authApi";
-// import { useEthereumConnectClient } from "../context/EthereumContext";
 import web3Context from "../context/web3/web3Context";
 
 function Logout() {

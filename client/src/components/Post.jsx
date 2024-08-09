@@ -43,15 +43,13 @@ const Post = ({
     const handleListClick = async (price) => {
         console.log("Listing post with price:", price);
         try {
-            const tx = await contract.methods
-                .listPost(postId, price)
-                .send({ from: address, gasPrice: "30000000000" });
-            // const receipt = await tx.wait(); // Wait for the transaction to be mined
-            if (tx.status === 1n) {
+            const tx = await contract.listPost(postId, price)
+            const receipt  = await tx.wait(); // Wait for the transaction to be mined
+            if (receipt.status === 1) {
                 console.log("Transaction successful");
                 setIsBlurred(false);
 
-                const postData = await contract.methods.getSinglePost(postId).call();
+                const postData = await contract.getSinglePost(postId);
                 try {
                     const res = await axios.post(
                         `${host}/api/postsFollowing`,
@@ -97,18 +95,14 @@ const Post = ({
         console.log("Buy post logic goes here");
         try {
             if (!isCreator) {
-                const listPrice = await contract.methods.getListPrice(postId).call();
-                const prevOwner = await contract.methods.getOwnerName(postId).call();
+                const listPrice = await contract.getListPrice(postId)
+                const prevOwner = await contract.getOwnerName(postId)
                 console.log("prevowner,", prevOwner, postId);
-                const listofFollowers = await contract.methods
-                    .getFollowers(prevOwner)
-                    .call();
+                const listofFollowers = await contract.getFollowers(prevOwner)
                 console.log("List of followrs", listofFollowers);
-                const tx = await contract.methods
-                    .buyPost(postId, { value: listPrice })
-                    .send({ from: address, gasPrice: "30000000000" });
-
-                if (tx.status === 1n) {
+                const tx = await contract.buyPost(postId, { value: listPrice })
+                const receipt = await tx.wait();
+                if (receipt.status === 1n) {
                     // Delete the posts from the prevOwner and its followers also.
                     try {
                         const res = await axios.delete(
@@ -126,7 +120,7 @@ const Post = ({
                             `${host}/api/deletePost/${e}/${postId}`
                         );
                     }
-                    const postData = await contract.methods.getSinglePost(postId).call();
+                    const postData = await contract.getSinglePost(postId);
                     console.log("Deleted success", postData);
                     try {
                         const res = await axios.post(
@@ -172,12 +166,11 @@ const Post = ({
         console.log("Cancelling post listing");
         try {
             // Assuming your contract has a cancelListing method
-            const tx = await contract.methods
-                .cancelListing(postId)
-                .send({ from: address, gasPrice: "30000000000" });
+            const tx = await contract.cancelListing(postId)
+            const receipt = await tx.wait();
 
-            if (tx.status === 1n) {
-                const postData = await contract.methods.getSinglePost(postId).call();
+            if (receipt.status === 1) {
+                const postData = await contract.getSinglePost(postId);
                 try {
                     const res = await axios.post(
                         `${host}/api/postsFollowing`,
@@ -222,7 +215,7 @@ const Post = ({
     useEffect(() => {
         const fetchComments = async () => {
             try {
-                const comments = await contract.methods.getPostComments(postId).call();
+                const comments = await contract.getPostComments(postId);
                 setComments(comments);
             } catch (error) {
                 console.error("Error fetching comments:", error);
@@ -234,7 +227,7 @@ const Post = ({
     useEffect(() => {
         const fetchLikes = async () => {
             try {
-                const likes = await contract.methods.getLikesForPost(postId).call();
+                const likes = await contract.getLikesForPost(postId);
                 setLikes(likes);
             } catch (error) {
                 console.error("Error fetching likes:", error);
@@ -246,12 +239,10 @@ const Post = ({
     const handleViewClick = async () => {
         if (!isCreator) {
             try {
-                const tx = await contract.methods
-                    .viewPaidPost(postId, { value: price })
-                    .send({ from: address, gasPrice: "30000000000" });
-
+                const tx = await contract.viewPaidPost(postId, { value: price })
+                const receipt = await tx.wait();
                 console.log("tx : ", tx);
-                if (tx.status === 1n) {
+                if (receipt.status === 1n) {
                     console.log("Transaction successful");
                     setIsBlurred(false);
                 } else {
@@ -269,12 +260,9 @@ const Post = ({
             return;
         }
         try {
-            const tx = await contract.methods
-                .addComment(postId, comment)
-                .send({ from: address, gasPrice: "30000000000" });
-            // const receipt = await tx.wait();
-            console.log("tx : ", tx);
-            if (tx.status === 1n) {
+            const tx = await contract.addComment(postId, comment)
+            const receipt = await tx.wait();
+            if (tx.status === 1) {
                 console.log("Comment posted successfully");
                 setCommentCount(!commentCount); // To trigger useEffect
             } else {
@@ -288,11 +276,9 @@ const Post = ({
     const handleLikeClick = async (postId) => {
         if (isLiked) {
             try {
-                const tx = await contract.methods
-                    .unlikePost(postId)
-                    .send({ from: address, gasPrice: "30000000000" });
-                // const receipt = await tx.wait();
-                if (tx.status === 1n) {
+                const tx = await contract.unlikePost(postId)
+                const receipt = await tx.wait();
+                if (receipt.status === 1) {
                     console.log("Post Unliked successfully");
                     setLikes((prevLikes) => BigInt(prevLikes) - 1n);
                     localStorage.setItem(`liked-${address}-${postId}`, "false");
@@ -304,11 +290,9 @@ const Post = ({
             }
         } else {
             try {
-                const tx = await contract.methods
-                    .likePost(postId)
-                    .send({ from: address, gasPrice: "30000000000" });
-                // const receipt = await tx.wait();
-                if (tx.status === 1n) {
+                const tx = await contract.likePost(postId);
+                const receipt = await tx.wait();
+                if (receipt.status === 1n) {
                     localStorage.setItem(`liked-${address}-${postId}`, "true");
                     setLikes((prevLikes) => BigInt(prevLikes) + 1n);
                 } else {
@@ -374,10 +358,8 @@ const Post = ({
                 const ipfsHash = res.data.IpfsHash;
 
                 // Store hash onto blockchain
-                receipt = await contract.methods
-                    .editPost(postId, String(ipfsHash), parseInt(content.viewPrice))
-                    .send({ from: address, gasPrice: "30000000000" });
-                // receipt = await tx.wait();
+                const tx = await contract.editPost(postId, String(ipfsHash), parseInt(content.viewPrice))
+                receipt = await tx.wait();
             } else {
                 content.ipfsHashes = ipfsHashes;
 
@@ -400,16 +382,12 @@ const Post = ({
                 const ipfsHash = res.data.IpfsHash;
 
                 // Store hash onto blockchain
-                (receipt = await contract),
-                    methods
-                        .editPost(postId, String(ipfsHash), parseInt(content.viewPrice))
-                        .send({ from: address });
-                // receipt = await tx.wait();
+                tx = await contract.editPost(postId, String(ipfsHash), parseInt(content.viewPrice))
+                receipt = await tx.wait();
             }
-            if (receipt.status == 1n) {
+            if (receipt.status == 1) {
                 //Now update in db for each user and its followers
-                const postData = await contract.methods
-                    .getSinglePost(postId).call();
+                const postData = await contract.getSinglePost(postId);
                 console.log(postData);
                 try {
                     const res = await axios.post(

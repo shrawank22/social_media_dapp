@@ -1,9 +1,22 @@
 import Web3Context from "./web3Context";
-import { useState } from "react";
-import { providers, ethers } from 'ethers'
-import { contractAddress, contractABI } from '../../constants/constants'
+import { useState, useContext, useEffect } from "react";
+import { providers, ethers } from 'ethers';
+import { contractAddress, contractABI } from '../../constants/constants';
 
 const Web3State = ({ children }) => {
+    const [alert, setAlert] = useState(null);
+    const [isMetaMaskAvailable, setIsMetaMaskAvailable] = useState(false);
+
+    const showAlert = (type, message) => {
+        setAlert({
+            type: type,
+            msg: message,
+        });
+        setTimeout(() => {
+            setAlert(null);
+        }, 5000);
+    };
+
     const [state, setState] = useState({
         provider: null,
         signer: null,
@@ -13,8 +26,8 @@ const Web3State = ({ children }) => {
 
     const connectWallet = async () => {
         console.log("Connecting Wallet");
-        console.log("window.ethereum : ", window.ethereum);
         if (window.ethereum) {
+            setIsMetaMaskAvailable(true);
             try {
                 const provider = new providers.Web3Provider(window.ethereum);
                 console.log("metamask provider : ", provider);
@@ -27,10 +40,11 @@ const Web3State = ({ children }) => {
                     window.location.reload();
                 });
 
-                const signer = await provider.getSigner();
+                const signer = provider.getSigner();
                 console.log("signer : ", signer);
-                const address = await signer.getAddress();
-                console.log("address : ", address);
+                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                const address = accounts[0];
+                console.log("accounts : ", accounts);
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
                 console.log("contract : ", contract);
                 setState({ provider, signer, contract, address });
@@ -40,6 +54,9 @@ const Web3State = ({ children }) => {
             }
         } else {
             console.error("Metamask not Detected");
+            showAlert("danger", "Metamask not Detected, Please install it and then try again");
+            setIsMetaMaskAvailable(false);
+            return;
         }
     };
 
@@ -53,8 +70,15 @@ const Web3State = ({ children }) => {
         });
     };
 
+    useEffect(() => {
+        // Check if MetaMask is installed
+        setIsMetaMaskAvailable(Boolean(window.ethereum));
+    }, []);
+
     return (
-        <Web3Context.Provider value={{ state, connectWallet, resetConnection }}>
+        <Web3Context.Provider value={{
+            state, connectWallet, resetConnection, alert, showAlert, isMetaMaskAvailable
+        }}>
             {children}
         </Web3Context.Provider>
     );

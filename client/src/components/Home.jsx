@@ -17,14 +17,14 @@ const Home = () => {
 
     const deletePostHandler = key => async () => {
         try {
-            const usersWhoPaid = await contract.methods.getPaidUsersByPostId(key).call();
+            const usersWhoPaid = await contract.getPaidUsersByPostId(key);
             if (usersWhoPaid.length > 0) {
                 showAlert("danger", "You cannot delete a post that has been paid for");
                 return null;
             }
 
-            await contract.methods.deletePost(key).send({ from: address, gasPrice: '30000000000' });
-            // await receipt.wait();
+            const receipt = await contract.deletePost(key);
+            await receipt.wait();
             setPosts(posts.filter(post => post[0] !== key));
             deletePost(key);
         } catch (error) {

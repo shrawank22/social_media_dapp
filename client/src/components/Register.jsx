@@ -10,6 +10,7 @@ import web3Context from "../context/web3/web3Context";
 const Register = () => {
   const context = useContext(web3Context);
   const { state } = context;
+  console.log("state : ", state);
   const { address, contract } = state;
 
   const [name, setName] = useState("");
@@ -63,12 +64,7 @@ const Register = () => {
         try {
           console.log("contract : ", contract);
 
-          const tx = await contract.methods
-            .registerUser(name, "https://via.placeholder.com/50")
-            .send({
-              from: address,
-              gasPrice: "30000000000",
-            });
+          const tx = await contract.registerUser(name, "https://via.placeholder.com/50")
           console.log("tx : ", tx);
         } catch (e) {
           console.log("Error adding user to blockchain : ", e);

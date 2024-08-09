@@ -1,22 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { QRCode } from "./QRCode";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { Loader } from "./Loader";
-// import { EthereumContext } from "../context/EthereumContext";
-import web3Context from "../context/web3/web3Context";
 
 function Connection() {
-    // const context1 = useContext(EthereumContext);
-    const context = useContext(web3Context);
-    const { resetConnection } = context;
-
     const [sessionId, setSessionId] = useState("");
     const [qrCodeData, setQrCodeData] = useState("");
     const [connectionMessage, setConnectionMessage] = useState("⌛ Waiting for Connection...");
     const [socketEvents, setSocketEvents] = useState([]);
 
     const navigate = useNavigate();
+    console.log("window.location.href : ", window.location.href);
     const serverUrl = window.location.href.startsWith("https") ? import.meta.env.VITE_REACT_APP_VERIFICATION_SERVER_PUBLIC_URL : import.meta.env.VITE_REACT_APP_VERIFICATION_SERVER_LOCAL_HOST_URL;
     console.log("serverUrl : ", serverUrl);
     const socket = io(serverUrl);
@@ -95,13 +90,6 @@ function Connection() {
         navigate("/register");
     }
 
-    const handleReset = () => {
-        console.log("handleReset");
-        resetConnection();
-        indexedDB.deleteDatabase("WALLET_CONNECT_V2_INDEXED_DB");
-        connectWallet();
-    }
-
     return (
         <section className="bg-gray-50 min-h-[93vh] py-10 flex items-center justify-center">
             <div className="w-full min-h-[72vh] max-w-md p-6 bg-white rounded-lg shadow">
@@ -118,9 +106,6 @@ function Connection() {
                         </div>
                         <p className="text-center text-gray-500">
                             {connectionMessage}
-                        </p>
-                        <p onClick={handleReset} className="text-center text-gray-500 my-5 font-bold text-sm cursor-pointer">
-                            Reset Wallet Connection
                         </p>
                     </>
                 ) : (

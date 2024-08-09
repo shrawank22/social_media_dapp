@@ -35,11 +35,11 @@ const Navbar = () => {
             try {
                 console.log("contract : ", contract);
                 console.log("address: ", address);
-                const tx = await contract.methods.getUsersByName(searchText).call();
+                const tx = await contract.getUsersByName(searchText);
                 console.log("tx: ", tx);
 
                 const promises = tx.map(async item => {
-                    const followTx = await contract.methods.isFollowing(item[0], address).call();
+                    const followTx = await contract.isFollowing(item[0], address)
                     console.log("followTx : ", followTx);
 
                     return {
@@ -66,11 +66,8 @@ const Navbar = () => {
         console.log("addr : ", addr);
         console.log("address : ", address);
         try {
-            const tx = await contract.methods.followUser(addr).send({
-                from: address,
-                gasPrice: '30000000000'
-            });
-            console.log("tx : ", tx);
+            const receipt = await contract.followUser(addr);
+            await receipt.wait();
         } catch(e) {
             console.log("followUser error : ", e)
         }
@@ -80,11 +77,8 @@ const Navbar = () => {
         console.log("addr : ", addr);
         console.log("address : ", address);
         try {
-            const tx = await contract.methods.unfollowUser(addr).send({
-                from: address,
-                gasPrice: '30000000000'
-            });
-            console.log("tx : ", tx);
+            const tx = await contract.unfollowUser(addr)
+            await tx.wait();
         } catch(e) {
             console.log("unFollowUser error : ", e)
         }
@@ -190,15 +184,6 @@ const Navbar = () => {
                                     }
                                 </>
                             }
-                            {/* {(localStorage.getItem("userDid") || localStorage.getItem("jwz-token")) &&
-                                <li>
-                                    <button onClick={web3 ? reset : connectWallet} type="button" className={`text-white ${web3 ? 'bg-red-700' : 'bg-green-700'} ${web3 ? 'hover:bg-red-800' : 'hover:bg-green-800'} focus:ring-4 focus:outline-none ${web3 ? 'focus:ring-red-300' : 'focus:ring-green-300'}  font-medium rounded-lg text-sm px-4 py-2 md:!my-0 my-2 text-center`}>
-                                        {
-                                            web3 ? "Disconnect Wallet" : "Connect Wallet"
-                                        }
-                                    </button>
-                                </li>
-                            } */}
                         </ul>
                     </div>
                 </div>

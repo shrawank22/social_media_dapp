@@ -72,3 +72,12 @@
 {"level":"info","message":"QR code link generated: http://35.244.0.131:3002/v1/qr-store?id=f9a06e4d-62c7-420e-ae36-ffc7068ce9f2","timestamp":"2024-08-08T19:09:12.274Z"}
 {"level":"info","message":"User saved successfully: 0x3524475669908C46b4417743D2B9D0d16a4eF378","timestamp":"2024-08-08T19:09:12.501Z"}
 {"level":"info","message":"Registration successful","timestamp":"2024-08-08T19:09:12.502Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"level":"info","message":"Registering user: null","timestamp":"2024-08-09T06:03:54.884Z"}
+{"level":"info","message":"Creating credential","timestamp":"2024-08-09T06:03:54.886Z"}
+{"error":"connect ETIMEDOUT 35.244.0.131:3002","level":"error","message":"Error in registration process","timestamp":"2024-08-09T06:04:15.923Z","username":null}
+{"level":"info","message":"Registering user: 0x3524475669908c46b4417743d2b9d0d16a4ef378","timestamp":"2024-08-09T06:48:25.058Z"}
+{"level":"info","message":"Creating credential","timestamp":"2024-08-09T06:48:25.061Z"}
+{"error":"connect ETIMEDOUT 35.244.0.131:3002","level":"error","message":"Error in registration process","timestamp":"2024-08-09T06:48:46.110Z","username":"0x3524475669908c46b4417743d2b9d0d16a4ef378"}
+{"level":"info","message":"Registering user: 0x3524475669908c46b4417743d2b9d0d16a4ef378","timestamp":"2024-08-09T09:57:55.146Z"}
+{"level":"info","message":"Creating credential","timestamp":"2024-08-09T09:57:55.151Z"}
+{"error":"connect ETIMEDOUT 35.244.0.131:3002","level":"error","message":"Error in registration process","timestamp":"2024-08-09T09:58:16.219Z","username":"0x3524475669908c46b4417743d2b9d0d16a4ef378"}
