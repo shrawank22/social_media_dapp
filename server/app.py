@@ -9,7 +9,7 @@ from PIL import Image
 app = Flask(__name__)
 CORS(app) 
 # MongoDB connection
-client = MongoClient('mongodb+srv://shrawan:shrawanKumar@cluster0.ot6w9.mongodb.net/dapp6?retryWrites=true&w=majority')
+client = MongoClient('mongodb+srv://shrawan:shrawanKumar@cluster0.ot6w9.mongodb.net/dapp1?retryWrites=true&w=majority')
 db = client['minhash_db']
 collection = db['minhashes']
 
@@ -18,7 +18,6 @@ image_collection = db2['image_hashes']
 
 @app.route('/check_plagiarism', methods=['POST'])
 def check_plagiarism():
-    print("the csvfvfbdfb")
     data = request.get_json()
     text1 = data['text1']
     num_perm = data.get('num_perm', 128)
@@ -38,7 +37,7 @@ def check_plagiarism():
         minhash2_dict = doc['minhash']
         minhash2 = minhash_from_dict(minhash2_dict, num_perm)
         sim = similarity(minhash1, minhash2)
-        if sim >= 0.8:
+        if sim >= 0.95:
             return jsonify({'plagiarism': True})
 
     # No plagiarism detected, insert the new MinHash object into the database
@@ -65,7 +64,7 @@ def check_plagiarism_image():
         for doc in image_collection.find():
             stored_phash = imagehash.hex_to_hash(doc['phash'])
             diff = (image_phash - stored_phash) / len(image_phash.hash) ** 2
-            if diff < 0.2:
+            if diff < 0.1:
                 return jsonify({'plagiarism': True})
 
         # No image plagiarism detected, insert the new image hash into the database

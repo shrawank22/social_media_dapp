@@ -27,10 +27,10 @@ const Profile = () => {
 
 	return (
 		<div className="feed mt-3">
-			<div className="profile-info">
+			{/* <div className="profile-info">
 				<div className="cover-image" style={{ backgroundImage: `url(${userProfileData.coverImage})` }}></div>
 				<img className="profile-image" src={userProfileData.profileImage} alt="Profile" />
-			</div>
+			</div> */}
 
 
 			<div className="bg-white overflow-hidden shadow rounded-lg border mt-3">
@@ -89,14 +89,14 @@ const Profile = () => {
 			</div>
 
 			{/* User-created Posts */}
-			<div className="user-posts mt-5">
+			{/* <div className="user-posts mt-5">
 				<h3>User Posts</h3>
 				<ul>
 					{userProfileData.posts.map((post) => (
 						<li key={post.id}>{post.text}</li>
 					))}
 				</ul>
-			</div>
+			</div> */}
 
 		</div>
 	);

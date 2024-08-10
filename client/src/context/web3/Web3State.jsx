@@ -42,9 +42,8 @@ const Web3State = ({ children }) => {
 
                 const signer = provider.getSigner();
                 console.log("signer : ", signer);
-                const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                const address = accounts[0];
-                console.log("accounts : ", accounts);
+                const address = await signer.getAddress();
+                console.log("address : ", address);
                 const contract = new ethers.Contract(contractAddress, contractABI, signer);
                 console.log("contract : ", contract);
                 setState({ provider, signer, contract, address });

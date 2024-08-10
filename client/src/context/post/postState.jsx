@@ -10,12 +10,16 @@ import Post from "../../components/Post";
 // import { useEthereumConnectClient } from "../EthereumContext";
 import web3Context from "../web3/web3Context";
 
+const token = localStorage.getItem("jwz-token");
+const isAuthenticated = !!token;
+console.log(isAuthenticated)
+
 const PostState = ({ children }) => {
     const host = "http://localhost:8080";
 
     //------------------------------ Web3 Context ------------------------------
     const context = useContext(web3Context);
-    const { state, showAlert} = context
+    const { state, showAlert } = context
     const { contract, address } = state;
 
     //--------------------------------- States ---------------------------------
@@ -42,6 +46,8 @@ const PostState = ({ children }) => {
                     num_perm: numPerm,
                 }
             );
+
+            console.log(response);
 
             const plagiarism = response.data.plagiarism;
             if (plagiarism) {
@@ -100,14 +106,14 @@ const PostState = ({ children }) => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                if (contract) {
+                if (contract && isAuthenticated) {
                     let user, id;
                     // console.log(followEvent)
                     if (followEvent && Object.keys(followEvent).length > 0) {
-                        user = followEvent.sender;
-                        id = followEvent.postId;
+                        user = followEvent[0].args.sender;
+                        id = followEvent[0].args.postId;
 
-                        for (let e of followEvent.followers) {
+                        for (let e of followEvent[0].args.followers) {
                             const follower = e;
                             if (user === address) {
                                 const postData = await contract.getSinglePost(id);
@@ -146,9 +152,7 @@ const PostState = ({ children }) => {
                     let posts;
                     try {
                         const limit = 100;
-                        const response = await axios.get(
-                            `${host}/api/topPosts/${address}/${limit}`
-                        );
+                        const response = await axios.get(`${host}/api/topPosts/${address}/${limit}`);
                         posts = response.data;
                         console.log(posts);
                     } catch (error) {
@@ -156,54 +160,7 @@ const PostState = ({ children }) => {
                         throw error;
                     }
 
-                    //old method of fetching posts
-                    //let allPosts = await contract.getAllPosts();
                     let allPosts = posts;
-
-                    // for (let p of allPosts.posts) {
-                    //   let postId = p.NFTID;
-                    //   let postData = await contract.getSinglePost(postId).call();
-                    //   //console.log(p)
-                    //   let arr2, arr1;
-                    //   arr2 = [
-                    //     postData[0].toString(),
-                    //     postData[1],
-                    //     postData[2],
-                    //     postData[3].toString(),
-                    //     postData[4],
-                    //     postData[11],
-                    //     postData[12].toString(),
-                    //   ];
-                    //   //console.log("arr2:",arr2)
-                    //   arr1 = [
-                    //     p.NFTID,
-                    //     p.username,
-                    //     p.postText,
-                    //     p.viewPrice.toString(),
-                    //     p.isDeleted,
-                    //     p.hasListed,
-                    //     p.listPrice.toString(),
-                    //   ];
-                    //   //console.log("arr1:", arr1)
-
-                    //   let isequal =
-                    //     arr1.length === arr2.length &&
-                    //     arr1.every((item) => arr2.includes(item));
-                    //   if (isequal) console.log("All good to go with post id", p.NFTID);
-                    //   else {
-                    //     console.log("Post has been maniupoulated");
-                    //     showAlert(
-                    //       "danger",
-                    //       "Post with id",
-                    //       p.NFTID,
-                    //       "has been manipulated"
-                    //     );
-                    //   }
-                    // }
-
-                    //let allPosts = await contract.getAllPosts();
-                    // let allPosts = await contract.getFollowedUsersPosts();
-                    //console.log("allposts",allPosts);
 
                     // Fetching text from IPFS for each post
                     const postsWithData = await Promise.all(
@@ -264,12 +221,12 @@ const PostState = ({ children }) => {
         };
 
         fetchPosts();
-        return () => {
-            if (contract) {
-                contract.removeAllListeners("NewPostForFollower");
-            }
-        };
-    }, [posted, followEvent]);
+        // return () => {
+        //     if (contract) {
+        //         contract.removeAllListeners("NewPostForFollower");
+        //     }
+        // };
+    }, [posted, followEvent, address]);
 
     //--------------------------------- API Calls ---------------------------------
     const getPost = async (id) => {
@@ -455,14 +412,13 @@ const PostState = ({ children }) => {
 
                     // Store hash onto blockchain
                     const tx = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice))
+                    const receipt = await tx.wait();
 
-                    const addPostEvent = tx.events.hasOwnProperty("AddPost")
-                        ? tx.events.AddPost
-                        : {};
-                    console.log("addPostEvent: ", addPostEvent);
+                    const addPostEvent = receipt.events.find(event => event.event === 'AddPost');
 
-                    const username = addPostEvent.returnValues[0].toString();
-                    const postId = addPostEvent.returnValues[1].toString();
+                    let username = addPostEvent.args[0].toString();
+                    const postId = addPostEvent.args[1].toString();
+                    console.log("username: ", username, "postId: ", postId);
 
                     const postData = await contract.getSinglePost(postId);
                     console.log("Here is the details of my new post..", postData);
@@ -492,10 +448,7 @@ const PostState = ({ children }) => {
                         return error;
                     }
 
-                    console.log("tx.events: ", tx.events);
-                    const followEvent = tx.events.NewPostForFollowers
-                        ? tx.events.NewPostForFollowers.returnValues
-                        : {};
+                    const followEvent = receipt.events.filter(event => event.event === 'NewPostForFollowers');
                     console.log("followEvent: ", followEvent);
                     setFollowEvent(followEvent);
 
@@ -552,16 +505,17 @@ const PostState = ({ children }) => {
                     const ipfsHash = res.data.IpfsHash;
 
                     // Store hash onto blockchain
-                    const tx = await contract.addPost(String(ipfsHash), parseInt(content.viewPrice))
+                    const tx = await contract.addPost(
+                        String(ipfsHash),
+                        parseInt(content.viewPrice)
+                    );
+                    const receipt = await tx.wait();
 
+                    const addPostEvent = receipt.events.find(event => event.event === 'AddPost');
 
-                    const addPostEvent = tx.events.hasOwnProperty("AddPost")
-                        ? tx.events.AddPost
-                        : {};
-                    console.log("addPostEvent: ", addPostEvent);
-
-                    const username = addPostEvent.returnValues[0].toString();
-                    const postId = addPostEvent.returnValues[1].toString();
+                    let username = addPostEvent.args[0].toString();
+                    const postId = addPostEvent.args[1].toString();
+                    console.log("username: ", username, "postId: ", postId);
 
                     const postData = await contract.getSinglePost(postId);
                     console.log(postData);
@@ -591,10 +545,9 @@ const PostState = ({ children }) => {
                         return error;
                     }
 
-                    console.log("tx.events : ", tx.events);
-                    const followEvent = tx.events.NewPostForFollowers
-                        ? tx.events.NewPostForFollowers.returnValues
-                        : {};
+                    console.log(receipt.events);
+
+                    const followEvent = receipt.events.filter(event => event.event === 'NewPostForFollowers');
                     console.log("followEvent: ", followEvent);
                     setFollowEvent(followEvent);
 
