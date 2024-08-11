@@ -14,15 +14,23 @@ const Login = () => {
     const { state } = context2;
 
     const [provedAccess, setProvedAccess] = useState(false);
-    const { uri, provider, connectWallet } = useEthereumConnectClient();
+    const { uri, connectWallet, provider } = useEthereumConnectClient();
 
     const navigate = useNavigate();
+    
+    useEffect(() => {
+        if(!provider) {
+            console.log("provider not initialized");
+            return;
+        }
+        connectWallet();
+    }, [provider]);
 
     useEffect(() => {
-        if (provider) {
-            connectWallet();
-        }
-    }, [provider]);
+        console.log("Inside Login useEffect1");
+        console.log("uri : ", uri);
+        setConnectId(uri);
+    }, [uri]);
 
     useEffect(() => {
         if(provedAccess) {
@@ -32,9 +40,6 @@ const Login = () => {
         }   
     }, [provedAccess]);
 
-    useEffect(() => {
-        setConnectId(uri);
-    }, [uri]);
 
     return (
         <>
@@ -55,6 +60,7 @@ const Login = () => {
                               onVerificationResult={setProvedAccess}
                               userAddress={state.address}
                               uri={connectId}
+                              contract={state.contract}
                         />
                     </Container>
                 </Center>

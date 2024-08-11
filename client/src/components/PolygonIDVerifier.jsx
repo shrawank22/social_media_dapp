@@ -18,7 +18,8 @@ function PolygonIDVerifier({
     publicServerURL,
     localServerURL,
     userAddress,
-    uri
+    uri,
+    contract,
 }) {
     const [sessionId, setSessionId] = useState("");
     const [qrCodeData, setQrCodeData] = useState();
@@ -62,8 +63,8 @@ function PolygonIDVerifier({
             console.log("data : ", data);
             let res = {
                 ssi: data,
-                uri: uri,
-            }
+                uri: contract ? "" : uri,
+            }   
             console.log("new data : ", res);
             return res;
         };

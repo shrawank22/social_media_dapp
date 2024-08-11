@@ -5,9 +5,7 @@ import './index.css'
 import { EthereumContextProvider } from './context/EthereumContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
     <EthereumContextProvider>
       <App />
     </EthereumContextProvider>
-  </React.StrictMode>
 )

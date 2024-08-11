@@ -8,91 +8,92 @@ import { QRCode } from "./QRCode";
 import { EthereumContext } from "../context/EthereumContext";
 
 const Register = () => {
-  const context1 = useContext(postContext);
-  const { state } = useContext(EthereumContext);
-  const { showAlert } = context1;
+    const context1 = useContext(postContext);
+    const { state } = useContext(EthereumContext);
+    const { showAlert } = context1;
 
-  const { address, contract } = state;
+        const { address, contract } = state;
+        console.log("state : ", state);
 
-  const [name, setName] = useState("");
-  const [aadhaarNo, setAadhaarNo] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
-  const [city, setCity] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [loader, setLoader] = useState(false);
-  const [qrcode, setQrcode] = useState("");
+    const [name, setName] = useState("");
+    const [aadhaarNo, setAadhaarNo] = useState("");
+    const [dob, setDob] = useState("");
+    const [gender, setGender] = useState("");
+    const [city, setCity] = useState("");
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const [loader, setLoader] = useState(false);
+    const [qrcode, setQrcode] = useState("");
 
-  let navigateTo = useNavigate();
+    let navigateTo = useNavigate();
 
-  useEffect(() => {
-    if (!localStorage.getItem("userDid")) {
-      navigateTo("/connection");
-    }
-  });
+    useEffect(() => {
+        if (!localStorage.getItem("userDid")) {
+        navigateTo("/connection");
+        }
+    });
 
-  console.log("contract : ", contract);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoader(true);
+        setError("");
+        setSuccess("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoader(true);
-    setError("");
-    setSuccess("");
+        const data = {
+            data : JSON.stringify({
+                name,
+                gender,
+                aadhaarNo,
+                dob: new Date(dob).toLocaleDateString("en-GB").replace(/\//g, '-'),
+                city,
+            }),
+            id: localStorage.getItem("userDid"),
+        };
 
-    const data = {
-      data: JSON.stringify({
-        name,
-        gender,
-        aadhaarNo,
-        dob: new Date(dob).toLocaleDateString("en-GB").replace(/\//g, "-"),
-        city,
-      }),
-      id: localStorage.getItem("userDid"),
-    };
-
-    try {
-      const res = await issueCredential({
-        userDetails: data,
-        userAddress: address,
-      });
-
-      if (res.data) {
-        setLoader(false);
-        setSuccess("Scan using Polygon Wallet to get Credentials!!!");
-        console.log("res.data : ", res.data);
+        console.log("address : ", address);
 
         try {
-          console.log("contract : ", contract);
-
-          const tx = await contract.methods
-            .registerUser(name, "https://via.placeholder.com/50")
-            .send({
-              from: address,
-              gasPrice: "30000000000",
+            const res = await issueCredential({
+                userDetails: data,
+                userAddress: address,
             });
-          console.log("tx : ", tx);
-        } catch (e) {
-          console.log("Error adding user to blockchain : ", e);
-        }
 
-        setQrcode(JSON.stringify(res.data));
-        console.log(qrcode);
-      }
-    } catch (err) {
-      console.log("Error in creating profile : ", err);
-      setLoader(false);
-      if (err.code === "ECONNABORTED") {
-        setError("Error in creating profile!!!");
-        return;
-      }
-      if (err.response?.data?.message) {
-        setError(err.response?.data?.message);
-      } else {
-        setError("Something went wrong!!! Retry...");
-      }
-    }
-  };
+            console.log("res : ", res);
+
+            if (res.data) {
+                setLoader(false);
+                setSuccess("Scan using Polygon Wallet to get Credentials!!!");
+                console.log("res.data : ", res.data);
+
+                try {
+                    console.log("contract : ", contract);
+
+                    const tx = await contract.methods.registerUser(name, 'https://via.placeholder.com/50').send({
+                        from: address,
+                        gasPrice: '30000000000'
+                    });
+                    console.log("tx : ", tx);
+                } catch (e) {
+                    console.log("Error adding user to blockchain : ", e);
+                }
+
+                setQrcode(JSON.stringify(res.data));
+                console.log(qrcode);
+            }
+        } catch (err) {
+            console.log("Error in creating profile : ", err);
+            setLoader(false);
+            if (err.code === "ECONNABORTED") {
+                setError("Error in creating profile!!!");
+                return;
+            }
+            if (err.response?.data?.message) {
+                setError(err.response?.data?.message);
+            } else {
+                setError("Something went wrong!!! Retry...");
+            }
+        }
+    };
 
   const redoConnection = () => {
     localStorage.clear();
