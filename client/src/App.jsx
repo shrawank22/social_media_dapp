@@ -23,6 +23,8 @@ function App() {
     }
   }, [provider]);
 
+  
+
   return (
     <PostState>
       <Router>
