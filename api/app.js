@@ -16,9 +16,60 @@ const options = {
 app.use(cors(options));
 
 app.use(express.static("public"));
-app.use(express.json({limit: '1mb'}));
+app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ limit: '1mb', extended: true }));
 app.use(expressSanitizer());
+
+// Throttle requests to 2 per second
+function throttle(requestsPerSecond) {
+    const queue = [];
+    const intervalMs = 1000 / requestsPerSecond;
+    let lastProcessedTime = Date.now();
+
+    function processQueue() {
+        const now = Date.now();
+        if (queue.length > 0 && now - lastProcessedTime >= intervalMs) {
+            const { req, res, next } = queue.shift();
+            lastProcessedTime = now;
+            next();
+        }
+        setTimeout(processQueue, 0);
+    }
+
+    processQueue();
+
+    return (req, res, next) => {
+        queue.push({ req, res, next });
+    };
+}
+// Apply request throttling
+// app.use(throttle(2));
+
+// Rate limiting middleware
+function rateLimiter(limit, windowMs) {
+    const requests = new Map();
+    console.log(requests)
+
+    return (req, res, next) => {
+        const ip = req.ip;
+        const now = Date.now();
+        const windowStart = now - windowMs;
+
+        const requestTimestamps = requests.get(ip) || [];
+        const requestsInWindow = requestTimestamps.filter(timestamp => timestamp > windowStart);
+
+        if (requestsInWindow.length >= limit) {
+            return res.status(429).json({ message: 'Too many requests, please try again later.' });
+        }
+
+        requestTimestamps.push(now);
+        requests.set(ip, requestTimestamps);
+
+        next();
+    };
+}
+// Apply rate limiting: 1000 requests per minute
+app.use(rateLimiter(10000, 60 * 1000));
 
 // routes imported
 const authRoutes = require('./routes/authRoutes');
