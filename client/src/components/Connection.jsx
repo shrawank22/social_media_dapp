@@ -7,7 +7,7 @@ import { EthereumContext } from "../context/EthereumContext";
 
 function Connection() {
     const context1 = useContext(EthereumContext);
-    const { uri, provider, connectWallet, reset, setProvider } = context1;
+    const { uri, provider, connectWallet, reset, setProvider, web3 } = context1;
 
     const [sessionId, setSessionId] = useState("");
     const [qrCodeData, setQrCodeData] = useState("");
@@ -29,9 +29,11 @@ function Connection() {
     });
 
     useEffect(() => {
-        if(provider) {
-            connectWallet();
+        if(!provider) {
+            console.log("provider not initialized");
+            return;
         }
+        connectWallet();
     }, [provider])
 
     useEffect(() => {
@@ -51,9 +53,10 @@ function Connection() {
             const response = await fetch(getQrCodeApi(sessionId));
             const data = await response.text();
             console.log("connection qrcode data : ", data);
+            console.log("web3 : ", web3);
             let res = {
                 ssi: data,
-                uri: uri
+                uri: web3 ? '' : uri,
             }
 
             console.log("new data : ", res);

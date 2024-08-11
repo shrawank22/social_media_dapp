@@ -14,6 +14,7 @@ const Register = () => {
     const { showAlert } = context1;
 
     const { address, contract } = state;
+    console.log("state : ", state);
 
     const [name, setName] = useState("");
     const [aadhaarNo, setAadhaarNo] = useState("");
@@ -33,8 +34,6 @@ const Register = () => {
         }
     });
 
-    console.log("contract : ", contract);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoader(true);
@@ -52,11 +51,15 @@ const Register = () => {
             id: localStorage.getItem("userDid"),
         };
 
+        console.log("address : ", address);
+
         try {
             const res = await issueCredential({
                 userDetails: data,
                 userAddress: address,
             });
+
+            console.log("res : ", res);
 
             if (res.data) {
                 setLoader(false);
