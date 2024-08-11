@@ -5,11 +5,19 @@ from datasketch import MinHash
 from flask_cors import CORS
 import imagehash
 from PIL import Image
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
+
+# Get MongoDB URI from environment variable
+mongo_uri = os.getenv('MONGO_URI')
+
 # MongoDB connection
-client = MongoClient('mongodb+srv://shrawan:shrawanKumar@cluster0.ot6w9.mongodb.net/dapp6?retryWrites=true&w=majority')
+client = MongoClient(mongo_uri)
 db = client['minhash_db']
 collection = db['minhashes']
 

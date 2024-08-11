@@ -54,5 +54,128 @@
         }
       ]
     }
+  },
+  "T4H-QwZHaooRgCzcAAAB": {
+    "id": "T4H-QwZHaooRgCzcAAAB",
+    "thid": "T4H-QwZHaooRgCzcAAAB",
+    "from": "did:polygonid:polygon:amoy:2qUydEhn4Pri8Jf4k7SuXedtoVvJD3qvLzY6HZLVe5",
+    "typ": "application/iden3comm-plain-json",
+    "type": "https://iden3-communication.io/authorization/1.0/request",
+    "body": {
+      "reason": "Authentication to connect",
+      "message": "",
+      "callbackUrl": "https://b2d3-103-95-81-164.ngrok-free.app/api/connection-callback?sessionId=T4H-QwZHaooRgCzcAAAB",
+      "scope": []
+    }
+  },
+  "97ca0cdc61a37630722ff1bc2b99cd54": {
+    "id": "IKfteQ0HTGzkAuU7AAAj",
+    "thid": "IKfteQ0HTGzkAuU7AAAj",
+    "from": "did:polygonid:polygon:amoy:2qUydEhn4Pri8Jf4k7SuXedtoVvJD3qvLzY6HZLVe5",
+    "typ": "application/iden3comm-plain-json",
+    "type": "https://iden3-communication.io/authorization/1.0/request",
+    "body": {
+      "reason": "Profile must be presented",
+      "message": "",
+      "callbackUrl": "https://b2d3-103-95-81-164.ngrok-free.app/api/verification-callback?sessionId=IKfteQ0HTGzkAuU7AAAj",
+      "scope": [
+        {
+          "id": 1,
+          "circuitId": "credentialAtomicQuerySigV2",
+          "query": {
+            "allowedIssuers": [
+              "*"
+            ],
+            "type": "profile",
+            "context": "https://gist.githubusercontent.com/raj-71/dee54870bf7126726bbcab69effd25bf/raw/90cf59c1f744a6f0515cbd2e4ce4f6ca9a71ecbe/context-ld_v4.json",
+            "credentialSubject": {
+              "data": {}
+            }
+          }
+        }
+      ]
+    }
+  },
+  "EXMcw13dkUA9Z6XCAAA3": {
+    "id": "EXMcw13dkUA9Z6XCAAA3",
+    "thid": "EXMcw13dkUA9Z6XCAAA3",
+    "from": "did:polygonid:polygon:amoy:2qUydEhn4Pri8Jf4k7SuXedtoVvJD3qvLzY6HZLVe5",
+    "typ": "application/iden3comm-plain-json",
+    "type": "https://iden3-communication.io/authorization/1.0/request",
+    "body": {
+      "reason": "Authentication to connect",
+      "message": "",
+      "callbackUrl": "https://b2d3-103-95-81-164.ngrok-free.app/api/connection-callback?sessionId=EXMcw13dkUA9Z6XCAAA3",
+      "scope": []
+    }
+  },
+  "dc817b77a72fc0c4b3f89859174807fd": {
+    "id": "fU8CuE-pXZr5-b2YAABV",
+    "thid": "fU8CuE-pXZr5-b2YAABV",
+    "from": "did:polygonid:polygon:amoy:2qUydEhn4Pri8Jf4k7SuXedtoVvJD3qvLzY6HZLVe5",
+    "typ": "application/iden3comm-plain-json",
+    "type": "https://iden3-communication.io/authorization/1.0/request",
+    "body": {
+      "reason": "Profile must be presented",
+      "message": "",
+      "callbackUrl": "https://b2d3-103-95-81-164.ngrok-free.app/api/verification-callback?sessionId=fU8CuE-pXZr5-b2YAABV",
+      "scope": [
+        {
+          "id": 1,
+          "circuitId": "credentialAtomicQuerySigV2",
+          "query": {
+            "allowedIssuers": [
+              "*"
+            ],
+            "type": "profile",
+            "context": "https://gist.githubusercontent.com/raj-71/dee54870bf7126726bbcab69effd25bf/raw/90cf59c1f744a6f0515cbd2e4ce4f6ca9a71ecbe/context-ld_v4.json",
+            "credentialSubject": {
+              "data": {}
+            }
+          }
+        }
+      ]
+    }
+  },
+  "6b7q9HR96PcpNdb_AABp": {
+    "id": "6b7q9HR96PcpNdb_AABp",
+    "thid": "6b7q9HR96PcpNdb_AABp",
+    "from": "did:polygonid:polygon:amoy:2qUydEhn4Pri8Jf4k7SuXedtoVvJD3qvLzY6HZLVe5",
+    "typ": "application/iden3comm-plain-json",
+    "type": "https://iden3-communication.io/authorization/1.0/request",
+    "body": {
+      "reason": "Authentication to connect",
+      "message": "",
+      "callbackUrl": "https://b2d3-103-95-81-164.ngrok-free.app/api/connection-callback?sessionId=6b7q9HR96PcpNdb_AABp",
+      "scope": []
+    }
+  },
+  "2203de17def152844a05c34e70224daa": {
+    "id": "IKlbQpHp4Nxr7D_xAACA",
+    "thid": "IKlbQpHp4Nxr7D_xAACA",
+    "from": "did:polygonid:polygon:amoy:2qUydEhn4Pri8Jf4k7SuXedtoVvJD3qvLzY6HZLVe5",
+    "typ": "application/iden3comm-plain-json",
+    "type": "https://iden3-communication.io/authorization/1.0/request",
+    "body": {
+      "reason": "Profile must be presented",
+      "message": "",
+      "callbackUrl": "https://b2d3-103-95-81-164.ngrok-free.app/api/verification-callback?sessionId=IKlbQpHp4Nxr7D_xAACA",
+      "scope": [
+        {
+          "id": 1,
+          "circuitId": "credentialAtomicQuerySigV2",
+          "query": {
+            "allowedIssuers": [
+              "*"
+            ],
+            "type": "profile",
+            "context": "https://gist.githubusercontent.com/raj-71/dee54870bf7126726bbcab69effd25bf/raw/90cf59c1f744a6f0515cbd2e4ce4f6ca9a71ecbe/context-ld_v4.json",
+            "credentialSubject": {
+              "data": {}
+            }
+          }
+        }
+      ]
+    }
   }
 }

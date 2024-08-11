@@ -66,3 +66,15 @@
 {"level":"info","message":"Registering user: 0x3524475669908C46b4417743D2B9D0d16a4eF378","timestamp":"2024-08-05T10:12:55.896Z"}
 {"level":"info","message":"Creating credential","timestamp":"2024-08-05T10:12:55.899Z"}
 {"error":"connect ETIMEDOUT 34.93.171.75:3002","level":"error","message":"Error in registration process","timestamp":"2024-08-05T10:13:16.955Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"level":"info","message":"Registering user: 0x3524475669908C46b4417743D2B9D0d16a4eF378","timestamp":"2024-08-11T08:36:23.330Z"}
+{"level":"info","message":"Creating credential","timestamp":"2024-08-11T08:36:23.335Z"}
+{"level":"info","message":"Creating QR code","timestamp":"2024-08-11T08:36:24.314Z"}
+{"level":"info","message":"QR code link generated: http://35.239.34.57:3002/v1/qr-store?id=42077f0e-d7d1-4594-9503-2fc863d55f10","timestamp":"2024-08-11T08:36:24.914Z"}
+{"level":"info","message":"User saved successfully: 0x3524475669908C46b4417743D2B9D0d16a4eF378","timestamp":"2024-08-11T08:36:25.709Z"}
+{"level":"info","message":"Registration successful","timestamp":"2024-08-11T08:36:25.711Z","username":"0x3524475669908C46b4417743D2B9D0d16a4eF378"}
+{"level":"info","message":"Registering user: 0xF3C95B1A8cAbf3D5151912377AeAdd84aA41c27C","timestamp":"2024-08-11T08:40:50.204Z"}
+{"level":"info","message":"Creating credential","timestamp":"2024-08-11T08:40:50.215Z"}
+{"level":"info","message":"Creating QR code","timestamp":"2024-08-11T08:40:50.863Z"}
+{"level":"info","message":"QR code link generated: http://35.239.34.57:3002/v1/qr-store?id=8aac267c-c5d1-43ea-bea2-ccc7e7637dac","timestamp":"2024-08-11T08:40:51.440Z"}
+{"level":"info","message":"User saved successfully: 0xF3C95B1A8cAbf3D5151912377AeAdd84aA41c27C","timestamp":"2024-08-11T08:40:52.189Z"}
+{"level":"info","message":"Registration successful","timestamp":"2024-08-11T08:40:52.190Z","username":"0xF3C95B1A8cAbf3D5151912377AeAdd84aA41c27C"}

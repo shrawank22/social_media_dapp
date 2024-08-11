@@ -272,7 +272,7 @@ const PostState = ({ children }) => {
                 contract.removeAllListeners("NewPostForFollower");
             }
         };
-    }, [posted]);
+    }, [posted, address]);
 
     //--------------------------------- API Calls ---------------------------------
     const getPost = async (id) => {
