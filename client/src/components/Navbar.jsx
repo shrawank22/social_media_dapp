@@ -1,13 +1,16 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { EthereumContext } from '../context/EthereumContext';
+import { QRCode } from './QRCode';
+import { Loader } from './Loader';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const { web3, reset, connectWallet, state } = useContext(EthereumContext);
+    const { web3, reset, connectWallet, state, balance, uri } = useContext(EthereumContext);
     const [searchText, setSearchText] = useState('');
     const [showSearchItems, setShowSearchItems] = useState(false);
     const [searchResult, setSearchResult] = useState([]);
+    const [showModal, setShowModal] = useState(false);
 
     const { contract, address } = state;
 
@@ -15,12 +18,6 @@ const Navbar = () => {
     let navigate = useNavigate();
     const token = localStorage.getItem("jwz-token");
     const isAuthenticated = !!token;
-    const usersData = [
-        { id: 1, name: 'John Doe', imageUrl: 'https://via.placeholder.com/50', isFollowing: false },
-        { id: 2, name: 'Jane Smith', imageUrl: 'https://via.placeholder.com/50', isFollowing: true },
-        { id: 3, name: 'Alice Johnson', imageUrl: 'https://via.placeholder.com/50', isFollowing: false },
-        { id: 4, name: 'Bob Brown', imageUrl: 'https://via.placeholder.com/50', isFollowing: true },
-    ];
 
     const handleLogout = () => {
         localStorage.removeItem("userDid");
@@ -33,33 +30,33 @@ const Navbar = () => {
 
     const handleSearch = async () => {
         console.log("Search Query : ", searchText);
-        
-            try {
-                console.log("contract : ", contract);
-                console.log("address: ", address);
-                const tx = await contract.methods.getUsersByName(searchText).call();
-                console.log("tx: ", tx);
 
-                const promises = tx.map(async item => {
-                    const followTx = await contract.methods.isFollowing(item[0], address).call();
-                    console.log("followTx : ", followTx);
+        try {
+            console.log("contract : ", contract);
+            console.log("address: ", address);
+            const tx = await contract.methods.getUsersByName(searchText).call();
+            console.log("tx: ", tx);
 
-                    return {
-                        address : item[0],
-                        imageUrl : item[1],
-                        name: searchText,
-                        isFollowing: followTx || false
-                    };
-                });
+            const promises = tx.map(async item => {
+                const followTx = await contract.methods.isFollowing(item[0], address).call();
+                console.log("followTx : ", followTx);
 
-                console.log("promises : ", promises);
-                const newSearchResult = await Promise.all(promises);
-                console.log("newSearchResult : ", newSearchResult);
-                setSearchResult(newSearchResult);
-                setShowSearchItems(true);
-            } catch (e) {
-                console.log("Error searching user : ", e);
-            }
+                return {
+                    address: item[0],
+                    imageUrl: item[1],
+                    name: searchText,
+                    isFollowing: followTx || false
+                };
+            });
+
+            console.log("promises : ", promises);
+            const newSearchResult = await Promise.all(promises);
+            console.log("newSearchResult : ", newSearchResult);
+            setSearchResult(newSearchResult);
+            setShowSearchItems(true);
+        } catch (e) {
+            console.log("Error searching user : ", e);
+        }
 
         return;
     }
@@ -73,7 +70,7 @@ const Navbar = () => {
                 gasPrice: '30000000000'
             });
             console.log("tx : ", tx);
-        } catch(e) {
+        } catch (e) {
             console.log("followUser error : ", e)
         }
     }
@@ -87,9 +84,20 @@ const Navbar = () => {
                 gasPrice: '30000000000'
             });
             console.log("tx : ", tx);
-        } catch(e) {
+        } catch (e) {
             console.log("unFollowUser error : ", e)
         }
+    }
+
+    useEffect(() => {
+        if(showModal === true && contract) {
+            setShowModal(false);
+        }
+    }, [contract]);
+
+    const reconnect = async () => {
+        connectWallet();
+        setShowModal(true);
     }
 
     return (
@@ -154,21 +162,21 @@ const Navbar = () => {
                     <div className={`w-full md:block md:w-auto ${isOpen ? '' : 'hidden'}`} id="navbar-default">
                         <ul className="font-medium flex flex-col my-3 md:p-0 bg-dark md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white-700">
                             <li>
-                                <Link to="/" className={`block py-2 px-3 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/" ? "text-blue-400" : "text-white"}`}>Home</Link>
+                                <Link to="/" className={`block py-2 px-2 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/" ? "text-blue-400" : "text-white"}`}>Home</Link>
                             </li>
-                            <li>
-                                <Link to="/about" className={`block py-2 px-3 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/about" ? "text-blue-400" : "text-white"}`}>About</Link>
-                            </li>
+                            {/* <li>
+                                <Link to="/about" className={`block py-2 px-2 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/about" ? "text-blue-400" : "text-white"}`}>About</Link>
+                            </li> */}
                             {isAuthenticated ?
                                 <>
                                     <li>
-                                        <Link to="/notifications" className={`block py-2 px-3 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/notifications" ? "text-blue-400" : "text-white"}`}>Notifications</Link>
+                                        <Link to="/notifications" className={`block py-2 px-2 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/notifications" ? "text-blue-400" : "text-white"}`}>Notifications</Link>
                                     </li>
                                     <li>
-                                        <Link to="/profile" className={`block py-2 px-3 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/profile" ? "text-blue-400" : "text-white"}`}>Profile</Link>
+                                        <Link to="/profile" className={`block py-2 px-2 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/profile" ? "text-blue-400" : "text-white"}`}>Profile</Link>
                                     </li>
                                     <li>
-                                        <Link to="/logout" className={`block py-2 px-3 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/logout" ? "text-blue-400" : "text-white"}`} onClick={handleLogout}>Logout</Link>
+                                        <Link to="/logout" className={`block py-2 px-2 rounded md:bg-transparent md:p-0 hover:text-blue-700 ${location.pathname === "/logout" ? "text-blue-400" : "text-white"}`} onClick={handleLogout}>Logout</Link>
                                     </li>
                                 </>
                                 :
@@ -193,10 +201,15 @@ const Navbar = () => {
                                 </>
                             }
                             {(localStorage.getItem("userDid") || localStorage.getItem("jwz-token")) &&
-                                <li>
-                                    <button onClick={web3 ? reset : connectWallet} type="button" className={`text-white ${web3 ? 'bg-red-700' : 'bg-green-700'} ${web3 ? 'hover:bg-red-800' : 'hover:bg-green-800'} focus:ring-4 focus:outline-none ${web3 ? 'focus:ring-red-300' : 'focus:ring-green-300'}  font-medium rounded-lg text-sm px-4 py-2 md:!my-0 my-2 text-center`}>
+                                <li className='flex items-center space-x-4'>
+                                    {contract && balance && (
+                                        <button className='text-white'>
+                                            {(Number(balance) / 10 ** 18).toFixed(3)} MATIC
+                                        </button>
+                                    )}
+                                    <button onClick={contract ? reset : reconnect} type="button" className={`text-white ${contract ? 'bg-red-700' : 'bg-green-700'} ${contract ? 'hover:bg-red-800' : 'hover:bg-green-800'} focus:ring-4 focus:outline-none ${web3 ? 'focus:ring-red-300' : 'focus:ring-green-300'}  font-medium rounded-lg text-sm px-4 py-2 md:!my-0 my-2 text-center`}>
                                         {
-                                            web3 ? "Disconnect Wallet" : "Connect Wallet"
+                                            contract ? "Disconnect Wallet" : "Connect Wallet"
                                         }
                                     </button>
                                 </li>
@@ -205,6 +218,43 @@ const Navbar = () => {
                     </div>
                 </div>
             </nav>
+            {
+                showModal ? (
+                    <>
+                        <div
+                            className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
+                        >
+                            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+                                <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                                    <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                                        <h3 className="text-2xl font-semibold text-center">
+                                            Scan to Connect Wallet
+                                        </h3>
+                                    </div>
+                                    <div className="relative p-6 flex-auto flex items-center justify-center">
+                                        {uri ? 
+                                        <QRCode invitationUrl={JSON.stringify({
+                                            uri, ssi: ""
+                                        })} size={200} /> :
+                                        <Loader size={40}/>
+                                        }
+                                    </div>
+                                    <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
+                                        <button
+                                            className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                            type="button"
+                                            onClick={() => setShowModal(false)}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+                    </>
+                ) : null}
+
         </>
     )
 }

@@ -13,7 +13,7 @@ export function EthereumContextProvider({ children }) {
     const [account, setAccount] = useState('');
     const [contract, setContract] = useState(null);
     const [address, setAddress] = useState(null);
-    const [balance, setBalance] = useState({});
+    const [balance, setBalance] = useState(null);
     const [state, setState] = useState({
         provider: provider,
         contract: contract,
@@ -25,7 +25,7 @@ export function EthereumContextProvider({ children }) {
         setUri(uri);
     }
 
-    const getBalance = async (web3, address) => {
+    const getBalance = async () => {
         console.log("Inside getBalance");
         console.log("web3 : ", web3);
         console.log("address : ", address);
@@ -47,21 +47,19 @@ export function EthereumContextProvider({ children }) {
         console.log("balance : ", balance);
     }
 
-    const reset = () => {
-        setBalance({});
-        setAddress('');
-        setWeb3();
-        setContract();
-        setState({
-            provider: null,
-            contract: null,
-            address: null
-        });
+    getBalance();
 
-        provider.on("disconnect", () => {
-            console.log("[EVENT]", " disconnect ");
-            reset();
-        }); 
+    const reset = () => {
+        console.log("Inside reset");
+        setBalance(null);
+        setContract();
+        setUri();
+        setState(prevState => ({
+            ...prevState,
+            contract: null
+        }));
+
+        provider.disconnect();
     }
 
     // const _checkPersistedState = useCallback(async () => {
@@ -180,7 +178,6 @@ export function EthereumContextProvider({ children }) {
     if(address) {
         console.log("address : ", address);
     }
-    
 
     const connectWallet = async () => {
         console.log("Inside connectWallet");
