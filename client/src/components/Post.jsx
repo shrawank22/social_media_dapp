@@ -325,7 +325,7 @@ const Post = ({
         try {
             let content = {
                 postText: editedText,
-                viewPrice: parseFloat(editedPrice) * 100,
+                viewPrice: parseFloat(editedPrice) * 1000000000,
             };
 
             // Getting meta data of post which is saved in DB

@@ -65,7 +65,7 @@ const Home = () => {
                     key={post.NFTID}
                     displayName={post.username}
                     text={post.postText}
-                    price={Number(post.viewPrice) / 100}
+                    price={Number(post.viewPrice) / 1000000000}
                     deletePostHandler={deletePostHandler(post.NFTID)}
                     isCreator={address === post.username}
                     postId={post.NFTID}

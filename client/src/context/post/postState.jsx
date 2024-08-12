@@ -399,7 +399,7 @@ const PostState = ({ children }) => {
             } else {
                 let content = {
                     postText: postText,
-                    viewPrice: parseFloat(viewPrice) * 100,
+                    viewPrice: parseFloat(viewPrice) * 1000000000, // Gwei
                 };
 
                 const uniqueId = uuidv4();
@@ -407,10 +407,10 @@ const PostState = ({ children }) => {
                 if (content.viewPrice > 0) {
                     //check for plag here:
 
-                    const result = await checkPlagiarism(content);
-                    if (result === null) {
-                        return;
-                    }
+                    // const result = await checkPlagiarism(content);
+                    // if (result === null) {
+                    //     return;
+                    // }
 
                     // Encrypt the content and split the key
                     let key = CryptoJS.lib.WordArray.random(256 / 8).toString(); // Generate a random encryption key

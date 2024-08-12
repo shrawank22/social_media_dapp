@@ -482,5 +482,74 @@
         }
       ]
     }
+  },
+  "zTyHN4Hs5nn-QGKmAAA0": {
+    "id": "zTyHN4Hs5nn-QGKmAAA0",
+    "thid": "zTyHN4Hs5nn-QGKmAAA0",
+    "from": "did:polygonid:polygon:amoy:2qUydEhn4Pri8Jf4k7SuXedtoVvJD3qvLzY6HZLVe5",
+    "typ": "application/iden3comm-plain-json",
+    "type": "https://iden3-communication.io/authorization/1.0/request",
+    "body": {
+      "reason": "Authentication to connect",
+      "message": "",
+      "callbackUrl": "https://75ad-202-3-77-209.ngrok-free.app/api/connection-callback?sessionId=zTyHN4Hs5nn-QGKmAAA0",
+      "scope": []
+    }
+  },
+  "dGte63SFvhCraBZ2AABU": {
+    "id": "dGte63SFvhCraBZ2AABU",
+    "thid": "dGte63SFvhCraBZ2AABU",
+    "from": "did:polygonid:polygon:amoy:2qUydEhn4Pri8Jf4k7SuXedtoVvJD3qvLzY6HZLVe5",
+    "typ": "application/iden3comm-plain-json",
+    "type": "https://iden3-communication.io/authorization/1.0/request",
+    "body": {
+      "reason": "Profile must be presented",
+      "message": "",
+      "callbackUrl": "https://75ad-202-3-77-209.ngrok-free.app/api/verification-callback?sessionId=dGte63SFvhCraBZ2AABU",
+      "scope": [
+        {
+          "id": 1,
+          "circuitId": "credentialAtomicQuerySigV2",
+          "query": {
+            "allowedIssuers": [
+              "*"
+            ],
+            "type": "profile",
+            "context": "https://gist.githubusercontent.com/raj-71/dee54870bf7126726bbcab69effd25bf/raw/90cf59c1f744a6f0515cbd2e4ce4f6ca9a71ecbe/context-ld_v4.json",
+            "credentialSubject": {
+              "data": {}
+            }
+          }
+        }
+      ]
+    }
+  },
+  "a95e7365966c49de1c16b7b0ecc25795": {
+    "id": "rbGN-QDEOpJY0mZtAABs",
+    "thid": "rbGN-QDEOpJY0mZtAABs",
+    "from": "did:polygonid:polygon:amoy:2qUydEhn4Pri8Jf4k7SuXedtoVvJD3qvLzY6HZLVe5",
+    "typ": "application/iden3comm-plain-json",
+    "type": "https://iden3-communication.io/authorization/1.0/request",
+    "body": {
+      "reason": "Profile must be presented",
+      "message": "",
+      "callbackUrl": "https://75ad-202-3-77-209.ngrok-free.app/api/verification-callback?sessionId=rbGN-QDEOpJY0mZtAABs",
+      "scope": [
+        {
+          "id": 1,
+          "circuitId": "credentialAtomicQuerySigV2",
+          "query": {
+            "allowedIssuers": [
+              "*"
+            ],
+            "type": "profile",
+            "context": "https://gist.githubusercontent.com/raj-71/dee54870bf7126726bbcab69effd25bf/raw/90cf59c1f744a6f0515cbd2e4ce4f6ca9a71ecbe/context-ld_v4.json",
+            "credentialSubject": {
+              "data": {}
+            }
+          }
+        }
+      ]
+    }
   }
 }

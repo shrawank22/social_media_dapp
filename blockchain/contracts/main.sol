@@ -234,7 +234,25 @@ contract SocialMedia is ERC721 {
     // Unfollow a user
     function unfollowUser(address _user) external {
         require(_user != msg.sender, "You cannot unfollow yourself");
+
+        // Check if the user is currently following the _user
+        require(
+            followers[_user][msg.sender],
+            "You are not following this user"
+        );
+
+        // Remove the follower from the mapping
         followers[_user][msg.sender] = false;
+
+        // Remove the follower from the arrayList
+        address[] storage userFollowers = arrayList[_user];
+        for (uint256 i = 0; i < userFollowers.length; i++) {
+            if (userFollowers[i] == msg.sender) {
+                userFollowers[i] = userFollowers[userFollowers.length - 1];
+                userFollowers.pop();
+                break;
+            }
+        }
     }
 
     function isFollowing(
@@ -243,6 +261,7 @@ contract SocialMedia is ERC721 {
     ) public view returns (bool) {
         return followers[_follower][_following];
     }
+
     // Like a Post
     function likePost(uint256 postId) external {
         posts[postId].likes++;
@@ -346,7 +365,7 @@ contract SocialMedia is ERC721 {
         return postDataArray;
     }
 
-    //add the list price
+    // add the list price
     function listPost(uint256 postId, uint256 _listPrice) external {
         require(
             msg.sender == posts[postId].username,
@@ -364,7 +383,7 @@ contract SocialMedia is ERC721 {
         }
     }
 
-    //cancel a listing
+    // cancel a listing
     function cancelListing(uint256 postId) external {
         require(
             msg.sender == posts[postId].username,
@@ -382,7 +401,7 @@ contract SocialMedia is ERC721 {
         }
     }
 
-    //buy the post
+    // buy the post
     function buyPost(uint256 postId) external payable {
         require(posts[postId].hasListed, "This post is not listed for sale.");
 
@@ -415,12 +434,12 @@ contract SocialMedia is ERC721 {
         }
     }
 
-    //get ListPrice
+    // get ListPrice
     function getListPrice(uint256 postId) public view returns (uint256) {
         return posts[postId].listPrice;
     }
 
-    //get the followers lists
+    // Get the followers list
     function getFollowers(address user) public view returns (address[] memory) {
         uint256 followerCount = 0;
 
@@ -447,7 +466,7 @@ contract SocialMedia is ERC721 {
         return followerList;
     }
 
-    //for fetching a single post
+    // for fetching a single post
     function getSinglePost(
         uint256 _id
     ) public view returns (DataTypes.Post memory) {
