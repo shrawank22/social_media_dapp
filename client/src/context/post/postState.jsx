@@ -109,6 +109,8 @@ const PostState = ({ children }) => {
                         user = followEvent.sender;
                         id = followEvent.postId;
 
+                        console.log("User: ", user);
+
                         for (let e of followEvent.followers) {
                             const follower = e;
                             if (user === address) {
@@ -275,7 +277,7 @@ const PostState = ({ children }) => {
                 contract.removeAllListeners("NewPostForFollower");
             }
         };
-    }, [posted, address]);
+    }, [posted, address, followEvent]);
 
     //--------------------------------- API Calls ---------------------------------
     const getPost = async (id) => {

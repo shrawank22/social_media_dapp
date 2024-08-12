@@ -52,6 +52,7 @@ const Post = ({
                 setIsBlurred(false);
 
                 const postData = await contract.methods.getSinglePost(postId).call();
+                console.log(postData);
                 try {
                     const res = await axios.post(
                         `${host}/api/postsFollowing`,
@@ -82,6 +83,8 @@ const Post = ({
                 const followEvent = tx.events.ListPostEvent
                     ? tx.events.ListPostEvent.returnValues
                     : {};
+
+                console.log("followEvent", followEvent);
 
                 setFollowEvent(followEvent);
             } else {

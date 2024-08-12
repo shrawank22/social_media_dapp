@@ -35,19 +35,18 @@ contract SocialMedia is ERC721 {
         address indexed reporter,
         string reason
     );
-
     event ListPostEvent(
-        address indexed follower,
+        address[] followers,
         address indexed sender,
         uint256 indexed postId
     );
     event CancelPostEvent(
-        address indexed follower,
+        address[] followers,
         address indexed sender,
         uint256 indexed postId
     );
     event BuyPostEvent(
-        address indexed follower,
+        address[] followers,
         address indexed sender,
         uint256 indexed postId
     );
@@ -60,8 +59,6 @@ contract SocialMedia is ERC721 {
 
     constructor() ERC721("PostNFT", "PNFT") {}
 
-    // Functions
-    // Add a new post
     function addPost(
         string memory _postText,
         uint256 _viewPrice
@@ -77,7 +74,7 @@ contract SocialMedia is ERC721 {
         newPost.isDeleted = false;
         newPost.hasListed = false;
         newPost.listPrice = 0 ether;
-        _mint(msg.sender, postId); // Mint a new NFT for the post
+        _mint(msg.sender, postId);
 
         emit AddPost(msg.sender, postId);
 
@@ -106,11 +103,14 @@ contract SocialMedia is ERC721 {
         posts[_postId].postText = _newPostText;
         posts[_postId].viewPrice = _newPrice;
 
-        // address[] memory followerList = getFollowers(msg.sender);
-        // for (uint256 i = 0; i < followerList.length; i++) {
-        //     address follower = followerList[i];
-        //     emit NewPostForFollower(follower, msg.sender, _postId);
-        // }
+        address[] memory followerList = getFollowers(msg.sender);
+        address[] memory followers2 = new address[](followerList.length);
+
+        for (uint256 i = 0; i < followerList.length; i++) {
+            followers2[i] = followerList[i];
+        }
+
+        emit NewPostForFollowers(followers2, msg.sender, _postId);
     }
 
     // Delete a post
@@ -365,7 +365,7 @@ contract SocialMedia is ERC721 {
         return postDataArray;
     }
 
-    // add the list price
+    // Add the list price
     function listPost(uint256 postId, uint256 _listPrice) external {
         require(
             msg.sender == posts[postId].username,
@@ -377,13 +377,15 @@ contract SocialMedia is ERC721 {
         posts[postId].listPrice = _listPrice;
 
         address[] memory followerList = getFollowers(msg.sender);
+        address[] memory followers2 = new address[](followerList.length);
+
         for (uint256 i = 0; i < followerList.length; i++) {
-            address follower = followerList[i];
-            emit ListPostEvent(follower, msg.sender, postId);
+            followers2[i] = followerList[i];
         }
+        emit ListPostEvent(followers2, msg.sender, postId);
     }
 
-    // cancel a listing
+    // Cancel a listing
     function cancelListing(uint256 postId) external {
         require(
             msg.sender == posts[postId].username,
@@ -395,13 +397,15 @@ contract SocialMedia is ERC721 {
         posts[postId].listPrice = 0 ether;
 
         address[] memory followerList = getFollowers(msg.sender);
+        address[] memory followers2 = new address[](followerList.length);
+
         for (uint256 i = 0; i < followerList.length; i++) {
-            address follower = followerList[i];
-            emit CancelPostEvent(follower, msg.sender, postId);
+            followers2[i] = followerList[i];
         }
+        emit CancelPostEvent(followers2, msg.sender, postId);
     }
 
-    // buy the post
+    // Buy the post
     function buyPost(uint256 postId) external payable {
         require(posts[postId].hasListed, "This post is not listed for sale.");
 
@@ -428,18 +432,20 @@ contract SocialMedia is ERC721 {
         posts[postId].listPrice = 0;
 
         address[] memory followerList = getFollowers(msg.sender);
+        address[] memory followers2 = new address[](followerList.length);
+
         for (uint256 i = 0; i < followerList.length; i++) {
-            address follower = followerList[i];
-            emit ListPostEvent(follower, msg.sender, postId);
+            followers2[i] = followerList[i];
         }
+        emit ListPostEvent(followers2, msg.sender, postId);
     }
 
-    // get ListPrice
+    // Get ListPrice
     function getListPrice(uint256 postId) public view returns (uint256) {
         return posts[postId].listPrice;
     }
 
-    // Get the followers list
+    // Get the followers lists
     function getFollowers(address user) public view returns (address[] memory) {
         uint256 followerCount = 0;
 
@@ -466,7 +472,7 @@ contract SocialMedia is ERC721 {
         return followerList;
     }
 
-    // for fetching a single post
+    // For fetching a single post
     function getSinglePost(
         uint256 _id
     ) public view returns (DataTypes.Post memory) {

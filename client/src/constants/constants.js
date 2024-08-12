@@ -79,10 +79,10 @@ const contractABI = [
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "follower",
-				"type": "address"
+				"indexed": false,
+				"internalType": "address[]",
+				"name": "followers",
+				"type": "address[]"
 			},
 			{
 				"indexed": true,
@@ -104,10 +104,10 @@ const contractABI = [
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "follower",
-				"type": "address"
+				"indexed": false,
+				"internalType": "address[]",
+				"name": "followers",
+				"type": "address[]"
 			},
 			{
 				"indexed": true,
@@ -186,10 +186,10 @@ const contractABI = [
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "follower",
-				"type": "address"
+				"indexed": false,
+				"internalType": "address[]",
+				"name": "followers",
+				"type": "address[]"
 			},
 			{
 				"indexed": true,
