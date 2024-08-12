@@ -20,5 +20,7 @@
   "3f2072671978d6badae909cf03630ec2": "did:polygonid:polygon:amoy:2qT1QQQcJEdHNi1u3fhqxMUp5SeCisZesbmkZf2JZZ",
   "97ca0cdc61a37630722ff1bc2b99cd54": "did:polygonid:polygon:amoy:2qR4UW2GNkh65TMzPv97cykhMvrbx9uN26NjV2CaKE",
   "dc817b77a72fc0c4b3f89859174807fd": "did:polygonid:polygon:amoy:2qXouaKcVRx3qrDp266Xb95cDSCTcCvgusB12RUNbD",
-  "2203de17def152844a05c34e70224daa": "did:polygonid:polygon:amoy:2qR4UW2GNkh65TMzPv97cykhMvrbx9uN26NjV2CaKE"
+  "2203de17def152844a05c34e70224daa": "did:polygonid:polygon:amoy:2qR4UW2GNkh65TMzPv97cykhMvrbx9uN26NjV2CaKE",
+  "e5c988d4523fd36db08bf9f12d7613e4": "did:polygonid:polygon:amoy:2qR4UW2GNkh65TMzPv97cykhMvrbx9uN26NjV2CaKE",
+  "164f98ce0a218c823ccfc081b797c674": "did:polygonid:polygon:amoy:2qR4UW2GNkh65TMzPv97cykhMvrbx9uN26NjV2CaKE"
 }

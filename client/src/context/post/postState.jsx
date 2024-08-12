@@ -9,6 +9,9 @@ import postContext from "./postContext";
 import Post from "../../components/Post";
 import { useEthereumConnectClient } from "../EthereumContext";
 
+const token = localStorage.getItem("jwz-token");
+const isAuthenticated = !!token;
+
 const PostState = ({ children }) => {
     const host = "http://localhost:8080";
 
@@ -99,7 +102,7 @@ const PostState = ({ children }) => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                if (contract) {
+                if (contract && isAuthenticated) {
                     let user, id;
                     // console.log(followEvent)
                     if (followEvent && Object.keys(followEvent).length > 0) {

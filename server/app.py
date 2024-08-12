@@ -46,7 +46,7 @@ def check_plagiarism():
         minhash2_dict = doc['minhash']
         minhash2 = minhash_from_dict(minhash2_dict, num_perm)
         sim = similarity(minhash1, minhash2)
-        if sim >= 0.8:
+        if sim >= 0.90:
             return jsonify({'plagiarism': True})
 
     # No plagiarism detected, insert the new MinHash object into the database
@@ -73,7 +73,7 @@ def check_plagiarism_image():
         for doc in image_collection.find():
             stored_phash = imagehash.hex_to_hash(doc['phash'])
             diff = (image_phash - stored_phash) / len(image_phash.hash) ** 2
-            if diff < 0.2:
+            if diff < 0.1:
                 return jsonify({'plagiarism': True})
 
         # No image plagiarism detected, insert the new image hash into the database
