@@ -325,6 +325,7 @@ const Post = ({
 
     const updatePostHandler = async (event) => {
         event.preventDefault();
+        // console.log("IPFS Hashes", ipfsHashes);
         try {
             let content = {
                 postText: editedText,
@@ -364,25 +365,21 @@ const Post = ({
                 ).toString(); // Used AES to encrypt the content
 
                 // Storing paid content to IPFS
-                const res = await axios.post(
-                    "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-                    { ciphertext, uniqueId: uniqueID, encryptedFiles },
-                    {
-                        headers: {
-                            pinata_api_key: import.meta.env.VITE_PINATA_KEY,
-                            pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
-                        },
-                    }
-                );
+                const res = await axios.post("https://api.pinata.cloud/pinning/pinJSONToIPFS", { ciphertext, uniqueId: uniqueID, encryptedFiles }, {
+                    headers: {
+                        pinata_api_key: import.meta.env.VITE_PINATA_KEY,
+                        pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
+                    },
+                });
                 const ipfsHash = res.data.IpfsHash;
 
                 // Store hash onto blockchain
-                receipt = await contract.methods
-                    .editPost(postId, String(ipfsHash), parseInt(content.viewPrice))
-                    .send({ from: address, gasPrice: "30000000000" });
+                receipt = await contract.methods.editPost(postId, String(ipfsHash), parseInt(content.viewPrice)).send({ from: address, gasPrice: "30000000000" });
                 // receipt = await tx.wait();
             } else {
+                // console.log("IPFS Hashes1", ipfsHashes); 
                 content.ipfsHashes = ipfsHashes;
+                // console.log("content", content);    
 
                 // Storing free content to IPFS
                 const res = await axios.post(
@@ -403,10 +400,7 @@ const Post = ({
                 const ipfsHash = res.data.IpfsHash;
 
                 // Store hash onto blockchain
-                (receipt = await contract),
-                    methods
-                        .editPost(postId, String(ipfsHash), parseInt(content.viewPrice))
-                        .send({ from: address });
+                receipt = await contract.methods.editPost(postId, String(ipfsHash), parseInt(content.viewPrice)).send({ from: address, gasPrice: "30000000000" });
                 // receipt = await tx.wait();
             }
             if (receipt.status == 1n) {

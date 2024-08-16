@@ -4,6 +4,7 @@ import axios from 'axios';
 import { EthereumContext } from '../context/EthereumContext';
 
 const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) => {
+    // console.log(ipfsHashes, decryptedFiles);
     const context1 = useContext(postContext);
     const context2 = useContext(EthereumContext);
     const { showAlert } = context1;
@@ -14,11 +15,14 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
 
     const handleFollowClick = async () => {
         try {
-            const token = localStorage.getItem('token'); 
+            const token = localStorage.getItem('token');
             // console.log(token)
             console.log(isFollowing);
             if (!isFollowing) {
-                await contract.methods.followUser(displayName).send({ from: address });
+                await contract.methods.followUser(displayName).send({
+                    from: address,
+                    gasPrice: '30000000000'
+                });
 
                 const response = await axios.post(`http://localhost:8080/api/follow/${displayName}/${address}`, {}, {
                     headers: {
@@ -27,9 +31,12 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
                     },
                 });
                 console.log(response.data)
-        
+
             } else {
-                await contract.methods.unfollowUser(displayName).send({ from: address });
+                await contract.methods.unfollowUser(displayName).send({
+                    from: address,
+                    gasPrice: '30000000000'
+                });
                 const response = await axios.post(`http://localhost:8080/api/unfollow/${displayName}/${address}`, {}, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -47,8 +54,8 @@ const PostHelper = ({ displayName, text, price, decryptedFiles, ipfsHashes }) =>
 
     useEffect(() => {
         const checkFollowingStatus = async () => {
-           
-            const followingStatus = await contract.methods.isFollowing( displayName, address).call();
+
+            const followingStatus = await contract.methods.isFollowing(displayName, address).call();
             //console.log(followingStatus); 
             setIsFollowing(followingStatus);
         };

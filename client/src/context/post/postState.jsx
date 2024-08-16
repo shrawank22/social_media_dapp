@@ -156,7 +156,7 @@ const PostState = ({ children }) => {
                             `${host}/api/topPosts/${address}/${limit}`
                         );
                         posts = response.data;
-                        console.log(posts);
+                        // console.log(posts);
                     } catch (error) {
                         console.error("Error fetching top posts:", error);
                         throw error;
@@ -424,14 +424,14 @@ const PostState = ({ children }) => {
                     // Encrypt all the selected files
                     let encryptedFiles = [];
                     if (selectedFiles) {
-                        //handling image plagirism
-                        for (const file of selectedFiles) {
-                            const result = await checkPlagiarismImage(file);
-                            if (result === null) {
-                                // Plagiarism detected, handle accordingly
-                                return;
-                            }
-                        }
+                        // handling image plagirism
+                        // for (const file of selectedFiles) {
+                        //     const result = await checkPlagiarismImage(file);
+                        //     if (result === null) {
+                        //         // Plagiarism detected, handle accordingly
+                        //         return;
+                        //     }
+                        // }
                         encryptedFiles = handleFileEncrypt(key);
                     }
 
@@ -624,6 +624,7 @@ const PostState = ({ children }) => {
                     if (ipfsHashes.length === 0) {
                         postPost({ NFTID: postId, uniqueID: uniqueId });
                     } else {
+                        console.log(postId, uniqueId, ipfsHashes);
                         postPost({
                             NFTID: postId,
                             uniqueID: uniqueId,
